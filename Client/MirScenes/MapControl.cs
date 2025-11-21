@@ -845,10 +845,21 @@ namespace Client.MirScenes
 
             #region Object Lights (Player/Mob/NPC)
 
+            // 优化：只处理视野范围内的光源对象
+            // 计算最大光照范围（DXManager.Lights.Count - 1 通常是最大光照范围）
+            int maxLightRange = DXManager.Lights.Count - 1 + 3; // 额外3格缓冲
+
             foreach (var ob in Objects.Values)
             {
                 if (ob.Light > 0 && (!ob.Dead || ob == MapObject.User || ob.Race == ObjectType.Spell))
                 {
+                    // 空间剔除：只处理视野范围内的光源
+                    int dx = Math.Abs(ob.CurrentLocation.X - MapObject.User.Movement.X);
+                    int dy = Math.Abs(ob.CurrentLocation.Y - MapObject.User.Movement.Y);
+
+                    if (dx > ViewRangeX + maxLightRange || dy > ViewRangeY + maxLightRange)
+                        continue; // 跳过视野外的光源
+
                     light = ob.Light;
 
                     int lightRange = light % 15;
@@ -961,11 +972,15 @@ namespace Client.MirScenes
 
             #region Map Lights
 
-            for (int y = MapObject.User.Movement.Y - ViewRangeY - 24; y <= MapObject.User.Movement.Y + ViewRangeY + 24; y++)
+            // 优化：缩小地图光源扫描范围，根据实际视野范围计算
+            // 原来是 ±24，现在根据 ViewRange 动态计算
+            int mapLightExtraRange = maxLightRange; // 使用和对象光源相同的缓冲范围
+
+            for (int y = MapObject.User.Movement.Y - ViewRangeY - mapLightExtraRange; y <= MapObject.User.Movement.Y + ViewRangeY + mapLightExtraRange; y++)
             {
                 if (y < 0) continue;
                 if (y >= Height) break;
-                for (int x = MapObject.User.Movement.X - ViewRangeX - 24; x < MapObject.User.Movement.X + ViewRangeX + 24; x++)
+                for (int x = MapObject.User.Movement.X - ViewRangeX - mapLightExtraRange; x < MapObject.User.Movement.X + ViewRangeX + mapLightExtraRange; x++)
                 {
                     if (x < 0) continue;
                     if (x >= Width) break;
