@@ -11207,9 +11207,6 @@ namespace Client.MirScenes
             DXManager.Device.SetRenderState(RenderState.DestinationBlend, Blend.One);
 
             #region Object Lights (Player/Mob/NPC)
-            // Optimization: Only process light source objects within the view frustum.
-            // Calculate the maximum light range (DXManager.Lights.Count - 1 is usually the maximum light range)
-            int maxLightRange = DXManager.Lights.Count - 1 + 3; // Additional 3 grid buffer
 
             foreach (var ob in Objects.Values)
             {
@@ -11333,10 +11330,8 @@ namespace Client.MirScenes
             #endregion
 
             #region Map Lights
-            // Optimization: reduce the light source scanning range on the map, calculated based on the actual field of view
-            // Previously it was ±24, now dynamically calculated based on ViewRange
-            int mapLightExtraRange = maxLightRange; // Use the same buffer range as the light source
-            for (int y = MapObject.User.Movement.Y - ViewRangeY - mapLightExtraRange; y <= MapObject.User.Movement.Y + ViewRangeY + mapLightExtraRange; y++)
+
+            for (int y = MapObject.User.Movement.Y - ViewRangeY - 24; y <= MapObject.User.Movement.Y + ViewRangeY + 24; y++)
             {
                 if (y < 0) continue;
                 if (y >= Height) break;
