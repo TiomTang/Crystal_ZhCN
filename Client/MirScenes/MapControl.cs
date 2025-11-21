@@ -230,15 +230,18 @@ namespace Client.MirScenes
 
             CheckInput();
 
+
             MapObject bestmouseobject = null;
-            for (int y = MapLocation.Y + 2; y >= MapLocation.Y - 2; y--)
+            Point mouseCell = MapLocation;
+            
+            for (int y = mouseCell.Y + 1; y >= mouseCell.Y - 1; y--)
             {
-                if (y >= Height) continue;
-                if (y < 0) break;
-                for (int x = MapLocation.X + 2; x >= MapLocation.X - 2; x--)
+                if (y >= Height || y < 0) continue;
+
+                for (int x = mouseCell.X + 1; x >= mouseCell.X - 1; x--)
                 {
-                    if (x >= Width) continue;
-                    if (x < 0) break;
+                    if (x >= Width || x < 0) continue;
+
                     CellInfo cell = M2CellInfo[x, y];
                     if (cell.CellObjects == null) continue;
 
@@ -252,9 +255,7 @@ namespace Client.MirScenes
                             if (ob.Dead)
                             {
                                 if (!Settings.TargetDead && GameScene.TargetDeadTime <= CMain.Time) continue;
-
                                 bestmouseobject = ob;
-                                //continue;
                             }
 
                             MapObject.MouseObjectID = ob.ObjectID;
@@ -267,7 +268,7 @@ namespace Client.MirScenes
                             Redraw();
                         }
 
-                        return;
+                        return; 
                     }
                 }
             }
@@ -417,7 +418,7 @@ namespace Client.MirScenes
             int startY = User.Movement.Y - ViewRangeY;
             int endY = User.Movement.Y + ViewRangeY;
             int endYExtended = endY + 5;
-            
+
             // 缓存坐标计算结果
             int[] drawXCache = new int[endX - startX + 1];
             for (int xi = startX; xi <= endX; xi++)
