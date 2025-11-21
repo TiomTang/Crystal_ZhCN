@@ -362,10 +362,8 @@ namespace Client.MirScenes
 
             foreach (var ob in Objects.Values.OfType<ItemObject>())
             {
-
                 if (ob.MouseOver(MouseLocation))
                 {
-
                     ob.DrawName(offSet);
                     offSet -= ob.NameLabel.Size.Height + (ob.NameLabel.Border ? 1 : 0);
                 }
@@ -409,104 +407,103 @@ namespace Client.MirScenes
                 DXManager.FloorSurface = DXManager.FloorTexture.GetSurfaceLevel(0);
             }
 
-
             Surface oldSurface = DXManager.CurrentSurface;
-
             DXManager.SetSurface(DXManager.FloorSurface);
-            DXManager.Device.Clear(ClearFlags.Target, Color.Empty, 0, 0); //Color.Black
+            DXManager.Device.Clear(ClearFlags.Target, Color.Empty, 0, 0);
 
-            int index;
-            int drawY, drawX;
+            // 预计算范围
+            int startX = User.Movement.X - ViewRangeX;
+            int endX = User.Movement.X + ViewRangeX;
+            int startY = User.Movement.Y - ViewRangeY;
+            int endY = User.Movement.Y + ViewRangeY;
+            int endYExtended = endY + 5;
+            
+            // 缓存坐标计算结果
+            int[] drawXCache = new int[endX - startX + 1];
+            for (int xi = startX; xi <= endX; xi++)
+                drawXCache[xi - startX] = (xi - User.Movement.X + OffSetX) * CellWidth - OffSetX + User.OffSetMove.X;
 
-            for (int y = User.Movement.Y - ViewRangeY; y <= User.Movement.Y + ViewRangeY; y++)
-            {
-                if (y <= 0 || y % 2 == 1) continue;
-                if (y >= Height) break;
-                drawY = (y - User.Movement.Y + OffSetY) * CellHeight + User.OffSetMove.Y; //Moving OffSet
+            int[] drawYCache = new int[endYExtended - startY + 1];
+            for (int yi = startY; yi <= endYExtended; yi++)
+                drawYCache[yi - startY] = (yi - User.Movement.Y + OffSetY) * CellHeight + User.OffSetMove.Y;
 
-                for (int x = User.Movement.X - ViewRangeX; x <= User.Movement.X + ViewRangeX; x++)
-                {
-                    if (x <= 0 || x % 2 == 1) continue;
-                    if (x >= Width) break;
-                    drawX = (x - User.Movement.X + OffSetX) * CellWidth - OffSetX + User.OffSetMove.X; //Moving OffSet
-                    if ((M2CellInfo[x, y].BackImage == 0) || (M2CellInfo[x, y].BackIndex == -1)) continue;
-                    index = (M2CellInfo[x, y].BackImage & 0x1FFFFFFF) - 1;
-                    Libraries.MapLibs[M2CellInfo[x, y].BackIndex].Draw(index, drawX, drawY);
-                }
-            }
-
-            for (int y = User.Movement.Y - ViewRangeY; y <= User.Movement.Y + ViewRangeY + 5; y++)
+            // 一次循环绘制三层
+            for (int y = startY; y <= endYExtended; y++)
             {
                 if (y <= 0) continue;
                 if (y >= Height) break;
-                drawY = (y - User.Movement.Y + OffSetY) * CellHeight + User.OffSetMove.Y; //Moving OffSet
 
-                for (int x = User.Movement.X - ViewRangeX; x <= User.Movement.X + ViewRangeX; x++)
+                int drawY = drawYCache[y - startY];
+
+                for (int x = startX; x <= endX; x++)
                 {
                     if (x < 0) continue;
                     if (x >= Width) break;
-                    drawX = (x - User.Movement.X + OffSetX) * CellWidth - OffSetX + User.OffSetMove.X; //Moving OffSet
 
-                    index = M2CellInfo[x, y].MiddleImage - 1;
+                    int drawX = drawXCache[x - startX];
+                    var cell = M2CellInfo[x, y];
 
-                    if ((index < 0) || (M2CellInfo[x, y].MiddleIndex == -1)) continue;
-                    if (M2CellInfo[x, y].MiddleIndex >=
-                        0) //M2P '> 199' changed to '>= 0' to include mir2 libraries. Fixes middle layer tile strips draw. Also changed in 'Draw mir3 middle layer' bellow.
+                    // Back 层（偶数行列且 y <= endY）
+                    if (y % 2 == 0 && x % 2 == 0 && y <= endY)
                     {
-                        //mir3 mid layer is same level as front layer not real middle + it cant draw index -1 so 2 birds in one stone :p
-                        Size s = Libraries.MapLibs[M2CellInfo[x, y].MiddleIndex].GetSize(index);
-
-                        if ((s.Width != CellWidth || s.Height != CellHeight) &&
-                            ((s.Width != CellWidth * 2) || (s.Height != CellHeight * 2))) continue;
+                        if (cell.BackImage != 0 && cell.BackIndex != -1)
+                        {
+                            int index = (cell.BackImage & 0x1FFFFFFF) - 1;
+                            var lib = Libraries.MapLibs[cell.BackIndex];
+                            lib.Draw(index, drawX, drawY);
+                        }
                     }
 
-                    Libraries.MapLibs[M2CellInfo[x, y].MiddleIndex].Draw(index, drawX, drawY);
-                }
-            }
-
-            for (int y = User.Movement.Y - ViewRangeY; y <= User.Movement.Y + ViewRangeY + 5; y++)
-            {
-                if (y <= 0) continue;
-                if (y >= Height) break;
-                drawY = (y - User.Movement.Y + OffSetY) * CellHeight + User.OffSetMove.Y; //Moving OffSet
-
-                for (int x = User.Movement.X - ViewRangeX; x <= User.Movement.X + ViewRangeX; x++)
-                {
-                    if (x < 0) continue;
-                    if (x >= Width) break;
-                    drawX = (x - User.Movement.X + OffSetX) * CellWidth - OffSetX + User.OffSetMove.X; //Moving OffSet
-
-                    index = (M2CellInfo[x, y].FrontImage & 0x7FFF) - 1;
-                    if (index == -1) continue;
-                    int fileIndex = M2CellInfo[x, y].FrontIndex;
-                    if (fileIndex == -1) continue;
-                    Size s = Libraries.MapLibs[fileIndex].GetSize(index);
-                    if (fileIndex == 200) continue; //fixes random bad spots on old school 4.map
-                    if (M2CellInfo[x, y].DoorIndex > 0)
+                    // Middle 层
+                    int midIndex = cell.MiddleImage - 1;
+                    if (midIndex >= 0 && cell.MiddleIndex != -1)
                     {
-                        Door DoorInfo = GetDoor(M2CellInfo[x, y].DoorIndex);
-                        if (DoorInfo == null)
+                        var lib = Libraries.MapLibs[cell.MiddleIndex];
+                        Size s = lib.GetSize(midIndex);
+                        if ((s.Width == CellWidth && s.Height == CellHeight) ||
+                            (s.Width == CellWidth * 2 && s.Height == CellHeight * 2))
                         {
-                            DoorInfo = new Door() { index = M2CellInfo[x, y].DoorIndex, DoorState = 0, ImageIndex = 0, LastTick = CMain.Time };
-                            Doors.Add(DoorInfo);
+                            lib.Draw(midIndex, drawX, drawY);
                         }
-                        else
+                    }
+
+                    // Front 层
+                    int frontIndex = (cell.FrontImage & 0x7FFF) - 1;
+                    if (frontIndex != -1)
+                    {
+                        int fileIndex = cell.FrontIndex;
+                        if (fileIndex != -1 && fileIndex != 200)
                         {
-                            if (DoorInfo.DoorState != 0)
+                            var lib = Libraries.MapLibs[fileIndex];
+                            Size s = lib.GetSize(frontIndex);
+
+                            // 门动画处理
+                            if (cell.DoorIndex > 0)
                             {
-                                index += (DoorInfo.ImageIndex + 1) *
-                                         M2CellInfo[x, y].DoorOffset; //'bad' code if you want to use animation but it's gonna depend on the animation > has to be custom designed for the animtion
+                                Door doorInfo = GetDoor(cell.DoorIndex);
+                                if (doorInfo == null)
+                                {
+                                    doorInfo = new Door() { index = cell.DoorIndex, DoorState = 0, ImageIndex = 0, LastTick = CMain.Time };
+                                    Doors.Add(doorInfo);
+                                }
+                                else if (doorInfo.DoorState != 0)
+                                {
+                                    frontIndex += (doorInfo.ImageIndex + 1) * cell.DoorOffset;
+                                }
+                            }
+
+                            if (frontIndex >= 0 &&
+                                ((s.Width == CellWidth && s.Height == CellHeight) ||
+                                 (s.Width == CellWidth * 2 && s.Height == CellHeight * 2)))
+                            {
+                                lib.Draw(frontIndex, drawX, drawY);
                             }
                         }
                     }
-
-                    if (index < 0 || ((s.Width != CellWidth || s.Height != CellHeight) && ((s.Width != CellWidth * 2) || (s.Height != CellHeight * 2)))) continue;
-                    Libraries.MapLibs[fileIndex].Draw(index, drawX, drawY);
                 }
             }
 
             DXManager.SetSurface(oldSurface);
-
             FloorValid = true;
         }
 
@@ -799,26 +796,26 @@ namespace Client.MirScenes
             switch (setting)
             {
                 case LightSetting.Night:
+                {
+                    switch (MapDarkLight)
                     {
-                        switch (MapDarkLight)
-                        {
-                            case 1:
-                                darkness = Color.FromArgb(255, 20, 20, 20);
-                                break;
-                            case 2:
-                                darkness = Color.LightSlateGray;
-                                break;
-                            case 3:
-                                darkness = Color.SkyBlue;
-                                break;
-                            case 4:
-                                darkness = Color.Goldenrod;
-                                break;
-                            default:
-                                darkness = Color.Black;
-                                break;
-                        }
+                        case 1:
+                            darkness = Color.FromArgb(255, 20, 20, 20);
+                            break;
+                        case 2:
+                            darkness = Color.LightSlateGray;
+                            break;
+                        case 3:
+                            darkness = Color.SkyBlue;
+                            break;
+                        case 4:
+                            darkness = Color.Goldenrod;
+                            break;
+                        default:
+                            darkness = Color.Black;
+                            break;
                     }
+                }
                     break;
                 case LightSetting.Evening:
                 case LightSetting.Dawn:
@@ -1047,75 +1044,75 @@ namespace Client.MirScenes
             switch (me.Button)
             {
                 case MouseButtons.Left:
+                {
+                    AutoRun = false;
+                    GameScene.Scene.MapControl.AutoPath = false;
+                    if (MapObject.MouseObject == null) return;
+                    NPCObject npc = MapObject.MouseObject as NPCObject;
+                    if (npc != null)
                     {
-                        AutoRun = false;
-                        GameScene.Scene.MapControl.AutoPath = false;
-                        if (MapObject.MouseObject == null) return;
-                        NPCObject npc = MapObject.MouseObject as NPCObject;
-                        if (npc != null)
+                        if (npc.ObjectID == GameScene.NPCID &&
+                            (CMain.Time <= GameScene.NPCTime || GameScene.Scene.NPCDialog.Visible))
                         {
-                            if (npc.ObjectID == GameScene.NPCID &&
-                                (CMain.Time <= GameScene.NPCTime || GameScene.Scene.NPCDialog.Visible))
-                            {
-                                return;
-                            }
-
-                            //GameScene.Scene.NPCDialog.Hide();
-
-                            GameScene.NPCTime = CMain.Time + 5000;
-                            GameScene.NPCID = npc.ObjectID;
-                            Network.Enqueue(new C.CallNPC { ObjectID = npc.ObjectID, Key = "[@Main]" });
-                        }
-                    }
-                    break;
-                case MouseButtons.Right:
-                    {
-                        AutoRun = false;
-                        if (MapObject.MouseObject == null)
-                        {
-                            if (Settings.NewMove && MapLocation != MapObject.User.CurrentLocation && GameScene.Scene.MapControl.EmptyCell(MapLocation))
-                            {
-                                var path = GameScene.Scene.MapControl.PathFinder.FindPath(MapObject.User.CurrentLocation, MapLocation, 20);
-
-                                if (path != null && path.Count > 0)
-                                {
-                                    GameScene.Scene.MapControl.CurrentPath = path;
-                                    GameScene.Scene.MapControl.AutoPath = true;
-                                    var offset = MouseLocation.Subtract(ToMouseLocation(MapLocation));
-                                    Effects.Add(new Effect(Libraries.Magic3, 500, 10, 600, MapLocation) { DrawOffset = offset.Subtract(8, 15) });
-                                }
-                            }
-
                             return;
                         }
 
-                        if (CMain.Ctrl)
+                        //GameScene.Scene.NPCDialog.Hide();
+
+                        GameScene.NPCTime = CMain.Time + 5000;
+                        GameScene.NPCID = npc.ObjectID;
+                        Network.Enqueue(new C.CallNPC { ObjectID = npc.ObjectID, Key = "[@Main]" });
+                    }
+                }
+                    break;
+                case MouseButtons.Right:
+                {
+                    AutoRun = false;
+                    if (MapObject.MouseObject == null)
+                    {
+                        if (Settings.NewMove && MapLocation != MapObject.User.CurrentLocation && GameScene.Scene.MapControl.EmptyCell(MapLocation))
                         {
-                            HeroObject hero = MapObject.MouseObject as HeroObject;
+                            var path = GameScene.Scene.MapControl.PathFinder.FindPath(MapObject.User.CurrentLocation, MapLocation, 20);
 
-                            if (hero != null &&
-                                hero.ObjectID != (Hero is null ? 0 : Hero.ObjectID) &&
-                                CMain.Time >= GameScene.InspectTime)
+                            if (path != null && path.Count > 0)
                             {
-                                GameScene.InspectTime = CMain.Time + 500;
-                                InspectDialog.InspectID = hero.ObjectID;
-                                Network.Enqueue(new C.Inspect { ObjectID = hero.ObjectID, Hero = true });
-                                return;
-                            }
-
-                            PlayerObject player = MapObject.MouseObject as PlayerObject;
-
-                            if (player != null &&
-                                player != User &&
-                                CMain.Time >= GameScene.InspectTime)
-                            {
-                                GameScene.InspectTime = CMain.Time + 500;
-                                InspectDialog.InspectID = player.ObjectID;
-                                Network.Enqueue(new C.Inspect { ObjectID = player.ObjectID });
-                                return;
+                                GameScene.Scene.MapControl.CurrentPath = path;
+                                GameScene.Scene.MapControl.AutoPath = true;
+                                var offset = MouseLocation.Subtract(ToMouseLocation(MapLocation));
+                                Effects.Add(new Effect(Libraries.Magic3, 500, 10, 600, MapLocation) { DrawOffset = offset.Subtract(8, 15) });
                             }
                         }
+
+                        return;
                     }
+
+                    if (CMain.Ctrl)
+                    {
+                        HeroObject hero = MapObject.MouseObject as HeroObject;
+
+                        if (hero != null &&
+                            hero.ObjectID != (Hero is null ? 0 : Hero.ObjectID) &&
+                            CMain.Time >= GameScene.InspectTime)
+                        {
+                            GameScene.InspectTime = CMain.Time + 500;
+                            InspectDialog.InspectID = hero.ObjectID;
+                            Network.Enqueue(new C.Inspect { ObjectID = hero.ObjectID, Hero = true });
+                            return;
+                        }
+
+                        PlayerObject player = MapObject.MouseObject as PlayerObject;
+
+                        if (player != null &&
+                            player != User &&
+                            CMain.Time >= GameScene.InspectTime)
+                        {
+                            GameScene.InspectTime = CMain.Time + 500;
+                            InspectDialog.InspectID = player.ObjectID;
+                            Network.Enqueue(new C.Inspect { ObjectID = player.ObjectID });
+                            return;
+                        }
+                    }
+                }
                     break;
                 case MouseButtons.Middle:
                     AutoRun = !AutoRun;
@@ -1279,7 +1276,7 @@ namespace Client.MirScenes
                         if (CMain.Time > GameScene.AttackTime && CanRideAttack() && !User.Poison.HasFlag(PoisonType.Dazed))
                         {
                             User.QueuedAction = new QueuedAction
-                            { Action = MirAction.Attack1, Direction = Functions.DirectionFromPoint(User.CurrentLocation, MapObject.TargetObject.CurrentLocation), Location = User.CurrentLocation };
+                                { Action = MirAction.Attack1, Direction = Functions.DirectionFromPoint(User.CurrentLocation, MapObject.TargetObject.CurrentLocation), Location = User.CurrentLocation };
                             return;
                         }
                     }
@@ -1370,7 +1367,7 @@ namespace Client.MirScenes
                                     }
 
                                     User.QueuedAction = new QueuedAction
-                                    { Action = MirAction.AttackRange1, Direction = MouseDirection(), Location = User.CurrentLocation, Params = new List<object>() };
+                                        { Action = MirAction.AttackRange1, Direction = MouseDirection(), Location = User.CurrentLocation, Params = new List<object>() };
                                     User.QueuedAction.Params.Add(target != null ? target.ObjectID : (uint)0);
                                     User.QueuedAction.Params.Add(Functions.PointMove(User.CurrentLocation, MouseDirection(), 9));
                                     return;
@@ -2118,12 +2115,12 @@ namespace Client.MirScenes
                         ParticleEngine LeavesEngine2 = new ParticleEngine(textures, new Vector2(2f, 0), ParticleType.Leaves);
                         Vector2 lVelocity = new Vector2(0F, 0F);
                         for (int y = 512 * -1; y < Settings.ScreenHeight + 512; y += 512)
-                            for (int x = 512 * -1; x < Settings.ScreenWidth + 512; x += 512)
-                            {
-                                Particle part = LeavesEngine2.GenerateNewParticle(ParticleType.Leaves);
-                                part.Position = new Vector2(x, y);
-                                part.Velocity = lVelocity;
-                            }
+                        for (int x = 512 * -1; x < Settings.ScreenWidth + 512; x += 512)
+                        {
+                            Particle part = LeavesEngine2.GenerateNewParticle(ParticleType.Leaves);
+                            part.Position = new Vector2(x, y);
+                            part.Velocity = lVelocity;
+                        }
 
                         LeavesEngine2.GenerateParticles = false;
                         GameScene.Scene.ParticleEngines.Add(LeavesEngine2);
@@ -2138,12 +2135,12 @@ namespace Client.MirScenes
                         ParticleEngine FLeavesEngine2 = new ParticleEngine(textures, new Vector2(2f, 0), ParticleType.FireyLeaves);
                         Vector2 FlVelocity = new Vector2(0F, 0F);
                         for (int y = 512 * -1; y < Settings.ScreenHeight + 512; y += 512)
-                            for (int x = 512 * -1; x < Settings.ScreenWidth + 512; x += 512)
-                            {
-                                Particle part = FLeavesEngine2.GenerateNewParticle(ParticleType.FireyLeaves);
-                                part.Position = new Vector2(x, y);
-                                part.Velocity = FlVelocity;
-                            }
+                        for (int x = 512 * -1; x < Settings.ScreenWidth + 512; x += 512)
+                        {
+                            Particle part = FLeavesEngine2.GenerateNewParticle(ParticleType.FireyLeaves);
+                            part.Position = new Vector2(x, y);
+                            part.Velocity = FlVelocity;
+                        }
 
                         FLeavesEngine2.GenerateParticles = false;
                         GameScene.Scene.ParticleEngines.Add(FLeavesEngine2);
@@ -2159,12 +2156,12 @@ namespace Client.MirScenes
                         var xVar = 512;
                         var yVar = 512;
                         for (int y = yVar * -1; y < Settings.ScreenHeight + yVar; y += yVar)
-                            for (int x = xVar * -1; x < Settings.ScreenWidth + xVar; x += xVar)
-                            {
-                                Particle part = RainEngine2.GenerateNewParticle(ParticleType.Rain);
-                                part.Position = new Vector2(x, y);
-                                part.Velocity = rsevelocity;
-                            }
+                        for (int x = xVar * -1; x < Settings.ScreenWidth + xVar; x += xVar)
+                        {
+                            Particle part = RainEngine2.GenerateNewParticle(ParticleType.Rain);
+                            part.Position = new Vector2(x, y);
+                            part.Velocity = rsevelocity;
+                        }
 
                         RainEngine2.GenerateParticles = false;
                         GameScene.Scene.ParticleEngines.Add(RainEngine2);
@@ -2178,12 +2175,12 @@ namespace Client.MirScenes
                         Vector2 rsvelocity = new Vector2(1F, -1F);
 
                         for (int y = -400; y < Settings.ScreenHeight + 400; y += 400)
-                            for (int x = -400; x < Settings.ScreenWidth + 400; x += 400)
-                            {
-                                Particle part = RainEngine.GenerateNewParticle(ParticleType.Snow);
-                                part.Position = new Vector2(x, y);
-                                part.Velocity = rsvelocity;
-                            }
+                        for (int x = -400; x < Settings.ScreenWidth + 400; x += 400)
+                        {
+                            Particle part = RainEngine.GenerateNewParticle(ParticleType.Snow);
+                            part.Position = new Vector2(x, y);
+                            part.Velocity = rsvelocity;
+                        }
 
                         RainEngine.GenerateParticles = false;
                         GameScene.Scene.ParticleEngines.Add(RainEngine);
@@ -2197,12 +2194,12 @@ namespace Client.MirScenes
 
                         Vector2 fvelocity = new Vector2(2F, -2F);
                         for (int y = -512; y < Settings.ScreenHeight + 512; y += 512)
-                            for (int x = -512; x < Settings.ScreenWidth + 512; x += 512)
-                            {
-                                Particle part = fengine.GenerateNewParticle(ParticleType.Fog);
-                                part.Position = new Vector2(x, y);
-                                part.Velocity = fvelocity;
-                            }
+                        for (int x = -512; x < Settings.ScreenWidth + 512; x += 512)
+                        {
+                            Particle part = fengine.GenerateNewParticle(ParticleType.Fog);
+                            part.Position = new Vector2(x, y);
+                            part.Velocity = fvelocity;
+                        }
 
 
                         fengine.GenerateParticles = false;
@@ -2233,12 +2230,12 @@ namespace Client.MirScenes
                         var pEmberEngine = new ParticleEngine(textures, new Vector2(0, 0), ParticleType.PurpleLeaves);
 
                         for (int y = 512 * -1; y < Settings.ScreenHeight + 512; y += 512)
-                            for (int x = 512 * -1; x < Settings.ScreenWidth + 512; x += 512)
-                            {
-                                Particle part = pEmberEngine.GenerateNewParticle(ParticleType.PurpleLeaves);
-                                part.Position = new Vector2(x, y);
-                                part.Velocity = new Vector2(0, 0);
-                            }
+                        for (int x = 512 * -1; x < Settings.ScreenWidth + 512; x += 512)
+                        {
+                            Particle part = pEmberEngine.GenerateNewParticle(ParticleType.PurpleLeaves);
+                            part.Position = new Vector2(x, y);
+                            part.Velocity = new Vector2(0, 0);
+                        }
 
                         pEmberEngine.GenerateParticles = false;
                         GameScene.Scene.ParticleEngines.Add(pEmberEngine);
