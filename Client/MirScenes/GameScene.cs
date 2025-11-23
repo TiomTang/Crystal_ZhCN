@@ -933,7 +933,52 @@ namespace Client.MirScenes
                     magic.CastTime = CMain.Time;
                     break;
             }
+            if (actor.Class == MirClass.Taoist)
+            {
+                if (magic.Spell == Spell.SoulFireBall || magic.Spell == Spell.SummonSkeleton || magic.Spell == Spell.Hiding ||
+                    magic.Spell == Spell.MassHiding || magic.Spell == Spell.SoulShield || magic.Spell == Spell.BlessedArmour ||
+                    magic.Spell == Spell.TrapHexagon || magic.Spell == Spell.Purification || magic.Spell == Spell.Hallucination ||
+                    magic.Spell == Spell.SummonShinsu || magic.Spell == Spell.UltimateEnhancer || magic.Spell == Spell.SummonHolyDeva ||
+                    magic.Spell == Spell.EnergyShield || magic.Spell == Spell.Curse)
+                {
+                    UserItem amuletItem = actor.GetEquipmentAmulet([0]);
 
+                    if (amuletItem == null)
+                    {
+                        amuletItem = actor.GetInventoryAmulet([0]);
+                        if (amuletItem != null)
+                        {
+                            Network.Enqueue(new C.EquipItem { Grid = MirGridType.Inventory, UniqueID = amuletItem.UniqueID, To = (int)EquipmentSlot.Amulet });
+                        }
+                    }
+                }
+                else if (magic.Spell == Spell.Reincarnation)
+                {
+                    UserItem amuletItem = actor.GetEquipmentAmulet([3]);
+
+                    if (amuletItem == null)
+                    {
+                        amuletItem = actor.GetInventoryAmulet([3]);
+                        if (amuletItem != null)
+                        {
+                            Network.Enqueue(new C.EquipItem { Grid = MirGridType.Inventory, UniqueID = amuletItem.UniqueID, To = (int)EquipmentSlot.Amulet });
+                        }
+                    }
+                }
+                else if (magic.Spell == Spell.Poisoning)
+                {
+                    UserItem amuletItem = actor.GetEquipmentAmulet([1, 2]);
+
+                    if (amuletItem == null)
+                    {
+                        amuletItem = actor.GetInventoryAmulet([1, 2]);
+                        if (amuletItem != null)
+                        {
+                            Network.Enqueue(new C.EquipItem { Grid = MirGridType.Inventory, UniqueID = amuletItem.UniqueID, To = (int)EquipmentSlot.Amulet });
+                        }
+                    }
+                }
+            }
             int cost;
             string prefix = actor == Hero ? GameLanguage.ClientTextMap[nameof(ClientTextKeys.Hero)] : string.Empty;
             switch (magic.Spell)
