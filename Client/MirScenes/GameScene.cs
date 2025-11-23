@@ -11207,11 +11207,21 @@ namespace Client.MirScenes
             DXManager.Device.SetRenderState(RenderState.DestinationBlend, Blend.One);
 
             #region Object Lights (Player/Mob/NPC)
+            // Optimization: Only process light source objects within the view frustum.
+            // Calculate the maximum light range (DXManager.Lights.Count - 1 is usually the maximum light range)
+            int maxLightRange = DXManager.Lights.Count - 1 + 3; // Additional 3 grid buffer
 
             foreach (var ob in Objects.Values)
             {
                 if (ob.Light > 0 && (!ob.Dead || ob == MapObject.User || ob.Race == ObjectType.Spell))
                 {
+                    // Frustum Culling: Only process lights within the view frustum.
+                    int dx = Math.Abs(ob.CurrentLocation.X - MapObject.User.Movement.X);
+                    int dy = Math.Abs(ob.CurrentLocation.Y - MapObject.User.Movement.Y);
+
+                    if (dx > ViewRangeX + maxLightRange || dy > ViewRangeY + maxLightRange)
+                        continue; // Skip lights outside the view.
+
                     light = ob.Light;
 
                     int lightRange = light % 15;
@@ -11323,12 +11333,14 @@ namespace Client.MirScenes
             #endregion
 
             #region Map Lights
-
-            for (int y = MapObject.User.Movement.Y - ViewRangeY - 24; y <= MapObject.User.Movement.Y + ViewRangeY + 24; y++)
+            // Optimization: reduce the light source scanning range on the map, calculated based on the actual field of view
+            // Previously it was ±24, now dynamically calculated based on ViewRange
+            int mapLightExtraRange = maxLightRange; // Use the same buffer range as the light source
+            for (int y = MapObject.User.Movement.Y - ViewRangeY - mapLightExtraRange; y <= MapObject.User.Movement.Y + ViewRangeY + mapLightExtraRange; y++)
             {
                 if (y < 0) continue;
                 if (y >= Height) break;
-                for (int x = MapObject.User.Movement.X - ViewRangeX - 24; x < MapObject.User.Movement.X + ViewRangeX + 24; x++)
+                for (int x = MapObject.User.Movement.X - ViewRangeX - mapLightExtraRange; x < MapObject.User.Movement.X + ViewRangeX + mapLightExtraRange; x++)
                 {
                     if (x < 0) continue;
                     if (x >= Width) break;
