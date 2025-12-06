@@ -1361,8 +1361,8 @@ namespace Server.MirObjects
             PMode = PetMode.Both;
 
             // Only teleport if needed
-            if (CurrentMap != Master.CurrentMap)
-            {
+            //if (CurrentMap != Master.CurrentMap)
+            //{
                 if (!Teleport(Master.CurrentMap, Master.Back))
                     Teleport(Master.CurrentMap, Master.CurrentLocation);
 
@@ -1371,7 +1371,7 @@ namespace Server.MirObjects
                 {
                     Master.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.HasReturnedToYourSide,Name), ChatType.System);
                 }
-            }
+            //}
         }
         protected virtual void CompleteAttack(IList<object> data)
         {
