@@ -91,7 +91,7 @@ namespace Server.MirNetwork
 
             Envir.UpdateIPBlock(IPKey, TimeSpan.FromSeconds(Settings.IPBlockSeconds));
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.IPAddressConnected), IPAddress));
+            MessageQueue.Enqueue(GameLanguage.Get("{0}, Connected.", IPAddress));
 
             _client = client;
             _client.NoDelay = true;
@@ -183,7 +183,7 @@ namespace Server.MirNetwork
             {
                 Envir.UpdateIPBlock(IPKey, TimeSpan.FromHours(24));
 
-                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.IPAddressDisconnectedInvalidPacket), IPAddress));
+                MessageQueue.Enqueue(GameLanguage.Get("{0} Disconnected, Invalid packet.", IPAddress));
 
                 Disconnecting = true;
                 return;
@@ -204,7 +204,7 @@ namespace Server.MirNetwork
                     packetList.Add(cPacket.ToString());
                 }
 
-                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.IPAddressDisconnectedLargePackets), IPAddress, String.Join(",", packetList.Distinct())));
+                MessageQueue.Enqueue(GameLanguage.Get("{0} Disconnected, Large amount of Packets. LastPackets: {1}", IPAddress, String.Join(",", packetList.Distinct())));
 
                 Disconnecting = true;
                 return;
@@ -761,7 +761,7 @@ namespace Server.MirNetwork
                     DeleteItem((C.DeleteItem)p);
                     break;
                 default:
-                    MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.InvalidPacketReceived), p.Index));
+                    MessageQueue.Enqueue(GameLanguage.Get("Invalid packet received. Index : {0}", p.Index));
                     break;
             }
         }
@@ -933,11 +933,11 @@ namespace Server.MirNetwork
 
                 BeginSend(data);
                 SoftDisconnect(10);
-                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerDisconnectedWrongClientVersion), SessionID));
+                MessageQueue.Enqueue(GameLanguage.Get("{0}, Disconnnected - Wrong Client Version.", SessionID));
                 return;
             }
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ClientVersionMatched), SessionID, IPAddress));
+            MessageQueue.Enqueue(GameLanguage.Get("{0}, {1}, Client version matched.", SessionID, IPAddress));
             Enqueue(new S.ClientVersion { Result = 1, ProtocolVersion = Globals.ProtocolVersion });
 
             Stage = GameStage.Login;
@@ -953,14 +953,14 @@ namespace Server.MirNetwork
         {
             if (Stage != GameStage.Login) return;
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.NewAccountBeingCreated), SessionID, IPAddress));
+            MessageQueue.Enqueue(GameLanguage.Get("{0}, {1}, New account being created.", SessionID, IPAddress));
             Envir.NewAccount(p, this);
         }
         private void ChangePassword(C.ChangePassword p)
         {
             if (Stage != GameStage.Login) return;
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PasswordBeingChanged), SessionID, IPAddress));
+            MessageQueue.Enqueue(GameLanguage.Get("{0}, {1}, Password being changed.", SessionID, IPAddress));
             Envir.ChangePassword(p, this);
         }
         private void UnlockStorage(C.UnlockStorage p)
@@ -1097,7 +1097,7 @@ namespace Server.MirNetwork
         {
             if (Stage != GameStage.Login) return;
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.UserLoggingIn), SessionID, IPAddress));
+            MessageQueue.Enqueue(GameLanguage.Get("{0}, {1}, User logging in.", SessionID, IPAddress));
             Envir.Login(p, this);
         }
         private void NewCharacter(C.NewCharacter p)
@@ -1870,17 +1870,17 @@ namespace Server.MirNetwork
             {
                 Player.AllowMarriage = !Player.AllowMarriage;
                 if (Player.AllowMarriage)
-                    Player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouAllowMarriageRequests), ChatType.Hint);
+                    Player.ReceiveChat(GameLanguage.Get("You're now allowing marriage requests."), ChatType.Hint);
                 else
-                    Player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouBlockMarriageRequests), ChatType.Hint);
+                    Player.ReceiveChat(GameLanguage.Get("You're now blocking marriage requests."), ChatType.Hint);
             }
             else
             {
                 Player.AllowLoverRecall = !Player.AllowLoverRecall;
                 if (Player.AllowLoverRecall)
-                    Player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouAllowRecallFromLover), ChatType.Hint);
+                    Player.ReceiveChat(GameLanguage.Get("You're now allowing recall from lover."), ChatType.Hint);
                 else
-                    Player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouBlockRecallFromLover), ChatType.Hint);
+                    Player.ReceiveChat(GameLanguage.Get("You're now blocking recall from lover."), ChatType.Hint);
             }
         }
 
@@ -1918,9 +1918,9 @@ namespace Server.MirNetwork
 
                 Player.AllowMentor = !Player.AllowMentor;
                 if (Player.AllowMentor)
-                Player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.AllowingMentorRequests), ChatType.Hint);
+                Player.ReceiveChat(GameLanguage.Get("You're now allowing mentor requests."), ChatType.Hint);
                 else
-                    Player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.BlockingMentorRequests), ChatType.Hint);
+                    Player.ReceiveChat(GameLanguage.Get("You're now blocking mentor requests."), ChatType.Hint);
         }
 
         private void CancelMentor(C.CancelMentor p)
@@ -2020,7 +2020,7 @@ namespace Server.MirNetwork
                 return;
             }
 
-            Player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ReincarnationFailed), ChatType.System);
+            Player.ReceiveChat(GameLanguage.Get("Reincarnation failed."), ChatType.System);
         }
 
         private void CancelReincarnation()

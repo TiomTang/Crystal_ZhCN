@@ -13,6 +13,7 @@ namespace Server
         public MagicInfoForm()
         {
             InitializeComponent();
+            UiText.Apply(this);
             MagicSearchBox_TextChanged(this, EventArgs.Empty);
             UpdateMagicForm();
         }
@@ -26,8 +27,8 @@ namespace Server
             if (_selectedMagicInfo == null)
             {
                 tabControl1.Enabled = false;
-                    lblBookValid.Text = "Searching";
-                lblSelected.Text = "Selected Skill: none";
+                    lblBookValid.Text = GameLanguage.Get("Searching");
+                lblSelected.Text = GameLanguage.Get("Selected Skill: none");
                 lblDamageExample.Text = "";
                 lblDamageExplained.Text = "";
                 txtSkillIcon.Text = "0";
@@ -49,7 +50,7 @@ namespace Server
             else
             {
                 tabControl1.Enabled = true;
-                lblSelected.Text = "Selected Skill: " + _selectedMagicInfo.ToString();
+                lblSelected.Text = GameLanguage.Get("Selected Skill: ") + _selectedMagicInfo.ToString();
                 lblDamageExample.Text =
                     $"Damage @ Skill level 0: {GetMinPower(0):000}-{GetMaxPower(0):000}   |||   level 1: {GetMinPower(1):000}-{GetMaxPower(1):000}   |||   level 2: {GetMinPower(2):000}-{GetMaxPower(2):000}   |||   level 3: {GetMinPower(3):000}-{GetMaxPower(3):000}";
                 lblDamageExplained.Text =
@@ -81,7 +82,7 @@ namespace Server
                 }
                 else
                 {
-                    lblBookValid.Text = "No book found";
+                    lblBookValid.Text = GameLanguage.Get("No book found");
                     lblBookValid.BackColor = Color.Red;
                 }
                 textBoxName.Text = _selectedMagicInfo.Name;

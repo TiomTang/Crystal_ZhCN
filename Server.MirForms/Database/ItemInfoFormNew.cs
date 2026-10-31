@@ -24,6 +24,7 @@ namespace Server.Database
         public ItemInfoFormNew()
         {
             InitializeComponent();
+            UiText.Apply(this);
 
             SetDoubleBuffered(itemInfoGridView);
 
@@ -683,7 +684,7 @@ namespace Server.Database
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error :" + ex.Message);
+                    MessageBox.Show(GameLanguage.Get("Error :") + ex.Message);
                     return;
                 }
 
@@ -694,7 +695,7 @@ namespace Server.Database
                     if (columns.Length < 2)
                     {
                         fileError = true;
-                        MessageBox.Show("No columns to import.");
+                        MessageBox.Show(GameLanguage.Get("No columns to import."));
                     }
 
                     if (!fileError)
@@ -817,7 +818,7 @@ namespace Server.Database
                 }
                 else
                 {
-                    MessageBox.Show("No rows to import.");
+                    MessageBox.Show(GameLanguage.Get("No rows to import."));
                 }
             }
         }
@@ -841,7 +842,7 @@ namespace Server.Database
                         catch (IOException ex)
                         {
                             fileError = true;
-                            MessageBox.Show("It wasn't possible to write the data to the disk." + ex.Message);
+                            MessageBox.Show(GameLanguage.Get("It wasn't possible to write the data to the disk.") + ex.Message);
                         }
                     }
                     if (!fileError)
@@ -897,18 +898,18 @@ namespace Server.Database
                             }
 
                             CsvFile.WriteAllRows(sfd.FileName, outputCsv);
-                            MessageBox.Show("Data Exported Successfully.", "Info");
+                            MessageBox.Show(GameLanguage.Get("Data Exported Successfully."), GameLanguage.Get("Info"));
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show("Error :" + ex.Message);
+                            MessageBox.Show(GameLanguage.Get("Error :") + ex.Message);
                         }
                     }
                 }
             }
             else
             {
-                MessageBox.Show("No Items To Export.", "Info");
+                MessageBox.Show(GameLanguage.Get("No Items To Export."), GameLanguage.Get("Info"));
             }
         }
 

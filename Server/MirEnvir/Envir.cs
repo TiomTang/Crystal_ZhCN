@@ -1934,68 +1934,68 @@ namespace Server.MirEnvir
 
         private string CanStartEnvir()
         {
-            if (StartPoints.Count == 0) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMapAndStartPoint);
+            if (StartPoints.Count == 0) return GameLanguage.Get("Cannot start server without atleast 1 Map and StartPoint.");
 
             if (Settings.EnforceDBChecks)
             {
-                if (GetMonsterInfo(Settings.SkeletonName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.SkeletonName;
-                if (GetMonsterInfo(Settings.ShinsuName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ShinsuName;
-                if (GetMonsterInfo(Settings.BugBatName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BugBatName;
-                if (GetMonsterInfo(Settings.Zuma1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma1;
-                if (GetMonsterInfo(Settings.Zuma2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma2;
-                if (GetMonsterInfo(Settings.Zuma3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma3;
-                if (GetMonsterInfo(Settings.Zuma4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma4;
-                if (GetMonsterInfo(Settings.Zuma5, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma5;
-                if (GetMonsterInfo(Settings.Zuma6, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma6;
-                if (GetMonsterInfo(Settings.Zuma7, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma7;
-                if (GetMonsterInfo(Settings.Turtle1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle1;
-                if (GetMonsterInfo(Settings.Turtle2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle2;
-                if (GetMonsterInfo(Settings.Turtle3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle3;
-                if (GetMonsterInfo(Settings.Turtle4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle4;
-                if (GetMonsterInfo(Settings.Turtle5, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle5;
-                if (GetMonsterInfo(Settings.BoneMonster1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster1;
-                if (GetMonsterInfo(Settings.BoneMonster2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster2;
-                if (GetMonsterInfo(Settings.BoneMonster3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster3;
-                if (GetMonsterInfo(Settings.BoneMonster4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster4;
-                if (GetMonsterInfo(Settings.BehemothMonster1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BehemothMonster1;
-                if (GetMonsterInfo(Settings.BehemothMonster2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BehemothMonster2;
-                if (GetMonsterInfo(Settings.BehemothMonster3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BehemothMonster3;
-                if (GetMonsterInfo(Settings.HellKnight1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight1;
-                if (GetMonsterInfo(Settings.HellKnight2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight2;
-                if (GetMonsterInfo(Settings.HellKnight3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight3;
-                if (GetMonsterInfo(Settings.HellKnight4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight4;
-                if (GetMonsterInfo(Settings.HellBomb1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellBomb1;
-                if (GetMonsterInfo(Settings.HellBomb2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellBomb2;
-                if (GetMonsterInfo(Settings.HellBomb3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellBomb3;
-                if (GetMonsterInfo(Settings.WhiteSnake, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.WhiteSnake;
-                if (GetMonsterInfo(Settings.AngelName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.AngelName;
-                if (GetMonsterInfo(Settings.BombSpiderName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BombSpiderName;
-                if (GetMonsterInfo(Settings.CloneName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.CloneName;
-                if (GetMonsterInfo(Settings.AssassinCloneName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.AssassinCloneName;
-                if (GetMonsterInfo(Settings.VampireName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.VampireName;
-                if (GetMonsterInfo(Settings.ToadName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ToadName;
-                if (GetMonsterInfo(Settings.SnakeTotemName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.SnakeTotemName;
-                if (GetMonsterInfo(Settings.FishingMonster, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.FishingMonster;
-                if (GetMonsterInfo(Settings.GeneralMeowMeowMob1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob1;
-                if (GetMonsterInfo(Settings.GeneralMeowMeowMob2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob2;
-                if (GetMonsterInfo(Settings.GeneralMeowMeowMob3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob3;
-                if (GetMonsterInfo(Settings.GeneralMeowMeowMob4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob4;
-                if (GetMonsterInfo(Settings.KingHydraxMob, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.KingHydraxMob;
-                if (GetMonsterInfo(Settings.HornedCommanderMob, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HornedCommanderMob;
+                if (GetMonsterInfo(Settings.SkeletonName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.SkeletonName;
+                if (GetMonsterInfo(Settings.ShinsuName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.ShinsuName;
+                if (GetMonsterInfo(Settings.BugBatName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.BugBatName;
+                if (GetMonsterInfo(Settings.Zuma1, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Zuma1;
+                if (GetMonsterInfo(Settings.Zuma2, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Zuma2;
+                if (GetMonsterInfo(Settings.Zuma3, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Zuma3;
+                if (GetMonsterInfo(Settings.Zuma4, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Zuma4;
+                if (GetMonsterInfo(Settings.Zuma5, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Zuma5;
+                if (GetMonsterInfo(Settings.Zuma6, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Zuma6;
+                if (GetMonsterInfo(Settings.Zuma7, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Zuma7;
+                if (GetMonsterInfo(Settings.Turtle1, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Turtle1;
+                if (GetMonsterInfo(Settings.Turtle2, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Turtle2;
+                if (GetMonsterInfo(Settings.Turtle3, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Turtle3;
+                if (GetMonsterInfo(Settings.Turtle4, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Turtle4;
+                if (GetMonsterInfo(Settings.Turtle5, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.Turtle5;
+                if (GetMonsterInfo(Settings.BoneMonster1, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.BoneMonster1;
+                if (GetMonsterInfo(Settings.BoneMonster2, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.BoneMonster2;
+                if (GetMonsterInfo(Settings.BoneMonster3, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.BoneMonster3;
+                if (GetMonsterInfo(Settings.BoneMonster4, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.BoneMonster4;
+                if (GetMonsterInfo(Settings.BehemothMonster1, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.BehemothMonster1;
+                if (GetMonsterInfo(Settings.BehemothMonster2, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.BehemothMonster2;
+                if (GetMonsterInfo(Settings.BehemothMonster3, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.BehemothMonster3;
+                if (GetMonsterInfo(Settings.HellKnight1, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.HellKnight1;
+                if (GetMonsterInfo(Settings.HellKnight2, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.HellKnight2;
+                if (GetMonsterInfo(Settings.HellKnight3, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.HellKnight3;
+                if (GetMonsterInfo(Settings.HellKnight4, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.HellKnight4;
+                if (GetMonsterInfo(Settings.HellBomb1, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.HellBomb1;
+                if (GetMonsterInfo(Settings.HellBomb2, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.HellBomb2;
+                if (GetMonsterInfo(Settings.HellBomb3, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.HellBomb3;
+                if (GetMonsterInfo(Settings.WhiteSnake, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.WhiteSnake;
+                if (GetMonsterInfo(Settings.AngelName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.AngelName;
+                if (GetMonsterInfo(Settings.BombSpiderName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.BombSpiderName;
+                if (GetMonsterInfo(Settings.CloneName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.CloneName;
+                if (GetMonsterInfo(Settings.AssassinCloneName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.AssassinCloneName;
+                if (GetMonsterInfo(Settings.VampireName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.VampireName;
+                if (GetMonsterInfo(Settings.ToadName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.ToadName;
+                if (GetMonsterInfo(Settings.SnakeTotemName, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.SnakeTotemName;
+                if (GetMonsterInfo(Settings.FishingMonster, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.FishingMonster;
+                if (GetMonsterInfo(Settings.GeneralMeowMeowMob1, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.GeneralMeowMeowMob1;
+                if (GetMonsterInfo(Settings.GeneralMeowMeowMob2, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.GeneralMeowMeowMob2;
+                if (GetMonsterInfo(Settings.GeneralMeowMeowMob3, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.GeneralMeowMeowMob3;
+                if (GetMonsterInfo(Settings.GeneralMeowMeowMob4, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.GeneralMeowMeowMob4;
+                if (GetMonsterInfo(Settings.KingHydraxMob, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.KingHydraxMob;
+                if (GetMonsterInfo(Settings.HornedCommanderMob, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.HornedCommanderMob;
                 if (GetMonsterInfo(Settings.HornedCommanderBombMob, true) == null)
-                    return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HornedCommanderBombMob;
-                if (GetMonsterInfo(Settings.SnowWolfKingMob, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.SnowWolfKingMob;
-                if (GetMonsterInfo(Settings.ScrollMob1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob1;
-                if (GetMonsterInfo(Settings.ScrollMob2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob2;
-                if (GetMonsterInfo(Settings.ScrollMob3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob3;
-                if (GetMonsterInfo(Settings.ScrollMob4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob4;
+                    return GameLanguage.Get("Cannot start server without mob: ") + Settings.HornedCommanderBombMob;
+                if (GetMonsterInfo(Settings.SnowWolfKingMob, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.SnowWolfKingMob;
+                if (GetMonsterInfo(Settings.ScrollMob1, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.ScrollMob1;
+                if (GetMonsterInfo(Settings.ScrollMob2, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.ScrollMob2;
+                if (GetMonsterInfo(Settings.ScrollMob3, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.ScrollMob3;
+                if (GetMonsterInfo(Settings.ScrollMob4, true) == null) return GameLanguage.Get("Cannot start server without mob: ") + Settings.ScrollMob4;
 
-                if (GetItemInfo(Settings.RefineOreName) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutItem) + Settings.RefineOreName;
+                if (GetItemInfo(Settings.RefineOreName) == null) return GameLanguage.Get("Cannot start server without item: ") + Settings.RefineOreName;
             }
 
             WorldMapIcon wmi = ValidateWorldMap();
             if (wmi != null)
-                return GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.InvalidWorldmapIndex), wmi.MapIndex, wmi.Title);
+                return GameLanguage.Get("Invalid worldmap index: {0} ({1})", wmi.MapIndex, wmi.Title);
 
 
             //add intelligent creature checks?
@@ -2149,7 +2149,7 @@ namespace Server.MirEnvir
                             userTime = Time + Settings.Minute * 5;
                             Broadcast(new S.Chat
                             {
-                                Message = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.OnlinePlayers), Players.Count),
+                                Message = GameLanguage.Get("Online Players: {0}", Players.Count),
                                 Type = ChatType.Hint
                             });
                         }
@@ -2182,7 +2182,7 @@ namespace Server.MirEnvir
                     // Get the line number from the stack frame
                     var line = frame.GetFileLineNumber();
 
-                    MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.InnerWorkloopErrorLine), line, ex));
+                    MessageQueue.Enqueue(GameLanguage.Get("[inner workloop error. Line {0}]{1}", line, ex));
                 }
 
 
@@ -2196,7 +2196,7 @@ namespace Server.MirEnvir
                 // Get the line number from the stack frame
                 var line = frame.GetFileLineNumber();
 
-                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.OuterWorkloopErrorLine), line, ex));
+                MessageQueue.Enqueue(GameLanguage.Get("[outer workloop error. Line {0}]{1}", line, ex));
             }
 
             finally
@@ -2292,7 +2292,7 @@ namespace Server.MirEnvir
                 catch (Exception ex)
                 {
                     // A bad object must not permanently disable the rest of its map partition.
-                    MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ThreadLoopError), ex));
+                    MessageQueue.Enqueue(GameLanguage.Get("[threadloop error]{0}", ex));
                 }
                 current = next;
             }
@@ -2408,14 +2408,14 @@ namespace Server.MirEnvir
                 {
                     if (info.ItemType == MarketItemType.Auction && info.CurrentBid > info.Price)
                     {
-                        string message = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouWonForGold), info.Item.FriendlyName, info.CurrentBid);
+                        string message = GameLanguage.Get("You won {0} for {1:#,##0} Gold.", info.Item.FriendlyName, info.CurrentBid);
 
                         info.Sold = true;
                         MailCharacter(info.CurrentBuyerInfo, item: info.Item, customMessage: message);
 
-                        MessageAccount(info.CurrentBuyerInfo.AccountInfo, GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouBoughtForGold), info.Item.FriendlyName, info.CurrentBid),
+                        MessageAccount(info.CurrentBuyerInfo.AccountInfo, GameLanguage.Get("You bought {0} for {1:#,##0} Gold", info.Item.FriendlyName, info.CurrentBid),
                             ChatType.Hint);
-                        MessageAccount(info.SellerInfo.AccountInfo, GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouSoldForGold), info.Item.FriendlyName, info.CurrentBid),
+                        MessageAccount(info.SellerInfo.AccountInfo, GameLanguage.Get("You sold {0} for {1:#,##0} Gold", info.Item.FriendlyName, info.CurrentBid),
                             ChatType.Hint);
                     }
                     else
@@ -2935,12 +2935,12 @@ namespace Server.MirEnvir
 
                     if (LoadVersion < MinVersion)
                     {
-                        MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotLoadDatabaseMinSupported), LoadVersion, MinVersion));
+                        MessageQueue.Enqueue(GameLanguage.Get("Cannot load a database version {0}. Mininum supported is {1}.", LoadVersion, MinVersion));
                         return false;
                     }
                     else if (LoadVersion > Version)
                     {
-                        MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotLoadDatabaseMaxSupported), LoadVersion, Version));
+                        MessageQueue.Enqueue(GameLanguage.Get("Cannot load a database version {0}. Maximum supported is {1}.", LoadVersion, Version));
                         return false;
                     }
 
@@ -3391,7 +3391,7 @@ namespace Server.MirEnvir
         {
             new Thread(() =>
             {
-                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ServerRebooting));
+                MessageQueue.Enqueue(GameLanguage.Get("Server rebooting..."));
                 Stop();
                 Start();
             }).Start();
@@ -3422,7 +3422,7 @@ namespace Server.MirEnvir
                 BuffInfoList.Add(buff);
             }
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.BuffsLoaded), BuffInfoList.Count));
+            MessageQueue.Enqueue(GameLanguage.Get("{0} Buffs Loaded.", BuffInfoList.Count));
 
             RecipeInfoList.Clear();
             foreach (var recipe in Directory.GetFiles(Settings.RecipePath, "*.txt")
@@ -3432,7 +3432,7 @@ namespace Server.MirEnvir
                 RecipeInfoList.Add(new RecipeInfo(recipe));
             }
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.RecipesLoaded), RecipeInfoList.Count));
+            MessageQueue.Enqueue(GameLanguage.Get("{0} Recipes Loaded.", RecipeInfoList.Count));
 
             for (var i = 0; i < MapInfoList.Count; i++)
             {
@@ -3471,7 +3471,7 @@ namespace Server.MirEnvir
                 }
             }
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MapsLoaded), MapInfoList.Count));
+            MessageQueue.Enqueue(GameLanguage.Get("{0} Maps Loaded.", MapInfoList.Count));
 
             for (var i = 0; i < ItemInfoList.Count; i++)
             {
@@ -3494,14 +3494,14 @@ namespace Server.MirEnvir
                     if (DragonSystem.Load()) DragonSystem.Info.LoadDrops();
                 }
 
-                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.DragonLoaded));
+                MessageQueue.Enqueue(GameLanguage.Get("Dragon Loaded."));
             }
 
             DefaultNPC = NPCScript.GetOrAdd((uint)Random.Next(1000000, 1999999), Settings.DefaultNPCFilename, NPCScriptType.AutoPlayer);
             MonsterNPC = NPCScript.GetOrAdd((uint)Random.Next(2000000, 2999999), Settings.MonsterNPCFilename, NPCScriptType.AutoMonster);
             RobotNPC = NPCScript.GetOrAdd((uint)Random.Next(3000000, 3999999), Settings.RobotNPCFilename, NPCScriptType.Robot);
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.EnvirStarted));           
+            MessageQueue.Enqueue(GameLanguage.Get("Envir Started."));           
 
         }
 
@@ -3544,7 +3544,7 @@ namespace Server.MirEnvir
             if (_StatusPort != null)
                 MessageQueue.Enqueue($"Status listener started on {_StatusPort.LocalEndpoint} (DualMode={_StatusPort.Server.DualMode})");
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NetworkStarted));
+            MessageQueue.Enqueue(GameLanguage.Get("Network Started."));
         }
 
 
@@ -3588,7 +3588,7 @@ namespace Server.MirEnvir
 
             GC.Collect();
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.EnvirStopped));
+            MessageQueue.Enqueue(GameLanguage.Get("Envir Stopped."));
         }
         private void StopNetwork()
         {
@@ -3663,7 +3663,7 @@ namespace Server.MirEnvir
 
             if (errors.Count != 0)
                 throw new AggregateException("Network shutdown failed.", errors);
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NetworkStopped));
+            MessageQueue.Enqueue(GameLanguage.Get("Network Stopped."));
         }
 
         private void CleanUp()
@@ -3756,7 +3756,7 @@ namespace Server.MirEnvir
                         {
                             UpdateIPBlock(ipKey, TimeSpan.FromSeconds(Settings.IPBlockSeconds));
 
-                            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.IpAddressDisconnectedTooManyConnections), ipAddress));
+                            MessageQueue.Enqueue(GameLanguage.Get("{0} Disconnected, Too many connections.", ipAddress));
                         }
                         else
                         {
@@ -4100,7 +4100,7 @@ namespace Server.MirEnvir
                 if (account.WrongPasswordCount++ >= 5)
                 {
                     account.Banned = true;
-                    account.BanReason = GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TooManyWrongLoginAttempts);
+                    account.BanReason = GameLanguage.Get("Too many Wrong Login Attempts.");
                     account.ExpiryDate = Now.AddMinutes(2);
 
                     c.Enqueue(new ServerPackets.LoginBanned
@@ -4135,7 +4135,7 @@ namespace Server.MirEnvir
             account.LastDate = Now;
             account.LastIP = c.IPAddress;
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.UserLoggedIn), account.Connection.SessionID, account.Connection.IPAddress));
+            MessageQueue.Enqueue(GameLanguage.Get("{0}, {1}, User logged in.", account.Connection.SessionID, account.Connection.IPAddress));
             c.Enqueue(new ServerPackets.LoginSuccess { Characters = account.GetSelectInfo() });
         }
 
@@ -4178,7 +4178,7 @@ namespace Server.MirEnvir
                 if (account.WrongPasswordCount++ >= 5)
                 {
                     account.Banned = true;
-                    account.BanReason = GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TooManyWrongLoginAttempts);
+                    account.BanReason = GameLanguage.Get("Too many Wrong Login Attempts.");
                     account.ExpiryDate = Now.AddMinutes(2);
                     return 5;
                 }
@@ -5123,7 +5123,7 @@ namespace Server.MirEnvir
                             continue;
                         }
 
-                        rentingPlayer.Player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ItemExpiredFromInventory), item.Info.FriendlyName), ChatType.Hint);
+                        rentingPlayer.Player.ReceiveChat(GameLanguage.Get("{0} has just expired from your inventory.", item.Info.FriendlyName), ChatType.Hint);
                         rentingPlayer.Player.Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
                         rentingPlayer.Player.RefreshStats();
                     }
@@ -5151,7 +5151,7 @@ namespace Server.MirEnvir
                             continue;
                         }
 
-                        rentingPlayer.Player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ItemExpiredInventory), item.Info.FriendlyName), ChatType.Hint);
+                        rentingPlayer.Player.ReceiveChat(GameLanguage.Get("{0} has just expired from your inventory.", item.Info.FriendlyName), ChatType.Hint);
                         rentingPlayer.Player.Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
                         rentingPlayer.Player.RefreshStats();
                     }
@@ -5263,7 +5263,7 @@ namespace Server.MirEnvir
             }
 
             ResetGS = false;
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.GameshopPurchaseLogsCleared));
+            MessageQueue.Enqueue(GameLanguage.Get("Gameshop Purchase Logs Cleared."));
         }
 
         public void Inspect(MirConnection con, uint id)
@@ -5375,7 +5375,7 @@ namespace Server.MirEnvir
 
             con.Enqueue(new S.PlayerInspect
             {
-                Name = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerHero), ownerName),
+                Name = GameLanguage.Get("{0}'s Hero", ownerName),
                 Equipment = heroInfo.Equipment,
                 GuildName = String.Empty,
                 GuildRank = String.Empty,
@@ -5613,7 +5613,7 @@ namespace Server.MirEnvir
                 Scripts[key].Load();
             }
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NpcScriptsReloaded));
+            MessageQueue.Enqueue(GameLanguage.Get("NPC Scripts Reloaded."));
         }
 
         public void ReloadDrops()
@@ -5650,7 +5650,7 @@ namespace Server.MirEnvir
             BlackstoneDrops.Clear();
             DropInfo.Load(BlackstoneDrops, "Blackstone", Path.Combine(Settings.DropPath, Settings.BlackstoneDropFilename + ".txt"));
 
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.DropsLoaded));
+            MessageQueue.Enqueue(GameLanguage.Get("Drops Loaded."));
         }
 
         public void ReloadLineMessages()
@@ -5673,7 +5673,7 @@ namespace Server.MirEnvir
                     LineMessages.Add(lines[i]);
                 }
 
-                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.LineMessagesReloaded));
+                MessageQueue.Enqueue(GameLanguage.Get("LineMessages reloaded."));
             }
         }
 
@@ -5695,7 +5695,7 @@ namespace Server.MirEnvir
             GuildList.Remove(guild.Info);
 
             GuildRefreshNeeded = true;
-            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GuildWillBeDeletedFromServer), guild.Info.Name));
+            MessageQueue.Enqueue(GameLanguage.Get("{0} guild will be deleted from the server.", guild.Info.Name));
         }
     }
 }

@@ -40,11 +40,11 @@ namespace Server.Library.Utils
                     }
                     _listener.Start();
                 }
-                MessageQueue.Instance.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.HttpServiceStarted));
+                MessageQueue.Instance.Enqueue(GameLanguage.Get("HttpService started."));
             }
             catch (Exception err)
             {
-                MessageQueue.Instance.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.HttpServiceStartFailed) + err);
+                MessageQueue.Instance.Enqueue(GameLanguage.Get("HttpService start failed! Error:") + err);
                 lock (_listenerLock)
                     _listener?.Close();
                 throw;

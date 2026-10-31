@@ -122,6 +122,7 @@ namespace Server.MirForms.DropBuilder
         public DropGenForm()
         {
             InitializeComponent();
+            UiText.Apply(this);
 
             // Array of items
             ItemLists = new List<DropItem>[37]
@@ -310,7 +311,7 @@ namespace Server.MirForms.DropBuilder
                     }
                     catch (Exception)
                     {
-                        MessageBox.Show("Unreadable level filters.");
+                        MessageBox.Show(GameLanguage.Get("Unreadable level filters."));
                         break;
                     }
                 }
@@ -452,7 +453,7 @@ namespace Server.MirForms.DropBuilder
 
             if (!int.TryParse((textBoxItemOdds.Text ?? string.Empty).Trim(), out int chance) || chance < 1)
             {
-                MessageBox.Show("Drop rate must be a positive whole number.");
+                MessageBox.Show(GameLanguage.Get("Drop rate must be a positive whole number."));
                 return;
             }
 
@@ -585,7 +586,7 @@ namespace Server.MirForms.DropBuilder
             {
                 textBoxDropList.ReadOnly = true;
                 textBoxDropList.BackColor = System.Drawing.Color.Cornsilk;
-                buttonEdit.Text = "Edit Drop File";
+                buttonEdit.Text = GameLanguage.Get("Edit Drop File");
                 //buttonEdit.Image = Properties.Resources.edit;
 
                 // Empty List<DropItem>'s
@@ -606,7 +607,7 @@ namespace Server.MirForms.DropBuilder
             {
                 textBoxDropList.ReadOnly = false;
                 textBoxDropList.BackColor = System.Drawing.Color.Honeydew;
-                buttonEdit.Text = "Accept";
+                buttonEdit.Text = GameLanguage.Get("Accept");
                 //buttonEdit.Image = Properties.Resources.accept;
 
                 buttonAdd.Enabled = false;
@@ -653,7 +654,7 @@ namespace Server.MirForms.DropBuilder
             if (!int.TryParse(odds, out int chance) || chance < 1 ||
                 !uint.TryParse(amount, out uint gold) || gold == 0)
             {
-                MessageBox.Show("Gold rate and amount must be positive numbers.");
+                MessageBox.Show(GameLanguage.Get("Gold rate and amount must be positive numbers."));
                 return;
             }
 
