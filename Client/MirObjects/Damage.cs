@@ -36,11 +36,11 @@ namespace Client.MirObjects
                     OutLine = true,
                     OutLineColour = Color.Black,
                     Text = Text,
-                    Font = new Font(Settings.FontName, 8F, FontStyle.Bold)
+                    Font = new Font(Settings.FontName, 12F, FontStyle.Bold)
                 };
             }
 
-            displayLocation.Offset((int)(15 - (Text.Length * 3)), (int)(((int)((double)timeRemaining / Factor)) - Distance) - 75 - Offset);
+            displayLocation.Offset((50 - DamageLabel.Size.Width) / 2, (int)(((int)((double)timeRemaining / Factor)) - Distance) - 75 - Offset);
 
             DamageLabel.Location = displayLocation;
             DamageLabel.Draw();

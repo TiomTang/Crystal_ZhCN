@@ -3518,7 +3518,7 @@ namespace Client.MirScenes
                     switch (p.Type)
                     {
                         case DamageType.Hit: //add damage level colours
-                            obj.Damages.Add(new Damage(p.Damage.ToString("#,##0"), 1000, obj.Race == ObjectType.Player ? Color.Red : Color.White, 50));
+                            obj.Damages.Add(new Damage(p.Damage.ToString("#,##0"), 1000, p.Damage > 0 ? Color.Green : Color.Red, 50));
                             break;
                         case DamageType.Miss:
                             obj.Damages.Add(new Damage(GameLanguage.ClientTextMap.GetLocalization(ClientTextKeys.Miss), 1200, obj.Race == ObjectType.Player ? Color.LightCoral : Color.LightGray, 50));
