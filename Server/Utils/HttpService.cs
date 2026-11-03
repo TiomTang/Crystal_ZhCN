@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using Server.MirNetwork;
 
 namespace Server.Library.Utils
 {
@@ -63,7 +64,19 @@ namespace Server.Library.Utils
                         Console.WriteLine("Connection: {0}", request.KeepAlive ? "Keep-Alive" : "close");
                         Console.WriteLine("Host: {0}", request.UserHostName);
                         var response = context.Response;
+
                         if (context.Request.RemoteEndPoint != null)
+                        {
+                            // Normalised so an IPv4 client arriving over a dual-mode socket still
+                            // matches a 127.0.0.1 trust entry.
+                            var clientIp = NetUtil.ClientIP(context.Request.RemoteEndPoint);
+
+                            if (!IsTrustedAddress(clientIp, Settings.HTTPTrustedIPAddress))
+                            {
+                                WriteResponse(response, "notrusted:" + clientIp);
+                                continue;
+                            }
+                        }
                         {
                             var clientIp = context.Request.RemoteEndPoint.Address.ToString();
 
@@ -95,6 +108,17 @@ namespace Server.Library.Utils
                 lock (_listenerLock)
                     _listener?.Close();
             }
+        }
+
+        /// <summary>
+        /// Loopback may arrive as 127.0.0.1 or ::1 depending on the address family.
+        /// </summary>
+        private static bool IsTrustedAddress(string clientIp, string trustedIp)
+        {
+            if (clientIp == trustedIp) return true;
+
+            return (clientIp == "::1" && trustedIp == "127.0.0.1") ||
+                   (clientIp == "127.0.0.1" && trustedIp == "::1");
         }
 
         public void Stop()
