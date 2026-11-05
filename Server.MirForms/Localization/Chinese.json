@@ -82,6 +82,18 @@
     "Source": "You are not in a guild.",
     "Text": "你不属于任何帮会。"
   },
+  "Your guild does not currently own the palace.": {
+    "Source": "Your guild does not currently own the palace.",
+    "Text": "你的公会目前未占领宫殿。"
+  },
+  "You cannot return to the palace while the war is in progress.": {
+    "Source": "You cannot return to the palace while the war is in progress.",
+    "Text": "攻城战进行中，无法返回宫殿。"
+  },
+  "Unable to teleport to the palace.": {
+    "Source": "Unable to teleport to the palace.",
+    "Text": "无法传送至宫殿。"
+  },
   "You don't currently have a Mentorship to cancel.": {
     "Source": "You don't currently have a Mentorship to cancel.",
     "Text": "你目前没有师徒关系可取消。"
