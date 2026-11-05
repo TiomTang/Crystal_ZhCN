@@ -7896,11 +7896,11 @@
   },
   "ui.ItemInfoFormNew.itemInfoGridView.StatEnergyShieldPercent": {
     "Source": "Energy Shield %",
-    "Text": "能量护盾 %"
+    "Text": "阴阳盾 %"
   },
   "ui.ItemInfoFormNew.itemInfoGridView.StatEnergyShieldHPGain": {
     "Source": "Energy Shield HP Gain ",
-    "Text": "能量护盾 HP 加成"
+    "Text": "阴阳盾 HP 加成"
   },
   "ui.ItemInfoFormNew.itemInfoGridView.StatManaPenaltyPercent": {
     "Source": "Mana Penalty %",
@@ -8236,11 +8236,11 @@
   },
   "ui.MonsterInfoFormNew.monsterInfoGridView.StatEnergyShieldPercent": {
     "Source": "Energy Shield %",
-    "Text": "能量护盾 %"
+    "Text": "阴阳盾 %"
   },
   "ui.MonsterInfoFormNew.monsterInfoGridView.StatEnergyShieldHPGain": {
     "Source": "Energy Shield HP Gain ",
-    "Text": "能量护盾 HP 加成"
+    "Text": "阴阳盾 HP 加成"
   },
   "ui.MonsterInfoFormNew.monsterInfoGridView.StatManaPenaltyPercent": {
     "Source": "Mana Penalty %",
@@ -8908,11 +8908,11 @@
   },
   "Blade Avalanche\n\nActive Skill\nMana Cost {2}\n\nHurls blades in three directions in front of the\ncaster, creating a deadly storm of metal\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Blade Avalanche\n\nActive Skill\nMana Cost {2}\n\nHurls blades in three directions in front of the\ncaster, creating a deadly storm of metal\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "空破闪\n\n主动技能\n法力消耗 {2}\n\n向施法者前方三方向投掷刀刃，形成致命的金属风暴。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "攻破斩\n\n主动技能\n法力消耗 {2}\n\n三道刺杀.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Blessed Armour\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nBless caster and party members to strengthen their defence.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Blessed Armour\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nBless caster and party members to strengthen their defence.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "祝福铠甲\n\n瞬间施法\n法力消耗 {2}\n\n需要物品：护身符\n\n为施法者和队友施加祝福，提升其防御力。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "神圣战甲术\n\n瞬间施法\n法力消耗 {2}\n\n需要物品：护身符\n\n提升物理防御力,\n持续时间随技能等级\n和道术增长.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Blink": {
     "Source": "Blink",
@@ -8920,11 +8920,11 @@
   },
   "Blink\n\nInstant Casting\nMana Cost {2}\n\nTeleport to a random spot near you.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Blink\n\nInstant Casting\nMana Cost {2}\n\nTeleport to a random spot near you.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "闪现\n\n瞬间施法\n法力消耗 {2}\n\n随机瞬移至附近位置。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "闪现\n\n瞬间施法\n法力消耗 {2}\n\n有几率瞬移至施法范围内\n指定的有效位置；\n禁传地图无法使用。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Blizzard\n\nChannelling Casting\nMana Cost {2}\n\nConcentrate inner force and spreads it to all\nthe parts of your body.This will enhance the\nprotection from enemies. Defence power and duration\ntime will depend on the skill level. Once the skill\nhas been used, you will have to wait to use it again.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Blizzard\n\nChannelling Casting\nMana Cost {2}\n\nConcentrate inner force and spreads it to all\nthe parts of your body.This will enhance the\nprotection from enemies. Defence power and duration\ntime will depend on the skill level. Once the skill\nhas been used, you will have to wait to use it again.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "天霜冰环\n\n引导施法\n法力消耗 {2}\n\n集中内力并扩散至全身各处，\n增强对敌人的防护。防御力和持续时间\n取决于技能等级。技能使用后需等待一段时间才能再次施展。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "天霜冰环\n\n引导施法\n法力消耗 {2}\n\n引导冰雪法术，持续攻击\n指定地点5×5格范围内的敌人，\n并有概率使其减速。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Block List": {
     "Source": "Block List",
@@ -9260,7 +9260,7 @@
   },
   "Counter Attack\n\nBuff Skill\nMana Cost {2}\n\nIncreases AC and AMC for a short period of time\nChance to defend an attack and counter.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Counter Attack\n\nBuff Skill\nMana Cost {2}\n\nIncreases AC and AMC for a short period of time\nChance to defend an attack and counter.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "反击\n\n增益技能\n法力消耗 {2}\n\n短时间提升物防和魔防，并有几率格挡攻击并进行反击。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "反击\n\n增益技能\n法力消耗 {2}\n\n提高物理防御和魔法防御，\n持续7秒；期间受到攻击时，\n有几率对身旁的攻击者进行一次反击。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Counting down.": {
     "Source": "Counting down.",
@@ -9328,11 +9328,11 @@
   },
   "Crescent Slash\n\nMana Cost {2}\n\nBurst out of the power of your sword and attack all monsters around you.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Crescent Slash\n\nMana Cost {2}\n\nBurst out of the power of your sword and attack all monsters around you.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "月华乱舞\n\n魔法消耗 {2}\n\n爆发剑之力量攻击周围所有怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "猫舌兰\n\n魔法消耗 {2}\n\n挥剑攻击紧邻自身前方及两侧\n五个方位上的敌人。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Cripple Shot\n\nActive Skill\nMana Cost {2}\n\nShoots a Cripple Arrow that slows the enemy.\nPoisonShot buff will make Cripple shot produce\na 3×3 AOE poison attack. VampireShot Buff will\nmake Cripple shot hit twice and steal HP.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Cripple Shot\n\nActive Skill\nMana Cost {2}\n\nShoots a Cripple Arrow that slows the enemy.\nPoisonShot buff will make Cripple shot produce\na 3×3 AOE poison attack. VampireShot Buff will\nmake Cripple shot hit twice and steal HP.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "致残射击\n\n主动技能\n法力消耗 {2}\n\n射出一支削弱箭令敌人减速。\n毒箭增益可使削弱射击产生3×3范围的毒性攻击。\n吸血射击增益可使削弱射击攻击两次并吸取生命。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "致残射击\n\n主动技能\n法力消耗 {2}\n\n射出箭矢攻击目标。\n带有毒箭增益时，可使目标周围\n3×3格范围内的敌人中毒；\n带有吸血箭增益时，\n可追加攻击并恢复自身生命。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Crit": {
     "Source": "Crit",
@@ -9356,7 +9356,7 @@
   },
   "Cross Half-Moon\n\nToggle Skill\nMana Cost: {2} per attack\n\nA warrior uses two powerful waves of Half Moon\nto inflict damage on all mobs stood next to them.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Cross Half-Moon\n\nToggle Skill\nMana Cost: {2} per attack\n\nA warrior uses two powerful waves of Half Moon\nto inflict damage on all mobs stood next to them.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "狂风斩\n\n切换技能\n每次攻击法力消耗: {2}\n\n战士施展双重半月斩，击伤紧邻的所有怪物。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "圆月弯刀\n\n切换技能\n每次攻击法力消耗: {2}\n\n一个战士使用两道强力\n的半月对周围的所有怪\n物造成伤害.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Ctrl + Right Click": {
     "Source": "Ctrl + Right Click",
@@ -9372,7 +9372,7 @@
   },
   "Curse\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet + Poison\n\nReduces targets AttackSpeed, DC ,MC and SC.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Curse\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet + Poison\n\nReduces targets AttackSpeed, DC ,MC and SC.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "诅咒术\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符 + 毒药\n\n降低目标的攻击速度、物理攻击、\n魔法攻击与道术攻击力。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "诅咒术\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n降低目标攻击速度,\n攻击,魔法及道术.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Curse + {0}": {
     "Source": "Curse + {0}",
@@ -9440,7 +9440,7 @@
   },
   "Dark Body\n\nActive Skill\nMana Cost {2}\n\nCreate an illusion of yourself to attack\nthe monster while you become invisible.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Dark Body\n\nActive Skill\nMana Cost {2}\n\nCreate an illusion of yourself to attack\nthe monster while you become invisible.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "暗影替身\n\n主动技能\n魔法消耗 {2}\n\n制造一个自己的幻象去攻击怪物，同时自己进入隐身状态。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "烈火身\n\n主动技能\n魔法消耗 {2}\n\n制造一个你的幻象,\n在你隐身时攻击.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Data Exported Successfully.": {
     "Source": "Data Exported Successfully.",
@@ -9476,7 +9476,7 @@
   },
   "Delayed Explosion\n\nActive Skill\nMana Cost {2} \n\nFire an arrow that explodes after a short delay.\nUses Elements to cause additional damage.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Delayed Explosion\n\nActive Skill\nMana Cost {2} \n\nFire an arrow that explodes after a short delay.\nUses Elements to cause additional damage.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "延爆箭\n\n主动技能\n法力消耗 {2} \n\n发射一支会在短暂延迟后爆炸的箭矢。\n使用元素造成额外伤害。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "延爆箭\n\n主动技能\n法力消耗 {2} \n\n发射一支会在短暂延迟后\n爆炸的箭矢。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Delete": {
     "Source": "Delete",
@@ -9544,7 +9544,7 @@
   },
   "Do not use Cross Half Moon.": {
     "Source": "Do not use Cross Half Moon.",
-    "Text": "不使用狂风斩。"
+    "Text": "不使用圆月弯刀。"
   },
   "Do not use Double Slash.": {
     "Source": "Do not use Double Slash.",
@@ -9584,7 +9584,7 @@
   },
   "Double Slash\n\nToggle Skill\nMana Cost {2} per attack\n\nSlash the monster twice in a quick motion\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Double Slash\n\nToggle Skill\nMana Cost {2} per attack\n\nSlash the monster twice in a quick motion\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "风剑术\n\n切换技能\n每次攻击魔法消耗 {2}\n\n快速连续斩击怪物两次。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "双刀术\n\n切换技能\n每次攻击魔法消耗 {2}\n\n在一次动作里快速攻击\n两次,开关控制技能.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Downgrade: ": {
     "Source": "Downgrade: ",
@@ -9640,15 +9640,15 @@
   },
   "Electric Shock\n\nInstant Casting\nMana Cost {2}\n\nStrong shock wave hits the mob and the\nmob will not be able to move or the mob\nwill get confused and fight for you.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Electric Shock\n\nInstant Casting\nMana Cost {2}\n\nStrong shock wave hits the mob and the\nmob will not be able to move or the mob\nwill get confused and fight for you.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "诱惑之光\n\n瞬发技能\n魔法消耗 {2}\n\n释放强力电击波，击中怪物使其无法移动，或让其混乱为你作战。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "诱惑之光\n\n瞬发技能\n魔法消耗 {2}\n\n用于麻痹或迷惑怪物.\n也可以驯服怪物.可\n驯服等级不高于法师\n等级+2级的非不死系\n怪物.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Elemental Barrier\n\nBuff Skill\nMana Cost {2}\n\nProtects the caster with an elemental barrier.\nMore elements on cast increases damage reduction.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Elemental Barrier\n\nBuff Skill\nMana Cost {2}\n\nProtects the caster with an elemental barrier.\nMore elements on cast increases damage reduction.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "元素屏障\n\n增益技能\n法力消耗 {2}\n\n以元素屏障保护施法者。\n施法时元素越多，伤害减免越高。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "元素屏障\n\n增益技能\n法力消耗 {2}\n\n消耗元素生成保护自身的减伤屏障。\n元素可增加屏障持续时间，\n减伤比例随技能等级提高。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Elemental Shot\n\nActive Skill\nMana Cost {2} \n\nHigh damage magical attack. Damage is increased\nper element. Generates 2 elements if none exist.\nPushes back target if archer is higher level.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Elemental Shot\n\nActive Skill\nMana Cost {2} \n\nHigh damage magical attack. Damage is increased\nper element. Generates 2 elements if none exist.\nPushes back target if archer is higher level.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "元素射击\n\n主动技能\n法力消耗 {2} \n\n高伤害魔法攻击。每个元素可增加伤害。\n若无元素则生成 2 个元素。\n弓手等级高于目标时可将其击退。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "元素射击\n\n主动技能\n法力消耗 {2} \n\n以元素增强箭矢的魔法伤害。\n没有元素时改为凝聚元素，\n需先学会冥想。\n有几率击退等级低于自己的目标。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Empty": {
     "Source": "Empty",
@@ -9660,11 +9660,11 @@
   },
   "Energy Repulsor\n\nInstant Casting\nMana Cost {2}\n\nConcentrate your energy for one big blast to push away the monsters around you.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Energy Repulsor\n\nInstant Casting\nMana Cost {2}\n\nConcentrate your energy for one big blast to push away the monsters around you.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "气功波\n\n瞬发技能\n法力消耗 {2}\n\n聚集能量发动强力冲击，\n将周围怪物击退。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "气功波\n\n瞬发技能\n法力消耗 {2}\n\n制造一股能量波推开\n周围的单位.\n可推开等级低于自己的\n单位.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Energy Shield\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nCastable on self and friendly targets.\nReflects a percentage of received damage, back to the attacker.\n\nCurrent Skill Level {0}\n\nNext Level {1}": {
     "Source": "Energy Shield\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nCastable on self and friendly targets.\nReflects a percentage of received damage, back to the attacker.\n\nCurrent Skill Level {0}\n\nNext Level {1}",
-    "Text": "能量护盾\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n可施加于自己或友方目标。\n反弹所受伤害的一定比例给攻击者。\n\n当前技能等级 {0}\n\n下一级等级 {1}"
+    "Text": "阴阳盾\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n可对自己或友方玩家施放；\n受到有效攻击时，\n有一定概率立即恢复生命值。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Engagement window (open / close)": {
     "Source": "Engagement window (open / close)",
@@ -9696,7 +9696,7 @@
   },
   "Entrapment\n\nActive Skill\nMana Cost: {2}\n\nParalyses mobs and draws them to the caster.\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Entrapment\n\nActive Skill\nMana Cost: {2}\n\nParalyses mobs and draws them to the caster.\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "捕蝇剑\n\n主动技能\n法力消耗: {2}\n\n使怪物麻痹并将其拉向施法者。\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "捕绳剑\n\n主动技能\n法力消耗: {2}\n\n有几率麻痹怪物并将其拉向施法者，\n受双方等级与距离限制。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Equipment Open/Close": {
     "Source": "Equipment Open/Close",
@@ -9832,15 +9832,15 @@
   },
   "Fast Move\n\nChannelling Casting\nMana Cost {2}\n\nIncrease movement with rooted skills.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Fast Move\n\nChannelling Casting\nMana Cost {2}\n\nIncrease movement with rooted skills.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "快速移动\n\n引导施法\n法力消耗 {2}\n\n利用蓄力技能提升移动速度。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "快速移动\n\n未实现技能\n法力消耗 {2}\n\n当前版本尚未实现技能效果。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Fatal Sword\n\nPassive Skill\n\nIncrease attack damage on the monsters.\nalso increases accuracy a little.\nPassive Skill\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Fatal Sword\n\nPassive Skill\n\nIncrease attack damage on the monsters.\nalso increases accuracy a little.\nPassive Skill\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "绝命剑法\n\n被动技能\n\n增加对怪物的攻击伤害。\n并稍微提升准确度。\n被动技能\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "绝命剑法\n\n被动技能\n\n被动技能，攻击时有几率\n无视目标物理防御。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Fencing\n\nPassive Skill\n\nHitting accuracy will be increased in accordance\nwith practice level.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Fencing\n\nPassive Skill\n\nHitting accuracy will be increased in accordance\nwith practice level.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "基本剑术\n\n被动技能\n\n命中率会根据练习等级提高。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "基本剑术\n\n被动技能\n\n根据技能等级提高准确.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "File Error": {
     "Source": "File Error",
@@ -9856,19 +9856,19 @@
   },
   "Fire Bang\n\nInstant Casting\nMana Cost {2}\n\nFire Bang will burst out fire at a designated spot to\nburn all the monster within the area.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Fire Bang\n\nInstant Casting\nMana Cost {2}\n\nFire Bang will burst out fire at a designated spot to\nburn all the monster within the area.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "爆裂火焰\n\n瞬发技能\n魔法消耗 {2}\n\n在指定位置引发爆燃，烧灼范围内的所有怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "爆裂火焰\n\n瞬发技能\n魔法消耗 {2}\n\n制造3X3的火焰来伤害目标\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Fire Burst\n\nActive Skill\nMana Cost {2}\n\nPush away mobs surrounding you\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Fire Burst\n\nActive Skill\nMana Cost {2}\n\nPush away mobs surrounding you\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "烈风击\n\n主动技能\n魔法消耗 {2}\n\n将围绕你的敌人击退。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "烈风击\n\n主动技能\n魔法消耗 {2}\n\n推开等级低于施法者\n的目标.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Fire Wall\n\nInstant Casting\nMana Cost {2}\n\nThis skill will build a fire wall at a designated\nspot to attack the monster passing the area.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Fire Wall\n\nInstant Casting\nMana Cost {2}\n\nThis skill will build a fire wall at a designated\nspot to attack the monster passing the area.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "火墙\n\n瞬发技能\n魔法消耗 {2}\n\n在指定位置生成一堵火墙，攻击经过的怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "火墙\n\n瞬发技能\n魔法消耗 {2}\n\n在地面上制造一道火墙.\n持续时间取决于技能等级\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Fireball \n\nInstant Casting\nMana Cost {2}\n\nElements of fire are gathered to form\na fireball. Throw at monsters for damage.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Fireball \n\nInstant Casting\nMana Cost {2}\n\nElements of fire are gathered to form\na fireball. Throw at monsters for damage.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "火球术\n\n瞬发技能\n法力消耗 {2}\n\n汇聚火元素形成火球，投掷给怪物造成伤害。\n\n当前技能等级 {0}\n下一等级 {1}ThunderboltSkillDescription"
+    "Text": "火球术\n\n瞬发技能\n法力消耗 {2}\n\n掷出一枚火球造成远程\n伤害,伤害随技能等级提升.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Fish": {
     "Source": "Fish",
@@ -9888,11 +9888,11 @@
   },
   "Flame Disruptor\n\nInstant Casting\nMana Cost {2}\n\nFlame from the underground will be brought\ninto surface to attack the mobs.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Flame Disruptor\n\nInstant Casting\nMana Cost {2}\n\nFlame from the underground will be brought\ninto surface to attack the mobs.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "灭天火\n\n瞬发技能\n魔法消耗 {2}\n\n将地底的火焰引至地表，攻击怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "火龙术\n\n瞬发技能\n魔法消耗 {2}\n\n召唤一个强烈的火柱\n来攻击敌人\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Flame Field\n\nInstant Casting\nMana Cost {2}\n\nA powerful spell of fire is used to \ndamage surrounding enemies.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Flame Field\n\nInstant Casting\nMana Cost {2}\n\nA powerful spell of fire is used to \ndamage surrounding enemies.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "火龙气焰\n\n瞬间施法\n法力消耗 {2}\n\n释放强大的火焰法术，对周围敌人造成伤害。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "火龙气焰\n\n瞬间施法\n法力消耗 {2}\n\n一个强力的火焰技能\n,可攻击周围的单位\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Flame ring": {
     "Source": "Flame ring",
@@ -9900,11 +9900,11 @@
   },
   "Flaming Sword\n\nActive Skill\nMana Cost: {2}\n\nSummons the spirit of fire in to your next attack, causing\na devastating blow to the target.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Flaming Sword\n\nActive Skill\nMana Cost: {2}\n\nSummons the spirit of fire in to your next attack, causing\na devastating blow to the target.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "烈火剑法\n\n主动技能\n法力消耗: {2}\n\n在下一次攻击中召唤火之精灵，对目标造成毁灭性打击。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "烈火剑法\n\n主动技能\n法力消耗: {2}\n\n召唤火焰的灵魂到武器\n上来增加伤害.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Flash Dash\n\nActive Skill\nMana Cost {2}\n\nAttack a monster with quick slash and\nparalyse the monster\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Flash Dash\n\nActive Skill\nMana Cost {2}\n\nAttack a monster with quick slash and\nparalyse the monster\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "拔刀术\n\n主动技能\n魔法消耗 {2}\n\n以快速斩击攻击怪物并\n令其麻痹。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "拔刀术\n\n主动技能\n魔法消耗 {2}\n\n快速斩击前方目标，\n有概率附加眩晕；\n高等级时可向前突进一步。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Flexibility: + {0}": {
     "Source": "Flexibility: + {0}",
@@ -9956,11 +9956,11 @@
   },
   "Frost Crunch\n\nInstant Casting\nMana Cost {2}\n\nFreeze the elements in the air around the \nmonster to slow them down\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Frost Crunch\n\nInstant Casting\nMana Cost {2}\n\nFreeze the elements in the air around the \nmonster to slow them down\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "寒冰掌\n\n瞬发技能\n魔法消耗 {2}\n\n冻结怪物周围空气中的元素，使其减速。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "寒冰掌\n\n瞬发技能\n魔法消耗 {2}\n\n对目标造成伤害，\n并有几率使符合等级条件的目标\n减速或冰冻。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Fury\n\nBuff Skill\nMana Cost {2}\n\nIncreases the warriors Accuracy for a set period of time.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Fury\n\nBuff Skill\nMana Cost {2}\n\nIncreases the warriors Accuracy for a set period of time.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "嗜血\n\n增益技能\n法力消耗 {2}\n\n在一定时间内提升战士的命中率。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "血龙剑法\n\n增益技能\n法力消耗 {2}\n\n攻击速度提高4点，\n持续时间随技能等级提升而延长。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "GT Price": {
     "Source": "GT Price",
@@ -10032,7 +10032,7 @@
   },
   "Great Fireball\n\nInstant Casting\nMana Cost {2}\n\nSuccessor to fire ball, Great Fire Ball causes increased\ndamage to targets.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Great Fireball\n\nInstant Casting\nMana Cost {2}\n\nSuccessor to fire ball, Great Fire Ball causes increased\ndamage to targets.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "大火球\n\n瞬发技能\n魔法消耗 {2}\n\n火球术的进阶版，大火球术对目标造成更高的伤害。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "大火球\n\n瞬发技能\n魔法消耗 {2}\n\n火球术加强版\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Group": {
     "Source": "Group",
@@ -10116,11 +10116,11 @@
   },
   "Half Moon\n\nToggle Skill\nMana Cost: {2} per attack\n\nCause damage to enemies in a semi circle around the caster with\nthe shock waves from your fast moving weapon.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Half Moon\n\nToggle Skill\nMana Cost: {2} per attack\n\nCause damage to enemies in a semi circle around the caster with\nthe shock waves from your fast moving weapon.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "半月弯刀\n\n切换技能\n每次攻击法力消耗: {2}\n\n以高速挥动武器产生冲击波，对施法者周围半圆范围敌人造成伤害。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "半月弯刀\n\n切换技能\n每次攻击法力消耗: {2}\n\n快速移动的武器引起\n震动的波浪来对半圈\n的目标造成伤害.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Hallucination\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nThe monster will only see hallucination \nand attack anyone on the way\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Hallucination\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nThe monster will only see hallucination \nand attack anyone on the way\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "迷魂术\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n让怪物陷入幻觉，并攻击\n沿途遇到的任何目标。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "迷魂术\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n使怪物暂时陷入混乱，\n攻击周围其他怪物；\n成功率受等级影响。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Hand Weight + {0}": {
     "Source": "Hand Weight + {0}",
@@ -10128,15 +10128,15 @@
   },
   "Haste\n\nBuff Skill\nMana Cost {2}\n\nIncrease the attack speed\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Haste\n\nBuff Skill\nMana Cost {2}\n\nIncrease the attack speed\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "急速\n\n增益技能\n魔法消耗 {2}\n\n提高攻击速度。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "体迅风\n\n增益技能\n魔法消耗 {2}\n\n使用风的力量来增加\n攻击速度\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Healing\n\nInstant Casting\nMana Cost {2}\n\nHeals a single target \nrecovering HP over time.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Healing\n\nInstant Casting\nMana Cost {2}\n\nHeals a single target \nrecovering HP over time.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "治愈术\n\n瞬间施法\n法力消耗 {2}\n\n治疗单一目标，\n持续恢复生命值。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "治愈术\n\n瞬间施法\n法力消耗 {2}\n\n治疗自己或目标.\n治疗量取决于技能等级\n和道术\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Healing Circle\n\nInstant Casting\nMana Cost {2}\n\nTreatment area friendly target, and the enemy caused spell damage.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Healing Circle\n\nInstant Casting\nMana Cost {2}\n\nTreatment area friendly target, and the enemy caused spell damage.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "阴阳五行阵\n\n瞬间施放\n魔法消耗 {2}\n\n治疗范围内的友方目标，并对敌人造成法术伤害。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "阴阳五行阵\n\n瞬间施放\n魔法消耗 {2}\n\n治疗区域内友方目标,\n并对敌人造成法术伤害.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Healing ring": {
     "Source": "Healing ring",
@@ -10156,11 +10156,11 @@
   },
   "Heavenly Sword\n\nActive Skill\nMana Cost {2}\n\nAttack monsters with in 2 steps radius\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Heavenly Sword\n\nActive Skill\nMana Cost {2}\n\nAttack monsters with in 2 steps radius\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "天剑\n\n主动技能\n魔法消耗 {2}\n\n攻击半径两步范围内的怪物。\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "迁移剑\n\n主动技能\n魔法消耗 {2}\n\n攻击正前方直线上三格内的敌人。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Hellfire\n\nInstant Casting\nMana Cost {2}\n\nShoots out a streak of fire attack\nthe monster in front.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Hellfire\n\nInstant Casting\nMana Cost {2}\n\nShoots out a streak of fire attack\nthe monster in front.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "地狱火\n\n瞬发技能\n魔法消耗 {2}\n\n释放一道火焰攻击，击中前方的怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "地狱火\n\n瞬发技能\n魔法消耗 {2}\n\n释放火焰攻击前方目标。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Helmet": {
     "Source": "Helmet",
@@ -10184,7 +10184,7 @@
   },
   "Hemorrhage\n\nPassive Skill\n\nChance to deal critical damage and inflict bleeding damage.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Hemorrhage\n\nPassive Skill\n\nChance to deal critical damage and inflict bleeding damage.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "血凤击\n\n被动技能\n\n有几率造成致命伤害并附加流血效果。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "血风击\n\n被动技能\n\n一定几率暴击,并造成\n流血伤害.被动技能.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Hero Behaviour: {0}": {
     "Source": "Hero Behaviour: {0}",
@@ -10236,7 +10236,7 @@
   },
   "Hiding\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nMobs will not be able to spot you for a short\nmoment.Mobs will notice you if you start\nto move around.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Hiding\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nMobs will not be able to spot you for a short\nmoment.Mobs will notice you if you start\nto move around.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "隐身术\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n在短时间内怪物无法发现你，\n但一旦你开始移动，\n怪物将会注意到你。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "隐身术\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n让怪物无法看到你\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Highlight / Pickup Items": {
     "Source": "Highlight / Pickup Items",
@@ -10296,15 +10296,15 @@
   },
   "Ice Storm\n\nInstant Castin\nMana Cost {2}\n\nThis skill will make an ice storm with in a designated \narea to attack the monsters with in\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Ice Storm\n\nInstant Castin\nMana Cost {2}\n\nThis skill will make an ice storm with in a designated \narea to attack the monsters with in\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "冰咆哮\n\n瞬发技能\n魔法消耗 {2}\n\n在指定区域制造暴风雪，攻击范围内的怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "冰咆哮\n\n瞬发技能\n魔法消耗 {2}\n\n召唤一道强力的冰咆哮\n来攻击敌人\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Ice Thrust\n\nInstant Casting\nMana Cost {2}\n\nAttack monsters by creating an ice pillar.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Ice Thrust\n\nInstant Casting\nMana Cost {2}\n\nAttack monsters by creating an ice pillar.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "冰刺术\n\n瞬间施法\n法力消耗 {2}\n\n制造冰柱攻击怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "冰焰术\n\n瞬间施法\n法力消耗 {2}\n\n通过制造冰柱来攻击敌人.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Immortal Skin\n\nBuff Skill\nMana Cost {2}\n\nIncrease defence to reduce attacks.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Immortal Skin\n\nBuff Skill\nMana Cost {2}\n\nIncrease defence to reduce attacks.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "不灭护体\n\n增益技能\n法力消耗 {2}\n\n提升防御力，减少受到的伤害。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "不灭护体\n\n增益技能\n法力消耗 {2}\n\n提高物理防御上限，\n同时降低攻击力上限。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Inactive": {
     "Source": "Inactive",
@@ -10532,15 +10532,15 @@
   },
   "Light Body\n\nBuff Skill\nMana Cost {2}\n\nLighten your body using this skill and move faster\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Light Body\n\nBuff Skill\nMana Cost {2}\n\nLighten your body using this skill and move faster\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "轻身术\n\n增益技能\n魔法消耗 {2}\n\n使用此技能使身体更轻盈并提高移动速度。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "风身术\n\n增益技能\n魔法消耗 {2}\n\n暂时提高自身敏捷，\n提升幅度和持续时间\n随技能等级提高。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Lightning\n\nInstant Casting\nMana Cost {2}\n\nShoots out a steak of lightning to attack\nthe monster in front.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Lightning\n\nInstant Casting\nMana Cost {2}\n\nShoots out a steak of lightning to attack\nthe monster in front.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "疾光电影\n\n瞬发技能\n魔法消耗 {2}\n\n释放一道闪电，攻击前方的怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "疾光电影\n\n瞬发技能\n魔法消耗 {2}\n\n扔出一道闪电,攻击范\n围内的所有单位\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Lion Roar\n\nActive Skill\nMana Cost: {2}\n\nParalyses enemies around the caster, duration increases with skill level.\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Lion Roar\n\nActive Skill\nMana Cost: {2}\n\nParalyses enemies around the caster, duration increases with skill level.\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "狮子吼\n\n主动技能\n法力消耗: {2}\n\n麻痹施法者周围的敌人，持续时间随技能等级提升。\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "狮子吼\n\n主动技能\n法力消耗: {2}\n\n麻痹周围等级不高于\n自身等级加3级的怪物，\n持续时间随技能等级提升。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "List: {0}": {
     "Source": "List: {0}",
@@ -10652,7 +10652,7 @@
   },
   "MP Eater\n\nPassive Skill\n\nAbsorb monsters MP to recharge casters MP\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "MP Eater\n\nPassive Skill\n\nAbsorb monsters MP to recharge casters MP\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "吸气\n\n被动技能\n\n吸收怪物的魔法值以恢复施法者的魔法值。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "吸气\n\n被动技能\n\n被动技能，攻击时可恢复自身法力，\n并消耗玩家目标的法力。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "MP increase each level": {
     "Source": "MP increase each level",
@@ -10664,7 +10664,7 @@
   },
   "Magic Booster\n\nLasting Effect\nMana Cost {2}\n\nIncrease magical damage, but consume additional MP.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Magic Booster\n\nLasting Effect\nMana Cost {2}\n\nIncrease magical damage, but consume additional MP.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "魔力强化\n\n持续效果\n法力消耗 {2}\n\n提升魔法伤害，但额外消耗法力。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "深延术\n\n持续效果\n法力消耗 {2}\n\n提升魔力,但同时也会\n加大消耗.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Magic Glyph": {
     "Source": "Magic Glyph",
@@ -10676,7 +10676,7 @@
   },
   "Magic Shield\n\nInstant Casting\nMana Cost {2}\n\nCreates a protective field around the caster that absorbs damage.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Magic Shield\n\nInstant Casting\nMana Cost {2}\n\nCreates a protective field around the caster that absorbs damage.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "魔法护盾\n\n瞬发技能\n魔法消耗 {2}\n\n为施法者创造一个吸收伤害的防护屏障。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "魔法盾\n\n瞬发技能\n魔法消耗 {2}\n\n召唤一个魔法盾来保护\n施法者. 持续时间取决\n于魔法和技能等级\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Mail": {
     "Source": "Mail",
@@ -10716,11 +10716,11 @@
   },
   "Mass-Healing\n\nInstant Casting\nMana Cost {2}\n\nHeal all injured players in the specified\narea by surrounding them with mana.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Mass-Healing\n\nInstant Casting\nMana Cost {2}\n\nHeal all injured players in the specified\narea by surrounding them with mana.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "群体治疗术\n\n瞬发技能\n法力消耗 {2}\n\n用法力笼罩指定区域内的所有受伤玩家，\n为他们恢复生命值。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "群体治疗术\n\n瞬发技能\n法力消耗 {2}\n\n治疗3X3范围内的单位.\n治疗量随技能等级和\n道术增长.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Mass-Hiding\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nMobs will not be able to spot you or your \nparty members for a short moment. \nMobs will notice you and your party if \nyou start to move around.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Mass-Hiding\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nMobs will not be able to spot you or your \nparty members for a short moment. \nMobs will notice you and your party if \nyou start to move around.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "群体隐身术\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n在短时间内怪物无法发现你和你的队友，\n但一旦你或队友开始移动，\n怪物将会注意到你们。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "集体隐身术\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n目标3X3范围内的单位\n无法被怪物看到\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Materials": {
     "Source": "Materials",
@@ -10828,7 +10828,7 @@
   },
   "Meteor Strike\n\nChannelling Casting\nMana Cost {2}\n\nAttacks all monsters within 5x5 square area with lumps \nof fire falling from the sky.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Meteor Strike\n\nChannelling Casting\nMana Cost {2}\n\nAttacks all monsters within 5x5 square area with lumps \nof fire falling from the sky.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "流星打击\n\n引导施法\n法力消耗 {2}\n\n从天而降的火焰砸击5x5范围内的全部怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "流星火雨\n\n引导施法\n法力消耗 {2}\n\n召唤从天而降的火焰攻击\n5X5范围内的目标. 将会\n燃烧所有的目标. 有较长\n的施法时间,但造成比冰\n雨更高的伤害. 施法者被\n攻击将打断施法. 伤害随\n技能等级增加.\n\n法师在释放该技能时需集\n中精力引导法术.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "MiniMap ({0})": {
     "Source": "MiniMap ({0})",
@@ -10856,7 +10856,7 @@
   },
   "Mirroring\n\nInstant Casting\nMana Cost {2}\n\nCreate a mirror image of yourself to attack\nthe monsters together\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Mirroring\n\nInstant Casting\nMana Cost {2}\n\nCreate a mirror image of yourself to attack\nthe monsters together\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "分身术\n\n瞬间施法\n法力消耗 {2}\n\n创造一个自己的镜像，与自己一同攻击\n怪物。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "分身术\n\n瞬间施法\n法力消耗 {2}\n\n克隆施法者\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Misc Items": {
     "Source": "Misc Items",
@@ -10896,11 +10896,11 @@
   },
   "Moon Mist\n\nBuff Skill\nMana Cost {2}\n\nAbility to hide your self from Monster\nYour first attack will be stronger than normal.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Moon Mist\n\nBuff Skill\nMana Cost {2}\n\nAbility to hide your self from Monster\nYour first attack will be stronger than normal.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "月影迷雾\n\n增益技能\n魔法消耗 {2}\n\n可使自己从怪物视线中隐藏\n首次攻击将比平常更强。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "月华乱舞\n\n增益技能\n魔法消耗 {2}\n\n攻击以自身为中心的\n5×5格范围内的敌人，\n并获得短暂隐身。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Moonlight\n\nBuff Skill\nMana Cost {2}\n\nHide yourself from monster by turning invisible\nGreater damage is done when you attack monster using\nthis skill.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Moonlight\n\nBuff Skill\nMana Cost {2}\n\nHide yourself from monster by turning invisible\nGreater damage is done when you attack monster using\nthis skill.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "月光\n\n增益技能\n魔法消耗 {2}\n\n通过隐身来躲避怪物的视线\n使用此技能攻击怪物时造成更大伤害。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "月影术\n\n增益技能\n魔法消耗 {2}\n\n通过隐身来隐藏自己.\n在此状态下攻击造成\n更高伤害.冷却时间15秒.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Mount": {
     "Source": "Mount",
@@ -11124,7 +11124,7 @@
   },
   "One With Nature\n\nBuff Skill\nMana Cost {2}\n\nSummon an elemental ring around the caster that\ndeals damage to all targets within a 5×5 radius.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "One With Nature\n\nBuff Skill\nMana Cost {2}\n\nSummon an elemental ring around the caster that\ndeals damage to all targets within a 5×5 radius.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "天人合一\n\n增益技能\n法力消耗 {2}\n\n召唤一个环绕施法者的元素之环，\n对5×5范围内的所有目标造成伤害。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "天人合一\n\n增益技能\n法力消耗 {2}\n\n释放元素之环，对施法位置周围\n5×5格范围内可攻击的\n怪物和玩家造成一次魔法伤害。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "One or more files failed to download, check Error.txt for details.": {
     "Source": "One or more files failed to download, check Error.txt for details.",
@@ -11232,7 +11232,7 @@
   },
   "Pet Enhancer\n\nInstant Casting\nMana Cost {2}\n\nStrengthening pets defence and power.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Pet Enhancer\n\nInstant Casting\nMana Cost {2}\n\nStrengthening pets defence and power.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "宠物强化\n\n瞬间施放\n魔法消耗 {2}\n\n增强宠物的防御和力量。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "血龙水\n\n瞬间施放\n魔法消耗 {2}\n\n强化宠物.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Pets": {
     "Source": "Pets",
@@ -11248,7 +11248,7 @@
   },
   "Plague\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet + Poison\n\nDecreases targets MP and inflict target with various debuffs\nExample: Stun , Curse , Poison and Slow.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Plague\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet + Poison\n\nDecreases targets MP and inflict target with various debuffs\nExample: Stun , Curse , Poison and Slow.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "瘟疫术\n\n瞬间施放\n魔法消耗 {2}\n\n需要物品：护符 + 毒药\n\n降低目标的魔法值并施加各种负面状态\n示例：眩晕、诅咒、中毒和减速。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "瘟疫\n\n瞬间施放\n魔法消耗 {2}\n\n需要物品：护身符；\n装备毒药时可附加相应毒效\n\n攻击目标区域内的敌人，\n消耗敌方玩家法力，\n并有几率附加减速、冰冻\n或所持毒药效果。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Player is already in the selected namelist.": {
     "Source": "Player is already in the selected namelist.",
@@ -11376,7 +11376,7 @@
   },
   "Poison Cloud\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: GreenPoison\n\nThrow the amulet and a very strong\npoison cloud will appear in the area.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Poison Cloud\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: GreenPoison\n\nThrow the amulet and a very strong\npoison cloud will appear in the area.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "毒雾\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：绿毒\n\n投掷护身符，在目标区域生成\n强力的毒云。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "毒云\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：绿毒\n\n扔出的护身符会在目标\n区域造成一片毒云. 需\n要装备绿毒.\n基础伤害=道术平均值.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Poison Recovery + {0}": {
     "Source": "Poison Recovery + {0}",
@@ -11392,7 +11392,7 @@
   },
   "Poison Sword\n\nActive Skill\nMana Cost {2}\n\nPoison the monsters with a slash of you\nsword.Poison effect will damage the monster\nover time.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Poison Sword\n\nActive Skill\nMana Cost {2}\n\nPoison the monsters with a slash of you\nsword.Poison effect will damage the monster\nover time.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "猛毒剑气\n\n主动技能\n魔法消耗 {2}\n\n用剑斩击怪物使其中毒。中毒效果将随时间造成持续伤害。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "猛毒剑气\n\n主动技能\n魔法消耗 {2}\n\n消耗装备的毒药，\n使前方敌人持续中毒。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Poison: + {0}": {
     "Source": "Poison: + {0}",
@@ -11400,7 +11400,7 @@
   },
   "Poisoning\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Poison Powder\n\nThrow poison at mobs to weaken them.\nUse green poison to weaken Hp.\nUse red poison to weaken defense.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Poisoning\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Poison Powder\n\nThrow poison at mobs to weaken them.\nUse green poison to weaken Hp.\nUse red poison to weaken defense.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "施毒术\n\n瞬间施法\n法力消耗 {2}\n\n需要物品：剧毒粉末\n\n向怪物投掷毒药以削弱其能力。\n使用绿色毒药削弱生命值。\n使用红色毒药削弱防御力。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "施毒术\n\n瞬间施法\n法力消耗 {2}\n\n需要物品：剧毒粉末\n\n对目标使用毒素攻击,\n毒持续时间取决于技能\n等级和道术.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Potion": {
     "Source": "Potion",
@@ -11448,7 +11448,7 @@
   },
   "Protection Field\n\nBuff Skill\nMana Cost {2}\n\nConcentrates inner force and spreads it to all\n the parts of your body. This will enhance the\nprotection from enemies. Defense power and duration\nwill be depend on the skill level. Once the skill\n has been used, you will have to wait to use it again.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Protection Field\n\nBuff Skill\nMana Cost {2}\n\nConcentrates inner force and spreads it to all\n the parts of your body. This will enhance the\nprotection from enemies. Defense power and duration\nwill be depend on the skill level. Once the skill\n has been used, you will have to wait to use it again.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "护身气幕\n\n增益技能\n法力消耗 {2}\n\n凝聚内力覆盖全身，提升抵御敌人攻击的能力。防御力和持续时间取决于技能等级。技能使用后需等待才能再次施展。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "护身气幕\n\n增益技能\n法力消耗 {2}\n\n提起内力并散发到身体\n的每一个部分. 提升防\n御力. 提升的的防御和\n持续时间取决于技能等\n级.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Protection Glyph": {
     "Source": "Protection Glyph",
@@ -11472,7 +11472,7 @@
   },
   "Purification\n\nInstant Casting\nMana Cost {2}\n\nHelp others to recover from poisoning and\nparalysis using this skill.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Purification\n\nInstant Casting\nMana Cost {2}\n\nHelp others to recover from poisoning and\nparalysis using this skill.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "净化术\n\n瞬发技能\n法力消耗 {2}\n\n使用此技能帮助他人解除中毒\n和麻痹状态。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "净化术\n\n瞬发技能\n法力消耗 {2}\n\n净化中毒和麻痹效果\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Quest": {
     "Source": "Quest",
@@ -11504,7 +11504,7 @@
   },
   "Rage\n\nBuff Skill\nMana Cost {2}\n\nEnhances your inner force to increase its power\nfor a certain time. Attack power and duration time\nwill depend on the skill level. Once the skill has been used\n you will have to wait to use it again.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Rage\n\nBuff Skill\nMana Cost {2}\n\nEnhances your inner force to increase its power\nfor a certain time. Attack power and duration time\nwill depend on the skill level. Once the skill has been used\n you will have to wait to use it again.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "狂暴\n\n增益技能\n法力消耗 {2}\n\n激发内力在一段时间内提升力量。攻击力和持续时间取决于技能等级。技能使用后需等待才能再次施展。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "剑气爆\n\n增益技能\n法力消耗 {2}\n\n提起内力,在一定之间\n内增加攻击,提升的攻\n击和持续时间取决于\n技能等级.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Random": {
     "Source": "Random",
@@ -11592,7 +11592,7 @@
   },
   "Reincarnation\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nRevives a dead players\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Reincarnation\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nRevives a dead players\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "复活术\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n复活一名已死亡的玩家。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "复活术\n\n延时施法\n法力消耗 {2}\n\n需要物品：护身符\n\n经过一段时间施法后，\n尝试复活死亡玩家。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Reins": {
     "Source": "Reins",
@@ -11720,7 +11720,7 @@
   },
   "Repulsion\n\nInstant Casting\nMana Cost {2}\n\nPush away surrounding targets using the power of fire.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Repulsion\n\nInstant Casting\nMana Cost {2}\n\nPush away surrounding targets using the power of fire.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "抗拒火环\n\n瞬发技能\n魔法消耗 {2}\n\n借助火焰之力，将周围的敌人推开。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "抗拒火环\n\n瞬发技能\n魔法消耗 {2}\n\n推开周围的单位. 不造\n成伤害. 可推开等级低\n于自己的单位.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Request Divorce": {
     "Source": "Request Divorce",
@@ -11796,7 +11796,7 @@
   },
   "Revelation\n\nInstant Casting\nMana Cost {2}\n\nYou will be able to read Hp of others\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Revelation\n\nInstant Casting\nMana Cost {2}\n\nYou will be able to read Hp of others\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "心灵启示\n\n瞬发技能\n法力消耗 {2}\n\n能够读取其他人的生命值。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "心灵启示\n\n瞬发技能\n法力消耗 {2}\n\n显示目标的血量.\n持续时间随技能等级\n和道术增长. \n2级以上技能可立刻\n显示血量.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Revival ring": {
     "Source": "Revival ring",
@@ -12020,7 +12020,7 @@
   },
   "Shoulder Dash\n\nActive Skill\nMana Cost: {2}\n\nA warrior can push a target backwards by charging\nthem with his shoulder, inflicting damage\nif they hit any obstacle.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Shoulder Dash\n\nActive Skill\nMana Cost: {2}\n\nA warrior can push a target backwards by charging\nthem with his shoulder, inflicting damage\nif they hit any obstacle.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "野蛮冲撞\n\n主动技能\n法力消耗: {2}\n\n战士蓄力用肩膀撞击目标，将其推开，若目标撞上障碍物则造成额外伤害。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "野蛮冲撞\n\n主动技能\n法力消耗: {2}\n\n向前冲撞，推开等级低于自身的\n可推动敌人；成功推进后对目标\n造成伤害，遇到障碍停止前进。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Shout": {
     "Source": "Shout",
@@ -12112,11 +12112,11 @@
   },
   "Slashing Burst\n\nActive Skill\nMana Cost: {2}\n\nAllows The Warrior to Jump 1 Space Over an Object or Monster.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Slashing Burst\n\nActive Skill\nMana Cost: {2}\n\nAllows The Warrior to Jump 1 Space Over an Object or Monster.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "日闪\n\n主动技能\n法力消耗: {2}\n\n允许战士跳过物体或怪物跨越1格距离。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "日闪\n\n主动技能\n法力消耗: {2}\n\n攻击前方一格的敌人，\n并向前跃进两格；\n落点无法通行或被阻挡时不发生位移。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Slaying\n\nPassive Skill\n\nHitting accuracy and destructive power will\nbe increased in accordance with practice level.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Slaying\n\nPassive Skill\n\nHitting accuracy and destructive power will\nbe increased in accordance with practice level.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "攻杀剑术\n\n被动技能\n\n击中的准确度和破坏力会随着熟练等级的提升而增加。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "攻杀剑术\n\n被动技能\n\n根据技能等级，攻击命中率\n和破坏力将会得到提高.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Socket : {0}": {
     "Source": "Socket : {0}",
@@ -12124,7 +12124,7 @@
   },
   "Soul FireBall\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nPut power into a scroll and throw it at \na mob. The scroll will burst into fire.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Soul FireBall\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nPut power into a scroll and throw it at \na mob. The scroll will burst into fire.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "灵魂火符\n\n瞬间施法\n法力消耗 {2}\n\n需要物品：护身符\n\n将力量注入符咒并投向怪物，符咒将爆裂成火焰。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "灵魂火符\n\n瞬间施法\n法力消耗 {2}\n\n需要物品：护身符\n\n通过驱使护身符来攻击敌人.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Soul Glyph": {
     "Source": "Soul Glyph",
@@ -12132,7 +12132,7 @@
   },
   "Soul Shield\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nBless caster and party members to strengthen their magic\ndefence.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Soul Shield\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nBless caster and party members to strengthen their magic\ndefence.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "灵魂护盾\n\n瞬间施法\n法力消耗 {2}\n\n需要物品：护身符\n\n为施法者和队友施加祝福，强化其魔法防御力。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "幽灵盾\n\n瞬间施法\n法力消耗 {2}\n\n需要物品：护身符\n\n增加魔法防御.\n持续时间随技能等级和\n道术增长.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "SoulBinds on equip": {
     "Source": "SoulBinds on equip",
@@ -12152,7 +12152,7 @@
   },
   "Spirit Sword\n\nIncreases the chance of hitting the target in\n melee combat.\nPassive Skill\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Spirit Sword\n\nIncreases the chance of hitting the target in\n melee combat.\nPassive Skill\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "精神力战法\n\n提升近战命中目标的概率。\n被动技能\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "精神力战法\n\n被动技能\n\n准确随技能等级提高\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Split Amount:": {
     "Source": "Split Amount:",
@@ -12204,7 +12204,7 @@
   },
   "Storm Escape\n\nChannelling Casting\nMana Cost {2}\n\nParalyze nearby enemies and teleport to the designated location.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Storm Escape\n\nChannelling Casting\nMana Cost {2}\n\nParalyze nearby enemies and teleport to the designated location.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "风暴逃脱\n\n引导施法\n法力消耗 {2}\n\n麻痹附近敌人并瞬移至指定位置。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "风暴逃脱\n\n引导施法\n法力消耗 {2}\n\n对自身周围敌人造成伤害，\n并尝试瞬移至指定的有效位置；\n禁传地图无法传送。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Straight Shot\n\nActive Skill\nMana Cost {2} \n\nInfuses an arrow with mana to deal extra damage.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Straight Shot\n\nActive Skill\nMana Cost {2} \n\nInfuses an arrow with mana to deal extra damage.\n\nCurrent Skill Level {0}\nNext Level {1}",
@@ -12232,23 +12232,23 @@
   },
   "Summon HolyDeva\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nSummon a holy spirit.This holy spirit will\nuse strong thunder to attack monsters.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Summon HolyDeva\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nSummon a holy spirit.This holy spirit will\nuse strong thunder to attack monsters.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "召唤圣灵\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n召唤一位圣灵，它将释放强力雷电\n攻击怪物。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "召唤月灵\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n召唤一个月灵,可与神兽\n或骷髅同时存在.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Summon Shinsu\n\nInstant Casting\nMana Cost {2}\n\nSummons a Dog, That Will fight Side By Side with you.\nRequired Items: Amulet.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Summon Shinsu\n\nInstant Casting\nMana Cost {2}\n\nSummons a Dog, That Will fight Side By Side with you.\nRequired Items: Amulet.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "召唤神兽\n\n瞬发技能\n法力消耗 {2}\n\n召唤一只神兽，与您并肩作战。\n需要物品：护身符。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "召唤神兽\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符。\n\n召唤一只神兽帮助施法\n者战斗.\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Summon Skeleton\n\nInstant Casting\nMana Cost {2}\n\nSummons a Powerful AOE Skeleton, Which will Fight Side By Side With You\n\nRequired Items: Amulet.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Summon Skeleton\n\nInstant Casting\nMana Cost {2}\n\nSummons a Powerful AOE Skeleton, Which will Fight Side By Side With You\n\nRequired Items: Amulet.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "召唤骷髅\n\n瞬发技能\n法力消耗 {2}\n\n召唤一个强大的范围攻击骷髅，\n它将与你并肩作战。\n\n需要物品：护身符。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "召唤骷髅\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符。\n\n召唤一个骷髅协助战斗。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Summon Snakes\n\nSummoning Skill\nMana Cost {2}\n\nSummon a Totem that spawns a swarm of snakes that\naggro all monsters nearby and attack with\na chance to paralyse the target.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Summon Snakes\n\nSummoning Skill\nMana Cost {2}\n\nSummon a Totem that spawns a swarm of snakes that\naggro all monsters nearby and attack with\na chance to paralyse the target.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "召唤毒蛇\n\n召唤技能\n法力消耗 {2}\n\n召唤一个图腾，生成一群毒蛇。\n毒蛇会吸引周围所有怪物并攻击，\n有几率使目标麻痹。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "召唤毒蛇\n\n召唤技能\n法力消耗 {2}\n\n召唤能生成毒蛇的图腾。\n图腾可吸引附近符合条件的怪物，\n毒蛇攻击有几率使目标麻痹。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Summon Toad\n\nSummoning Skill\nMana Cost {2}\n\nSummons a Toad to fight by your side.\nThe toad cannot move and will explode if\nits master leaves its view range.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Summon Toad\n\nSummoning Skill\nMana Cost {2}\n\nSummons a Toad to fight by your side.\nThe toad cannot move and will explode if\nits master leaves its view range.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "召唤蟾蜍\n\n召唤技能\n法力消耗 {2}\n\n召唤一只蟾蜍与你并肩作战。\n蟾蜍无法移动，若主人离开其视野范围则会爆炸。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "召唤蟾蜍\n\n召唤技能\n法力消耗 {2}\n\n召唤一只原地作战的蟾蜍。\n主人离开一定范围或\n召唤时间结束后，蟾蜍死亡。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Summon Vampire\n\nSummoning Skill\nMana Cost {2}\n\nSummons a Vampire Spider to fight by your side.\nVampire Spider will leach enemy HP to heal caster.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Summon Vampire\n\nSummoning Skill\nMana Cost {2}\n\nSummons a Vampire Spider to fight by your side.\nVampire Spider will leach enemy HP to heal caster.\n\nCurrent Skill Level {0}\nNext Level {1}",
@@ -12256,7 +12256,7 @@
   },
   "Swift Feet\n\nBuff Skill\nMana Cost {2}\n\nIncreased Running Speed whilst active\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Swift Feet\n\nBuff Skill\nMana Cost {2}\n\nIncreased Running Speed whilst active\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "迅雷疾足\n\n增益技能\n魔法消耗 {2}\n\n激活时提高奔跑速度。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "轻身步\n\n增益技能\n魔法消耗 {2}\n\n增加移动速度\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "TOP 20 Archers": {
     "Source": "TOP 20 Archers",
@@ -12304,7 +12304,7 @@
   },
   "Teleport\n\nInstant Casting\nMana Cost {2}\n\nTeleport to a random spot.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Teleport\n\nInstant Casting\nMana Cost {2}\n\nTeleport to a random spot.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "瞬息移动\n\n瞬发技能\n魔法消耗 {2}\n\n瞬间传送到随机位置。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "瞬息移动\n\n瞬发技能\n魔法消耗 {2}\n\n随机传送到绑定回城点所在地图\n的可通行位置；技能等级越高，\n随机落点范围越靠近绑定回城点。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Teleport ring": {
     "Source": "Teleport ring",
@@ -12384,15 +12384,15 @@
   },
   "Thrusting\n\nToggle Skill\n\nIncreases the reach of your hits destructive power\nwill increase in accordance with practice level.\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Thrusting\n\nToggle Skill\n\nIncreases the reach of your hits destructive power\nwill increase in accordance with practice level.\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "刺杀剑术\n\n切换技能\n\n延长攻击距离，破坏力会随着熟练等级的提升而增加。\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "刺杀剑术\n\n切换技能\n\n同一方向攻击范围2格\n伤害取决于技能等级\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Thunderbolt\n\nInstant Casting\nMana Cost {2}\n\nStrikes the foe with a lightning bolt \ninflicting high damage.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Thunderbolt\n\nInstant Casting\nMana Cost {2}\n\nStrikes the foe with a lightning bolt \ninflicting high damage.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "雷电术\n\nInstant Casting\nMana Cost {2}\n\nStrikes the foe with a lightning bolt \ninflicting high damage.\n\nCurrent Skill Level {0}\nNext Level {1}"
+    "Text": "雷电术\n\n瞬发技能\n法力消耗 {2}\n\n从天空召唤雷电来攻击目标\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Thunderstorm \n\nInstant Casting\nMana Cost {2}\n\nCreates a thunder storm around the caster causing\ndamage to all Undead enemies with its range.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Thunderstorm \n\nInstant Casting\nMana Cost {2}\n\nCreates a thunder storm around the caster causing\ndamage to all Undead enemies with its range.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "地狱雷光\n\n瞬发技能\n魔法消耗 {2}\n\n在施法者周围制造雷暴，攻击范围内的所有亡灵敌人。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "地狱雷光\n\n瞬发技能\n魔法消耗 {2}\n\n在自身周围制造雷暴，\n攻击5×5格范围内的敌人；\n对非不死系敌人的伤害大幅降低。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Ticking time bomb.\n": {
     "Source": "Ticking time bomb.\n",
@@ -12508,11 +12508,11 @@
   },
   "Trap\n\nInstant casting\nCooldown Time 60 secs\n\nMana Cost {2}\n\nTrap the monster for a short while.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Trap\n\nInstant casting\nCooldown Time 60 secs\n\nMana Cost {2}\n\nTrap the monster for a short while.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "捕缚术\n\n瞬间施放\n冷却时间 60 秒\n\n魔法消耗 {2}\n\n将怪物困住一段时间。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "捕缚术\n\n主动技能\n魔法消耗 {2}\n\n困住怪物，受到攻击后解除；\n冷却时间随技能等级缩短。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Trap Hexagon\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nTrap the monster with this magical power\n to stop them from moving. Any damages\nfrom outside source will allow the monsters\nto move again.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Trap Hexagon\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nTrap the monster with this magical power\n to stop them from moving. Any damages\nfrom outside source will allow the monsters\nto move again.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "困魔咒\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n用这种魔法力量困住怪物，\n使其无法移动。受到外部伤害后，\n怪物将恢复移动能力。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "困魔咒\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n困住等级不高于\n自身等级加2级的怪物，\n受到攻击后解除。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Trick shot (Minimal damage)\nCan shoot over walls.\n": {
     "Source": "Trick shot (Minimal damage)\nCan shoot over walls.\n",
@@ -12520,11 +12520,11 @@
   },
   "Turn Undead\n\nInstant Casting\nMana Cost {2}\n\nChance to kill any undead target that meets the level requirements, in a single cast.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Turn Undead\n\nInstant Casting\nMana Cost {2}\n\nChance to kill any undead target that meets the level requirements, in a single cast.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "圣言术\n\n瞬发技能\n魔法消耗 {2}\n\n有几率瞬间击杀符合等级要求的亡灵目标。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "圣言术\n\n瞬发技能\n魔法消耗 {2}\n\n有几率击杀等级低于施法者的\n不死系怪物，成功率受\n双方等级和技能等级影响。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Twin Drake Blade\n\nActive Skill\nMana Cost {2}\n\nThe art of making multiple power attacks.\nIt has a low chance of stunning a target temporarily.\nStunned monsters receive an additional 50% damage.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Twin Drake Blade\n\nActive Skill\nMana Cost {2}\n\nThe art of making multiple power attacks.\nIt has a low chance of stunning a target temporarily.\nStunned monsters receive an additional 50% damage.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "双龙斩\n\n主动技能\n法力消耗 {2}\n\n连续施展多重强力攻击，有低概率短暂眩晕目标。被眩晕的怪物额外受到50%伤害。\n\n当前技能等级 {0}\n下一等级 {1}"
+    "Text": "双龙斩\n\n主动技能\n法力消耗 {2}\n\n造成多重伤害的艺术. \n一定几率麻痹怪物 \n(攻击被麻痹的怪物\n造成1.5倍伤害).\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Type: {0}": {
     "Source": "Type: {0}",
@@ -12544,7 +12544,7 @@
   },
   "Ultimate Enhancer\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nAbsorb the energy from the surroundings to increase the stats.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Ultimate Enhancer\n\nInstant Casting\nMana Cost {2}\n\nRequired Items: Amulet\n\nAbsorb the energy from the surroundings to increase the stats.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "终极强化\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n吸收周围能量以提升自身属性。\n\n当前技能等级 {0}\n下一级等级 {1}"
+    "Text": "无极真气\n\n瞬发技能\n法力消耗 {2}\n\n需要物品：护身符\n\n提升友方目标的攻击、魔法\n或道术上限，\n增益类型取决于目标。\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Unable to link item, message exceeds allowed length": {
     "Source": "Unable to link item, message exceeds allowed length",
@@ -12600,7 +12600,7 @@
   },
   "Use Cross Half Moon.": {
     "Source": "Use Cross Half Moon.",
-    "Text": "使用狂风斩。"
+    "Text": "使用圆月弯刀。"
   },
   "Use Double Slash.": {
     "Source": "Use Double Slash.",
@@ -12632,7 +12632,7 @@
   },
   "Vampirism\n\nInstant Casting\nMana Cost {2}\n\nUsing Mp take away monsters Hp to\nincrease your Hp.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Vampirism\n\nInstant Casting\nMana Cost {2}\n\nUsing Mp take away monsters Hp to\nincrease your Hp.\n\nCurrent Skill Level {0}\nNext Level {1}",
-    "Text": "噬血术\n\n瞬间施法\n法力消耗 {2}\n\n消耗法力夺取怪物生命值来\n提升自身生命值。\n\n当前技能等级 {0}\n下一级 {1}"
+    "Text": "嗜血术\n\n瞬间施法\n法力消耗 {2}\n\n从怪物身上汲取生命值\n\n当前技能等级 {0}\n下一级 {1}"
   },
   "Verification Failed!!": {
     "Source": "Verification Failed!!",
@@ -13366,6 +13366,114 @@
     "Source": "POST request: {0}",
     "Text": "POST 请求：{0}"
   },
+  "Cannot commit the current monster cell. Check the input value.": {
+    "Source": "Cannot commit the current monster cell. Check the input value.",
+    "Text": "无法提交当前怪物单元格，请检查输入值。"
+  },
+  "Cannot synchronize references for an empty original monster name.": {
+    "Source": "Cannot synchronize references for an empty original monster name.",
+    "Text": "原怪物名称为空，无法同步引用。"
+  },
+  "Drop file is referenced by #INSERT and cannot be renamed automatically: {0} -> {1}": {
+    "Source": "Drop file is referenced by #INSERT and cannot be renamed automatically: {0} -> {1}",
+    "Text": "掉落文件被 #INSERT 引用，无法自动改名：{0} -> {1}"
+  },
+  "Drop file is still used by another monster. Set an explicit drop path first: {0}": {
+    "Source": "Drop file is still used by another monster. Set an explicit drop path first: {0}",
+    "Text": "掉落文件仍被其他怪物使用，请先设置独立的掉落路径：{0}"
+  },
+  "Drop file rename conflict. Existing files will not be overwritten: {0} -> {1}": {
+    "Source": "Drop file rename conflict. Existing files will not be overwritten: {0} -> {1}",
+    "Text": "掉落文件改名冲突，已有文件不会被覆盖：{0} -> {1}"
+  },
+  "Duplicate setting prevents automatic synchronization: {0} [{1}] {2}": {
+    "Source": "Duplicate setting prevents automatic synchronization: {0} [{1}] {2}",
+    "Text": "配置项重复，无法自动同步：{0} [{1}] {2}"
+  },
+  "Failed to save monsters": {
+    "Source": "Failed to save monsters",
+    "Text": "保存怪物失败"
+  },
+  "File is not valid UTF-8 or BOM-marked Unicode. Refusing to rewrite its encoding: {0}": {
+    "Source": "File is not valid UTF-8 or BOM-marked Unicode. Refusing to rewrite its encoding: {0}",
+    "Text": "文件不是有效的 UTF-8 或带 BOM 的 Unicode 编码，为保护原文件已停止写入：{0}"
+  },
+  "Monster name cannot be blank: {0}": {
+    "Source": "Monster name cannot be blank: {0}",
+    "Text": "怪物名称不能为空，怪物编号：{0}"
+  },
+  "Monster name cannot be used as a drop filename: {0}": {
+    "Source": "Monster name cannot be used as a drop filename: {0}",
+    "Text": "怪物名称不能用作掉落文件名：{0}"
+  },
+  "Monster name contains script delimiters, whitespace or invisible characters: {0}": {
+    "Source": "Monster name contains script delimiters, whitespace or invisible characters: {0}",
+    "Text": "怪物名称包含脚本分隔符、空白或不可见字符：{0}"
+  },
+  "Monster name is ambiguous after removing spaces; references cannot be synchronized: {0}": {
+    "Source": "Monster name is ambiguous after removing spaces; references cannot be synchronized: {0}",
+    "Text": "怪物名称移除空格后存在歧义，无法同步引用：{0}"
+  },
+  "Monster reference save failed. Settings, scripts and database rollback was attempted. Check the error details before retrying.": {
+    "Source": "Monster reference save failed. Settings, scripts and database rollback was attempted. Check the error details before retrying.",
+    "Text": "怪物引用保存失败，已尝试回滚配置、脚本和数据库。请检查错误详情后再重试。"
+  },
+  "Monster save or drop file rename failed. Drop file rollback was attempted. Check the error details before retrying.": {
+    "Source": "Monster save or drop file rename failed. Drop file rollback was attempted. Check the error details before retrying.",
+    "Text": "怪物保存或掉落文件改名失败，已尝试回滚掉落文件。请检查错误详情后再重试。"
+  },
+  "Monster setting changed after validation. Save was cancelled: [{0}] {1}": {
+    "Source": "Monster setting changed after validation. Save was cancelled: [{0}] {1}",
+    "Text": "怪物配置项在校验后发生变化，已取消保存：[{0}] {1}"
+  },
+  "Monster setting differs between memory and disk. Resolve the conflict first: {0} [{1}] {2}": {
+    "Source": "Monster setting differs between memory and disk. Resolve the conflict first: {0} [{1}] {2}",
+    "Text": "怪物配置在内存与磁盘中不一致，请先解决冲突：{0} [{1}] {2}"
+  },
+  "Original monster name is ambiguous; references cannot be synchronized: {0}": {
+    "Source": "Original monster name is ambiguous; references cannot be synchronized: {0}",
+    "Text": "原怪物名称存在歧义，无法同步引用：{0}"
+  },
+  "Referenced file changed after validation. Save was cancelled: {0}": {
+    "Source": "Referenced file changed after validation. Save was cancelled: {0}",
+    "Text": "引用文件在校验后发生变化，已取消保存：{0}"
+  },
+  "Final monster name is ambiguous; references cannot be synchronized: {0}": {
+    "Source": "Final monster name is ambiguous; references cannot be synchronized: {0}",
+    "Text": "最终怪物名称存在重名或别名歧义，无法同步引用：{0}"
+  },
+  "Guild {0} is not available. Please contact an administrator.": {
+    "Source": "Guild {0} is not available. Please contact an administrator.",
+    "Text": "公会 {0} 不可用，请联系管理员。"
+  },
+  "Binding Shot\n\nActive Skill\nMana Cost {2}\n\nBind monsters in a 3x3 area around the target.\nTargets must be no more than two levels above the caster.\nTaking damage breaks the binding.\n\nCurrent Skill Level {0}\nNext Level {1}": {
+    "Source": "Binding Shot\n\nActive Skill\nMana Cost {2}\n\nBind monsters in a 3x3 area around the target.\nTargets must be no more than two levels above the caster.\nTaking damage breaks the binding.\n\nCurrent Skill Level {0}\nNext Level {1}",
+    "Text": "束缚箭\n\n主动技能\n法力消耗 {2}\n\n束缚目标周围3×3格范围内、\n等级不超过自身等级加2级的怪物；\n受到伤害会解除束缚。\n\n当前技能等级 {0}\n下一级 {1}"
+  },
+  "Mental State\n\nToggle Skill\n\nCycle between aggressive, trick-shot and group modes.\nAffects selected arrow attacks and monster targeting.\n\nCurrent Skill Level {0}\nNext Level {1}": {
+    "Source": "Mental State\n\nToggle Skill\n\nCycle between aggressive, trick-shot and group modes.\nAffects selected arrow attacks and monster targeting.\n\nCurrent Skill Level {0}\nNext Level {1}",
+    "Text": "精神状态\n\n切换技能\n\n循环切换攻击、技巧射击和组队模式，\n影响部分箭技与怪物的仇恨判定。\n\n当前技能等级 {0}\n下一级 {1}"
+  },
+  "Portal\n\nActive Skill\nMana Cost {2}\n\nPlace two portals for yourself and group members.\nPortal duration and uses are limited.\n\nCurrent Skill Level {0}\nNext Level {1}": {
+    "Source": "Portal\n\nActive Skill\nMana Cost {2}\n\nPlace two portals for yourself and group members.\nPortal duration and uses are limited.\n\nCurrent Skill Level {0}\nNext Level {1}",
+    "Text": "传送门\n\n主动技能\n法力消耗 {2}\n\n先后设置一对传送门，\n供自己和队友在两端间传送；\n持续时间和通行次数有限。\n\n当前技能等级 {0}\n下一级 {1}"
+  },
+  "Battle Cry\n\nActive Skill\nMana Cost {2}\n\nChance to draw nearby monsters in a 5x5 area to attack you.\nSome monsters are immune.\n\nCurrent Skill Level {0}\nNext Level {1}": {
+    "Source": "Battle Cry\n\nActive Skill\nMana Cost {2}\n\nChance to draw nearby monsters in a 5x5 area to attack you.\nSome monsters are immune.\n\nCurrent Skill Level {0}\nNext Level {1}",
+    "Text": "战吼\n\n主动技能\n法力消耗 {2}\n\n有概率吸引自身周围\n5×5格范围内的怪物，\n使其以自己为攻击目标；\n部分怪物不受影响。\n\n当前技能等级 {0}\n下一级 {1}"
+  },
+  "Fire Bounce\n\nActive Skill\nMana Cost {2}\n\nAttack with a fireball that can bounce from monsters\nto nearby enemies. Higher levels allow more bounces.\n\nCurrent Skill Level {0}\nNext Level {1}": {
+    "Source": "Fire Bounce\n\nActive Skill\nMana Cost {2}\n\nAttack with a fireball that can bounce from monsters\nto nearby enemies. Higher levels allow more bounces.\n\nCurrent Skill Level {0}\nNext Level {1}",
+    "Text": "弹射火球\n\n主动技能\n法力消耗 {2}\n\n发射火球攻击目标；\n目标为怪物时，可向附近敌人\n随机弹射，次数随技能等级提高。\n\n当前技能等级 {0}\n下一级 {1}"
+  },
+  "Meteor Shower\n\nActive Skill\nMana Cost {2}\n\nAttack the main target. If it is a monster, strike\na few nearby enemies with half the base damage.\n\nCurrent Skill Level {0}\nNext Level {1}": {
+    "Source": "Meteor Shower\n\nActive Skill\nMana Cost {2}\n\nAttack the main target. If it is a monster, strike\na few nearby enemies with half the base damage.\n\nCurrent Skill Level {0}\nNext Level {1}",
+    "Text": "流星雨\n\n主动技能\n法力消耗 {2}\n\n攻击主目标；主目标为怪物时，\n还会攻击附近少量敌人，\n次目标的伤害基数减半。\n\n当前技能等级 {0}\n下一级 {1}"
+  },
+  "Cat Tongue\n\nActive Skill\nMana Cost {2}\n\nAttack one enemy, then randomly inflict stun or slow.\nFreezing players depends on the server setting.\n\nCurrent Skill Level {0}\nNext Level {1}": {
+    "Source": "Cat Tongue\n\nActive Skill\nMana Cost {2}\n\nAttack one enemy, then randomly inflict stun or slow.\nFreezing players depends on the server setting.\n\nCurrent Skill Level {0}\nNext Level {1}",
+    "Text": "猫舌术\n\n主动技能\n法力消耗 {2}\n\n攻击一个敌人，造成伤害后\n随机附加眩晕或减速；\n服务器开启玩家冰冻时，\n也可能使玩家冰冻。\n\n当前技能等级 {0}\n下一级 {1}"
+  },
   "Drop rate must be a positive whole number.": {
     "Source": "Drop rate must be a positive whole number.",
     "Text": "掉落率必须是正整数。"
@@ -13373,9 +13481,5 @@
   "Gold rate and amount must be positive numbers.": {
     "Source": "Gold rate and amount must be positive numbers.",
     "Text": "金币倍率与数量必须是正数。"
-  },
-  "Guild {0} is not available. Please contact an administrator.": {
-    "Source": "Guild {0} is not available. Please contact an administrator.",
-    "Text": "公会 {0} 不可用，请联系管理员。"
   }
 }
