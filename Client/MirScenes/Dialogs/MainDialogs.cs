@@ -3477,6 +3477,10 @@ namespace Client.MirScenes.Dialogs
                     SkillButton.Hint = GameLanguage.Get("Blade Avalanche\n\nActive Skill\nMana Cost {2}\n\nHurls blades in three directions in front of the\ncaster, creating a deadly storm of metal\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
                     break;
 
+                case Spell.BattleCry:
+                    SkillButton.Hint = GameLanguage.Get("Battle Cry\n\nActive Skill\nMana Cost {2}\n\nChance to draw nearby monsters in a 5x5 area to attack you.\nSome monsters are immune.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
+                    break;
+
                 //Wizard
                 case Spell.FireBall:
                     SkillButton.Hint = GameLanguage.Get("Fireball \n\nInstant Casting\nMana Cost {2}\n\nElements of fire are gathered to form\na fireball. Throw at monsters for damage.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
@@ -3555,6 +3559,16 @@ namespace Client.MirScenes.Dialogs
                     break;
                 case Spell.Blink:
                     SkillButton.Hint = GameLanguage.Get("Blink\n\nInstant Casting\nMana Cost {2}\n\nTeleport to a random spot near you.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
+                    break;
+
+                case Spell.Portal:
+                    SkillButton.Hint = GameLanguage.Get("Portal\n\nActive Skill\nMana Cost {2}\n\nPlace two portals for yourself and group members.\nPortal duration and uses are limited.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
+                    break;
+                case Spell.FireBounce:
+                    SkillButton.Hint = GameLanguage.Get("Fire Bounce\n\nActive Skill\nMana Cost {2}\n\nAttack with a fireball that can bounce from monsters\nto nearby enemies. Higher levels allow more bounces.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
+                    break;
+                case Spell.MeteorShower:
+                    SkillButton.Hint = GameLanguage.Get("Meteor Shower\n\nActive Skill\nMana Cost {2}\n\nAttack the main target. If it is a monster, strike\na few nearby enemies with half the base damage.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
                     break;
 
                 //Taoist
@@ -3684,6 +3698,10 @@ namespace Client.MirScenes.Dialogs
                     SkillButton.Hint = GameLanguage.Get("Moon Mist\n\nBuff Skill\nMana Cost {2}\n\nAbility to hide your self from Monster\nYour first attack will be stronger than normal.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
                     break;
 
+                case Spell.CatTongue:
+                    SkillButton.Hint = GameLanguage.Get("Cat Tongue\n\nActive Skill\nMana Cost {2}\n\nAttack one enemy, then randomly inflict stun or slow.\nFreezing players depends on the server setting.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
+                    break;
+
                 //Archer
                 case Spell.Focus:
                     SkillButton.Hint = GameLanguage.Get("Focus\n\nPassive Skill\n\nIncreases chance to hit with physical attacks.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
@@ -3743,6 +3761,13 @@ namespace Client.MirScenes.Dialogs
                     SkillButton.Hint = GameLanguage.Get("One With Nature\n\nBuff Skill\nMana Cost {2}\n\nSummon an elemental ring around the caster that\ndeals damage to all targets within a 5×5 radius.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
                     break;
 
+
+                case Spell.BindingShot:
+                    SkillButton.Hint = GameLanguage.Get("Binding Shot\n\nActive Skill\nMana Cost {2}\n\nBind monsters in a 3x3 area around the target.\nTargets must be no more than two levels above the caster.\nTaking damage breaks the binding.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
+                    break;
+                case Spell.MentalState:
+                    SkillButton.Hint = GameLanguage.Get("Mental State\n\nToggle Skill\n\nCycle between aggressive, trick-shot and group modes.\nAffects selected arrow attacks and monster targeting.\n\nCurrent Skill Level {0}\nNext Level {1}", Magic.Level, Magic.Level == 0 ? Magic.Level1 : Magic.Level == 1 ? Magic.Level2 : Magic.Level == 2 ? Magic.Level3 : 0, Magic.BaseCost);
+                    break;
 
                 default:
 
