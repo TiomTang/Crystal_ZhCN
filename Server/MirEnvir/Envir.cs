@@ -2449,7 +2449,16 @@ namespace Server.MirEnvir
 
         public void SaveDB()
         {
-            if (File.Exists(DatabasePath))
+            bool existed = File.Exists(DatabasePath);
+            using var stream = new FileStream(DatabasePath, existed ? FileMode.Open : FileMode.CreateNew,
+                FileAccess.ReadWrite, FileShare.None);
+            SaveDB(stream, existed);
+        }
+
+        // The caller owns the stream and may retain it for a guarded save/rollback transaction.
+        public void SaveDB(FileStream stream, bool createBackup = true)
+        {
+            if (createBackup)
             {
                 if (!Directory.Exists(DatabaseBackUpPath)) Directory.CreateDirectory(DatabaseBackUpPath);
 
@@ -2459,11 +2468,13 @@ namespace Server.MirEnvir
                 var backupFile = Path.Combine(DatabaseBackUpPath, fileName);
 
                 if (File.Exists(backupFile)) File.Delete(backupFile);
-                File.Copy(DatabasePath, backupFile);
+                stream.Position = 0;
+                using var backup = File.Create(backupFile);
+                stream.CopyTo(backup);
             }
 
-            using (var stream = File.Create(DatabasePath))
-            using (var writer = new BinaryWriter(stream))
+            stream.Position = 0;
+            using (var writer = new BinaryWriter(stream, new System.Text.UTF8Encoding(false, true), leaveOpen: true))
             {
                 writer.Write(Version);
                 writer.Write(CustomVersion);
@@ -2515,6 +2526,8 @@ namespace Server.MirEnvir
                 for (var i = 0; i < GTMapList.Count; i++)
                     GTMapList[i].Save(writer);
             }
+            stream.SetLength(stream.Position);
+            stream.Flush(true);
         }
 
 
