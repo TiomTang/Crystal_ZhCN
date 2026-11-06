@@ -103,6 +103,9 @@ namespace Server.MirEnvir
 
         private Thread _thread;
         private TcpListener _listener;
+        private readonly object _networkLock = new object();
+        private bool _acceptingConnections;
+        private int _pendingAccepts;
         private bool StatusPortEnabled = true;
         public List<MirStatusConnection> StatusConnections = new List<MirStatusConnection>();
         private TcpListener _StatusPort;
@@ -138,7 +141,7 @@ namespace Server.MirEnvir
         public int GuildCount; //This shouldn't be needed?? -> remove in the future
 
         //Live Info
-        public bool Saving = false;
+        public volatile bool Saving = false;
         public List<Map> MapList = new List<Map>();
         public List<SafeZoneInfo> StartPoints = new List<SafeZoneInfo>();
         public List<ItemInfo> StartItems = new List<ItemInfo>();
@@ -157,6 +160,11 @@ namespace Server.MirEnvir
 
         private const int CycleInterval = 10;
         private readonly object _lifecycleLock = new object();
+        private readonly object _shutdownLock = new object();
+        private volatile bool _shutdownPending;
+        public bool ShutdownPending => _shutdownPending;
+        private bool _saveOnShutdown;
+        private readonly CountdownEvent _worldSaves = new CountdownEvent(1);
         private readonly ManualResetEvent _stopEvent = new ManualResetEvent(false);
         public MobThread[] MobThreads = new MobThread[Settings.ThreadLimit];
         public int SpawnMultiplier = 1;//set this to 2 if you want double spawns (warning this can easily lag your server far beyond what you imagine)
@@ -2033,6 +2041,7 @@ namespace Server.MirEnvir
                 }
 
                 StartNetwork();
+                _saveOnShutdown = true;
                 if (Settings.StartHTTPService)
                 {
                     http = new HttpServer();
@@ -2176,11 +2185,7 @@ namespace Server.MirEnvir
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.InnerWorkloopErrorLine), line, ex));
                 }
 
-                StopNetwork();
-                StopEnvir();
-                SaveAccounts();
-                SaveGuilds(true);
-                SaveConquests(true);
+
             }
             catch (Exception ex)
             {
@@ -2200,26 +2205,10 @@ namespace Server.MirEnvir
                 _stopEvent.Set();
                 try
                 {
-                    Interlocked.Exchange(ref http, null)?.Stop();
-                }
-                catch (Exception ex)
-                {
-                    MessageQueue.Enqueue(string.Format("[http stop error]{0}", ex));
+                    CompleteShutdown();
                 }
                 finally
                 {
-                    // The work loop, its Parallel.For passes and the network have all
-                    // returned by now, so nothing is still walking the world and the
-                    // previous world can be dropped before another Start is allowed.
-                    try
-                    {
-                        ReleaseRuntimeState();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageQueue.Enqueue(GameLanguage.Get("[runtime release error]{0}", ex));
-                    }
-
                     lock (_lifecycleLock)
                         _thread = null;
                 }
@@ -2231,6 +2220,54 @@ namespace Server.MirEnvir
             var remaining = cycleStart + CycleInterval - Stopwatch.ElapsedMilliseconds;
             if (remaining > 0)
                 _stopEvent.WaitOne((int)remaining);
+        }
+
+        // Keep the stopped world available for a later Stop retry if any final save
+        // fails. Start must not reload stale disk state over this retained world.
+        private void CompleteShutdown()
+        {
+            lock (_shutdownLock)
+            {
+                if (!_shutdownPending) return;
+                bool stopped = TryShutdownStep("http stop", () =>
+                {
+                    http?.Stop();
+                    http = null;
+                });
+                stopped &= TryShutdownStep("network stop", StopNetwork);
+                if (!stopped) return;
+
+                bool saved = true;
+                if (_saveOnShutdown)
+                {
+                    // Earlier asynchronous world saves must finish before final writes.
+                    _worldSaves.Signal();
+                    _worldSaves.Wait();
+                    _worldSaves.Reset(1);
+                    saved &= TryShutdownStep("goods save", () => SaveGoods(true));
+                    saved &= TryShutdownStep("account cleanup", CleanUp);
+                    saved &= TryShutdownStep("account save", () => SaveAccounts(true));
+                    saved &= TryShutdownStep("guild save", () => SaveGuilds(true));
+                    saved &= TryShutdownStep("conquest save", () => SaveConquests(true));
+                }
+
+                if (saved && TryShutdownStep("runtime release", ReleaseRuntimeState))
+                    _shutdownPending = false;
+            }
+        }
+
+        private bool TryShutdownStep(string step, Action action)
+        {
+            try
+            {
+                action();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageQueue.Enqueue(string.Format("[shutdown {0} failed] {1}. Runtime state retained; fix the error and stop again before restarting or closing the server.", step, ex));
+                return false;
+            }
         }
 
         private void ThreadLoop(MobThread Info)
@@ -2523,6 +2560,11 @@ namespace Server.MirEnvir
 
         public void SaveAccounts()
         {
+            SaveAccounts(false);
+        }
+
+        private void SaveAccounts(bool throwOnFailure)
+        {
             while (Saving)
                 Thread.Sleep(1);
 
@@ -2539,6 +2581,7 @@ namespace Server.MirEnvir
             catch (Exception ex)
             {
                 MessageQueue.Enqueue(ex);
+                if (throwOnFailure) throw;
             }
         }
 
@@ -2615,9 +2658,8 @@ namespace Server.MirEnvir
 					var mStream = new MemoryStream();
                     var writer = new BinaryWriter(mStream);
 					GuildList[i].Save(writer);
-                    var fStream = new FileStream(Path.Combine(Settings.GuildPath, i + ".mgdn"), FileMode.Create);
                     var data = mStream.ToArray();
-                    fStream.BeginWrite(data, 0, data.Length, EndSaveGuildsAsync, fStream);
+                    WriteWorldSave(Path.Combine(Settings.GuildPath, i + ".mgdn"), data, forced, EndSaveGuildsAsync);
                 }
             }
         }
@@ -2637,8 +2679,14 @@ namespace Server.MirEnvir
                 if (File.Exists(oldfilename + "o"))
                     File.Delete(oldfilename + "o");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageQueue.Enqueue(ex);
+            }
+            finally
+            {
+                fStream?.Dispose();
+                _worldSaves.Signal();
             }
         }
 
@@ -2678,17 +2726,16 @@ namespace Server.MirEnvir
                         npc.UsedGoods[k].Save(writer);
                     }
 
-                    var fStream = new FileStream(path, FileMode.Create);
                     var data = mStream.ToArray();
-                    fStream.BeginWrite(data, 0, data.Length, EndSaveGoodsAsync, fStream);
+                    WriteWorldSave(path, data, forced, EndSaveGoodsAsync);
                 }
             }
         }
         private void EndSaveGoodsAsync(IAsyncResult result)
         {
+            var fStream = result.AsyncState as FileStream;
             try
             {
-                var fStream = result.AsyncState as FileStream;
                 if (fStream == null) return;
                 var oldfilename = fStream.Name.Substring(0, fStream.Name.Length - 1);
                 var newfilename = fStream.Name;
@@ -2700,8 +2747,14 @@ namespace Server.MirEnvir
                 if (File.Exists(oldfilename + "o"))
                     File.Delete(oldfilename + "o");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageQueue.Enqueue(ex);
+            }
+            finally
+            {
+                fStream?.Dispose();
+                _worldSaves.Signal();
             }
         }
 
@@ -2715,9 +2768,8 @@ namespace Server.MirEnvir
                 var mStream = new MemoryStream();
                 var writer = new BinaryWriter(mStream);
                 ConquestList[i].Save(writer);
-                var fStream = new FileStream(Path.Combine(Settings.ConquestsPath, ConquestList[i].Info.Index + ".mcdn"), FileMode.Create);
                 var data = mStream.ToArray();
-                fStream.BeginWrite(data, 0, data.Length, EndSaveConquestsAsync, fStream);
+                WriteWorldSave(Path.Combine(Settings.ConquestsPath, ConquestList[i].Info.Index + ".mcdn"), data, forced, EndSaveConquestsAsync);
             }
         }
         private void EndSaveConquestsAsync(IAsyncResult result)
@@ -2736,8 +2788,44 @@ namespace Server.MirEnvir
                 if (File.Exists(oldfilename + "o"))
                     File.Delete(oldfilename + "o");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageQueue.Enqueue(ex);
+            }
+            finally
+            {
+                fStream?.Dispose();
+                _worldSaves.Signal();
+            }
+        }
+
+        // Final saves complete (including rename) before runtime roots are dropped.
+        // Regular saves retain their asynchronous behavior and join this barrier.
+        private void WriteWorldSave(string path, byte[] data, bool forced, AsyncCallback completed)
+        {
+            if (forced)
+            {
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    stream.Write(data, 0, data.Length);
+                    stream.Flush(true);
+                }
+                File.Move(path, path.Substring(0, path.Length - 1), true);
+                return;
+            }
+
+            _worldSaves.AddCount();
+            FileStream pending = null;
+            try
+            {
+                pending = new FileStream(path, FileMode.Create);
+                pending.BeginWrite(data, 0, data.Length, completed, pending);
+            }
+            catch
+            {
+                pending?.Dispose();
+                _worldSaves.Signal();
+                throw;
             }
         }
 
@@ -3230,8 +3318,15 @@ namespace Server.MirEnvir
             lock (_lifecycleLock)
             {
                 if (Running || _thread != null) return;
+                if (_shutdownPending)
+                {
+                    MessageQueue.Enqueue("[start blocked] Final shutdown failed. Fix the error and stop again before restarting or closing the server.");
+                    return;
+                }
 
                 _stopEvent.Reset();
+                _saveOnShutdown = false;
+                _shutdownPending = true;
                 Running = true;
                 _thread = new Thread(WorkLoop) { IsBackground = true };
                 _thread.Start();
@@ -3248,15 +3343,10 @@ namespace Server.MirEnvir
                 thread = _thread;
             }
 
-            try
-            {
-                Interlocked.Exchange(ref http, null)?.Stop();
-            }
-            finally
-            {
-                if (thread != null && thread != Thread.CurrentThread)
-                    thread.Join();
-            }
+            if (thread != null && thread != Thread.CurrentThread)
+                thread.Join();
+            else if (thread == null && _shutdownPending)
+                CompleteShutdown();
         }
 
         public void Reboot()
@@ -3380,6 +3470,11 @@ namespace Server.MirEnvir
         
         private void StartNetwork()
         {
+            lock (_networkLock)
+            {
+                if (_listener != null || _StatusPort != null || _pendingAccepts != 0)
+                    throw new InvalidOperationException("The previous network has not stopped.");
+            }
             Connections.Clear();
 
             LoadAccounts();
@@ -3389,26 +3484,26 @@ namespace Server.MirEnvir
             LoadConquests();
             LoadGTInfo();
 
-            _listener = new TcpListener(IPAddress.Parse(Settings.IPAddress), Settings.Port);
-            _listener.Start();
-            _listener.BeginAcceptTcpClient(Connection, null);
-
-            if (StatusPortEnabled)
+            lock (_networkLock)
             {
-                _StatusPort = new TcpListener(IPAddress.Parse(Settings.IPAddress), 3000);
-                _StatusPort.Start();
-                _StatusPort.BeginAcceptTcpClient(StatusConnection, null);
+                _listener = new TcpListener(IPAddress.Parse(Settings.IPAddress), Settings.Port);
+                _listener.Start();
+
+                if (StatusPortEnabled)
+                {
+                    _StatusPort = new TcpListener(IPAddress.Parse(Settings.IPAddress), 3000);
+                    _StatusPort.Start();
+                }
+
+                _acceptingConnections = true;
+                BeginNetworkAccept(_listener, Connection);
+                if (_StatusPort != null)
+                    BeginNetworkAccept(_StatusPort, StatusConnection);
             }
 
             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NetworkStarted));
         }
 
-        private void StopEnvir()
-        {
-            SaveGoods(true);
-
-            CleanUp();
-        }
 
         // Drops every reference Envir.Main keeps to the previous world so it can be
         // collected. Saving is deliberately NOT done here: callers must have finished
@@ -3454,48 +3549,77 @@ namespace Server.MirEnvir
         }
         private void StopNetwork()
         {
-            _listener.Stop();
-            lock (Connections)
+            var errors = new List<Exception>();
+            lock (_networkLock)
+            {
+                _acceptingConnections = false;
+                try
+                {
+                    _listener?.Stop();
+                    _listener = null;
+                }
+                catch (Exception ex) { errors.Add(ex); }
+                try
+                {
+                    _StatusPort?.Stop();
+                    _StatusPort = null;
+                }
+                catch (Exception ex) { errors.Add(ex); }
+
+                Monitor.PulseAll(_networkLock);
+                // Includes callbacks queued by BeginAccept but not yet entered.
+                while (errors.Count == 0 && _pendingAccepts != 0)
+                    Monitor.Wait(_networkLock);
+            }
+
+            try
             {
                 for (var i = Connections.Count - 1; i >= 0; i--)
                     Connections[i].SendDisconnect(0);
-            }
-
-            if (StatusPortEnabled)
-            {
-                _StatusPort.Stop();
                 for (var i = StatusConnections.Count - 1; i >= 0; i--)
                     StatusConnections[i].SendDisconnect();
+
+                var expire = Stopwatch.ElapsedMilliseconds + 5000;
+                while (Connections.Count != 0 && Stopwatch.ElapsedMilliseconds < expire)
+                {
+                    Time = Stopwatch.ElapsedMilliseconds;
+                    for (var i = Connections.Count - 1; i >= 0; i--)
+                        Connections[i].Process();
+                    Thread.Sleep(1);
+                }
+
+                expire = Stopwatch.ElapsedMilliseconds + 10000;
+                while (StatusConnections.Count != 0 && Stopwatch.ElapsedMilliseconds < expire)
+                {
+                    Time = Stopwatch.ElapsedMilliseconds;
+                    for (var i = StatusConnections.Count - 1; i >= 0; i--)
+                        StatusConnections[i].Process();
+                    Thread.Sleep(1);
+                }
             }
-
-            var expire = Time + 5000;
-
-            while (Connections.Count != 0 && Stopwatch.ElapsedMilliseconds < expire)
+            catch (Exception ex) { errors.Add(ex); }
+            finally
             {
-                Time = Stopwatch.ElapsedMilliseconds;
-
-                for (var i = Connections.Count - 1; i >= 0; i--)
-                    Connections[i].Process();
-
-                Thread.Sleep(1);
+                foreach (var connection in Connections.ToArray())
+                {
+                    try { connection.Disconnect(0); }
+                    catch (Exception ex) { errors.Add(ex); }
+                }
+                foreach (var connection in StatusConnections.ToArray())
+                {
+                    try { connection.Disconnect(); }
+                    catch (Exception ex) { errors.Add(ex); }
+                }
+                // Do not discard entries after a failed cleanup step.
+                if (errors.Count == 0)
+                {
+                    Connections.Clear();
+                    StatusConnections.Clear();
+                }
             }
 
-
-            Connections.Clear();
-
-            expire = Time + 10000;
-            while (StatusConnections.Count != 0 && Stopwatch.ElapsedMilliseconds < expire)
-            {
-                Time = Stopwatch.ElapsedMilliseconds;
-
-                for (var i = StatusConnections.Count - 1; i >= 0; i--)
-                    StatusConnections[i].Process();
-
-                Thread.Sleep(1);
-            }
-
-
-            StatusConnections.Clear();
+            if (errors.Count != 0)
+                throw new AggregateException("Network shutdown failed.", errors);
             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NetworkStopped));
         }
 
@@ -3556,56 +3680,57 @@ namespace Server.MirEnvir
 
         private void Connection(IAsyncResult result)
         {
+            var listener = (TcpListener)result.AsyncState;
+            TcpClient tempTcpClient = null;
             try
             {
-                if (!Running || !_listener.Server.IsBound) return;
-            }
-            catch (Exception e)
-            {
-                MessageQueue.Enqueue(e.ToString());
-            }
-
-            try
-            {
-                var tempTcpClient = _listener.EndAcceptTcpClient(result);
-
-                bool connected = false;
-                var ipAddress = tempTcpClient.Client.RemoteEndPoint.ToString().Split(':')[0];
-
-                if (!IPBlocks.TryGetValue(ipAddress, out DateTime banDate) || banDate < Now)
+                lock (_networkLock)
                 {
-                    int count = 0;
+                    tempTcpClient = listener.EndAcceptTcpClient(result);
+                    if (!_acceptingConnections || !Running || listener != _listener) return;
 
-                    for (int i = 0; i < Connections.Count; i++)
+                    var ipAddress = tempTcpClient.Client.RemoteEndPoint.ToString().Split(':')[0];
+
+                    if (!IPBlocks.TryGetValue(ipAddress, out DateTime banDate) || banDate < Now)
                     {
-                        var connection = Connections[i];
+                        int count = 0;
 
-                        if (!connection.Connected || connection.IPAddress != ipAddress)
-                            continue;
-
-                        count++;
-                    }
-
-                    if (count >= Settings.MaxIP)
-                    {
-                        UpdateIPBlock(ipAddress, TimeSpan.FromSeconds(Settings.IPBlockSeconds));
-
-                        MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.IpAddressDisconnectedTooManyConnections), ipAddress));
-                    }
-                    else
-                    {
-                        var tempConnection = new MirConnection(++_sessionID, tempTcpClient);
-                        if (tempConnection.Connected)
+                        lock (Connections)
                         {
-                            connected = true;
-                            lock (Connections)
-                                Connections.Add(tempConnection);
+                            for (int i = 0; i < Connections.Count; i++)
+                            {
+                                var connection = Connections[i];
+
+                                if (!connection.Connected || connection.IPAddress != ipAddress)
+                                    continue;
+
+                                count++;
+                            }
+                        }
+
+                        if (count >= Settings.MaxIP)
+                        {
+                            UpdateIPBlock(ipAddress, TimeSpan.FromSeconds(Settings.IPBlockSeconds));
+
+                            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.IpAddressDisconnectedTooManyConnections), ipAddress));
+                        }
+                        else
+                        {
+                            var tempConnection = new MirConnection(++_sessionID, tempTcpClient);
+                            if (tempConnection.Connected)
+                            {
+                                lock (Connections)
+                                    Connections.Add(tempConnection);
+                                tempTcpClient = null; // The connection owns the socket now.
+                            }
                         }
                     }
-                }
 
-                if (!connected)
-                    tempTcpClient.Close();
+                }
+            }
+            catch (Exception ex) when ((ex is ObjectDisposedException || ex is SocketException) && !_acceptingConnections)
+            {
+                // Stopping the captured listener completes its pending accept with an error.
             }
             catch (Exception ex)
             {
@@ -3613,23 +3738,29 @@ namespace Server.MirEnvir
             }
             finally
             {
-                while (Connections.Count >= Settings.MaxUser)
-                    Thread.Sleep(1);
-
-                if (Running && _listener.Server.IsBound)
-                    _listener.BeginAcceptTcpClient(Connection, null);
+                try { tempTcpClient?.Close(); }
+                finally { CompleteNetworkAccept(listener, false); }
             }
         }
 
         private void StatusConnection(IAsyncResult result)
         {
-            if (!Running || !_StatusPort.Server.IsBound) return;
-
+            var listener = (TcpListener)result.AsyncState;
+            TcpClient client = null;
             try
             {
-                var tempTcpClient = _StatusPort.EndAcceptTcpClient(result);
-                lock (StatusConnections)
-                    StatusConnections.Add(new MirStatusConnection(tempTcpClient));
+                lock (_networkLock)
+                {
+                    client = listener.EndAcceptTcpClient(result);
+                    if (!_acceptingConnections || !Running || listener != _StatusPort) return;
+                    lock (StatusConnections)
+                        StatusConnections.Add(new MirStatusConnection(client));
+                    client = null;
+                }
+            }
+            catch (Exception ex) when ((ex is ObjectDisposedException || ex is SocketException) && !_acceptingConnections)
+            {
+                // Cancellation is expected while draining the status listener.
             }
             catch (Exception ex)
             {
@@ -3637,11 +3768,51 @@ namespace Server.MirEnvir
             }
             finally
             {
-                while (StatusConnections.Count >= 5) //dont allow to many status port connections it's just an abuse thing
-                    Thread.Sleep(1);
+                try { client?.Close(); }
+                finally { CompleteNetworkAccept(listener, true); }
+            }
+        }
 
-                if (Running && _StatusPort.Server.IsBound)
-                    _StatusPort.BeginAcceptTcpClient(StatusConnection, null);
+        // Called with _networkLock held; reserve before queuing the callback.
+        private void BeginNetworkAccept(TcpListener listener, AsyncCallback callback)
+        {
+            _pendingAccepts++;
+            try { listener.BeginAcceptTcpClient(callback, listener); }
+            catch
+            {
+                _pendingAccepts--;
+                throw;
+            }
+        }
+
+        private void CompleteNetworkAccept(TcpListener listener, bool status)
+        {
+            lock (_networkLock)
+            {
+                try
+                {
+                    while (_acceptingConnections && Running && listener == (status ? _StatusPort : _listener))
+                    {
+                        bool full;
+                        if (status)
+                            lock (StatusConnections) full = StatusConnections.Count >= 5;
+                        else
+                            lock (Connections) full = Connections.Count >= Settings.MaxUser;
+                        if (!full)
+                        {
+                            BeginNetworkAccept(listener, status ? (AsyncCallback)StatusConnection : Connection);
+                            break;
+                        }
+                        // Release the gate so shutdown can cancel a full-capacity wait.
+                        Monitor.Wait(_networkLock, 1);
+                    }
+                }
+                catch (Exception ex) { MessageQueue.Enqueue(ex); }
+                finally
+                {
+                    _pendingAccepts--;
+                    Monitor.PulseAll(_networkLock);
+                }
             }
         }
 
