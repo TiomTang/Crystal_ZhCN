@@ -22,6 +22,35 @@ namespace Server.MirObjects
 
         public HeroInfo HInfo;
         public new PlayerObject Owner;
+        public override MapObject Target
+        {
+            get { return base.Target; }
+            set
+            {
+                if (value != null && !CanSelectTarget(value)) return;
+                base.Target = value;
+            }
+        }
+
+        internal void ReactToAttack(MapObject attacker)
+        {
+            if (Owner == null || Owner.Info.HeroBehaviour != HeroBehaviour.CounterAttack) return;
+            if (attacker == null || !attacker.IsAttackTarget(Owner)) return;
+            if (attacker.Hidden && (!CoolEye || Level < attacker.Level)) return;
+
+            // A received attack permits retaliation even when it deals no damage.
+            base.Target = attacker;
+        }
+
+        private bool CanSelectTarget(MapObject target)
+        {
+            if (Owner == null) return false;
+
+            return Owner.Info.HeroBehaviour == HeroBehaviour.Attack ||
+                Owner.Info.HeroBehaviour == HeroBehaviour.CounterAttack &&
+                (target == Target || target == LastHitter || target == Owner.LastHitter);
+        }
+
         public override int PotionBeltMinimum => 0;
         public override int PotionBeltMaximum => 2;
         public override int AmuletBeltMinimum => 1;
@@ -1079,6 +1108,8 @@ namespace Server.MirObjects
                         for (int i = 0; i < cell.Objects.Count; i++)
                         {
                             MapObject ob = cell.Objects[i];
+                            if (!CanSelectTarget(ob)) continue;
+
                             switch (ob.Race)
                             {
                                 case ObjectType.Monster:
@@ -1087,7 +1118,6 @@ namespace Server.MirObjects
                                     if (!ob.IsAttackTarget(Owner)) continue;
                                     if (ob.Hidden && (!CoolEye || Level < ob.Level)) continue;
                                     if (ob.Master != null && Target != ob) continue;
-                                    if (Owner.Info.HeroBehaviour == HeroBehaviour.CounterAttack && ob.Target != this && ob.Target != Owner) continue;
 
                                     Target = ob;
                                     return;
@@ -1095,11 +1125,11 @@ namespace Server.MirObjects
                                     PlayerObject playerob = (PlayerObject)ob;
                                     if (!ob.IsAttackTarget(Owner)) continue;
                                     if (playerob.GMGameMaster || ob.Hidden && (!CoolEye || Level < ob.Level)) continue;
-                                    if (Target != ob && Owner.LastHitter != ob && ob.LastHitter != Owner) continue;
+                                    if (Target != ob && LastHitter != ob && Owner.LastHitter != ob && ob.LastHitter != Owner) continue;
 
                                     Target = ob;
 
-                                    if (Owner != null)
+                                    if (Owner.Info.HeroBehaviour == HeroBehaviour.Attack)
                                     {
                                         for (int j = 0; j < playerob.Pets.Count; j++)
                                         {

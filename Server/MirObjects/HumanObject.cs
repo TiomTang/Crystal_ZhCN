@@ -7099,6 +7099,8 @@ namespace Server.MirObjects
                 heroAttacker.Target = this;
             }
 
+            (this as HeroObject ?? (this as PlayerObject)?.Hero)?.ReactToAttack(attacker);
+
             var armour = GetArmour(type, attacker, out bool hit);
 
             if (!hit)
@@ -7222,6 +7224,8 @@ namespace Server.MirObjects
         }
         public override int Attacked(MonsterObject attacker, int damage, DefenceType type = DefenceType.ACAgility)
         {
+            (this as HeroObject ?? (this as PlayerObject)?.Hero)?.ReactToAttack(attacker.Master ?? attacker);
+
             var armour = GetArmour(type, attacker, out bool hit);
 
             if (!hit)
