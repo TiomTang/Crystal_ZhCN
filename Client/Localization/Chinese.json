@@ -4633,7 +4633,7 @@
   },
   "enum.BuffType_Guild": {
     "Source": "Guild",
-    "Text": "行会增益"
+    "Text": "公会增益"
   },
   "enum.BuffType_Prison": {
     "Source": "Prison",
@@ -4865,11 +4865,11 @@
   },
   "A guild leader needs to be at least level {0}": {
     "Source": "A guild leader needs to be at least level {0}",
-    "Text": "行会会长至少需要 {0} 级"
+    "Text": "公会会长至少需要 {0} 级"
   },
   "A guild needs at least 2 leaders.": {
     "Source": "A guild needs at least 2 leaders.",
-    "Text": "行会至少需要 2 名会长。"
+    "Text": "公会至少需要 2 名会长。"
   },
   "A namelist with this name already exists.": {
     "Source": "A namelist with this name already exists.",
@@ -4913,7 +4913,7 @@
   },
   "Already at war with this guild.": {
     "Source": "Already at war with this guild.",
-    "Text": "已与该行会处于战争状态。"
+    "Text": "已与该公会处于战争状态。"
   },
   "Archers repaired: {0}/{1}": {
     "Source": "Archers repaired: {0}/{1}",
@@ -4993,7 +4993,7 @@
   },
   "Are you sure you want to remove the selected guildbuff?": {
     "Source": "Are you sure you want to remove the selected guildbuff?",
-    "Text": "确定要移除选中的行会增益吗？"
+    "Text": "确定要移除选中的公会增益吗？"
   },
   "Are you sure you want to remove the selected maps?": {
     "Source": "Are you sure you want to remove the selected maps?",
@@ -5121,11 +5121,11 @@
   },
   "Cannot go to war with new players guild.": {
     "Source": "Cannot go to war with new players guild.",
-    "Text": "无法与新玩家的行会开战。"
+    "Text": "无法与新玩家的公会开战。"
   },
   "Cannot go to war with your own guild.": {
     "Source": "Cannot go to war with your own guild.",
-    "Text": "无法与自己所属的行会开战。"
+    "Text": "无法与自己所属的公会开战。"
   },
   "Cannot hand in quest whilst bag is full.": {
     "Source": "Cannot hand in quest whilst bag is full.",
@@ -5133,7 +5133,7 @@
   },
   "Cannot leave guild whilst at war.": {
     "Source": "Cannot leave guild whilst at war.",
-    "Text": "战争期间无法退出行会。"
+    "Text": "战争期间无法退出公会。"
   },
   "Cannot load a database version {0}. Maximum supported is {1}.": {
     "Source": "Cannot load a database version {0}. Maximum supported is {1}.",
@@ -5297,7 +5297,7 @@
   },
   "Could not find guild {0}.": {
     "Source": "Could not find guild {0}.",
-    "Text": "找不到行会 {0}。"
+    "Text": "找不到公会 {0}。"
   },
   "Could not find ingredients: {0}, File: {1}": {
     "Source": "Could not find ingredients: {0}, File: {1}",
@@ -5549,7 +5549,7 @@
   },
   "Failed to create guild": {
     "Source": "Failed to create guild",
-    "Text": "创建行会失败"
+    "Text": "创建公会失败"
   },
   "Failed to create the new recipe file. Error: {0}": {
     "Source": "Failed to create the new recipe file. Error: {0}",
@@ -5657,35 +5657,35 @@
   },
   "Guild gold limit reached.": {
     "Source": "Guild gold limit reached.",
-    "Text": "已达行会金币上限。"
+    "Text": "已达公会金币上限。"
   },
   "Guild invites disabled.": {
     "Source": "Guild invites disabled.",
-    "Text": "行会邀请已禁用。"
+    "Text": "公会邀请已禁用。"
   },
   "Guild invites enabled.": {
     "Source": "Guild invites enabled.",
-    "Text": "行会邀请已启用。"
+    "Text": "公会邀请已启用。"
   },
   "Guild level too low (requires level {0}).": {
     "Source": "Guild level too low (requires level {0}).",
-    "Text": "行会等级过低（需要 {0} 级）。"
+    "Text": "公会等级过低（需要 {0} 级）。"
   },
   "Guild name too long.": {
     "Source": "Guild name too long.",
-    "Text": "行会名称过长。"
+    "Text": "公会名称过长。"
   },
   "Guild notice can not be longer then 200 lines!": {
     "Source": "Guild notice can not be longer then 200 lines!",
-    "Text": "行会公告不能超过 200 行！"
+    "Text": "公会公告不能超过 200 行！"
   },
   "Guild {0} already exists.": {
     "Source": "Guild {0} already exists.",
-    "Text": "行会 {0} 已存在。"
+    "Text": "公会 {0} 已存在。"
   },
   "Guildname is restricted to 3-20 characters.": {
     "Source": "Guildname is restricted to 3-20 characters.",
-    "Text": "行会名称限制为 3-20 个字符。"
+    "Text": "公会名称限制为 3-20 个字符。"
   },
   "HP : {0}, MinDC : {1}, MaxDC : {2}": {
     "Source": "HP : {0}, MinDC : {1}, MaxDC : {2}",
@@ -5797,7 +5797,7 @@
   },
   "Insufficient Guild funds!": {
     "Source": "Insufficient Guild funds!",
-    "Text": "行会资金不足！"
+    "Text": "公会资金不足！"
   },
   "Insufficient funds!": {
     "Source": "Insufficient funds!",
@@ -5809,7 +5809,7 @@
   },
   "Insufficient gold. Creating a guild requires {0} gold.": {
     "Source": "Insufficient gold. Creating a guild requires {0} gold.",
-    "Text": "金币不足。创建行会需要 {0} 金币。"
+    "Text": "金币不足。创建公会需要 {0} 金币。"
   },
   "Insufficient rank.": {
     "Source": "Insufficient rank.",
@@ -5817,7 +5817,7 @@
   },
   "Insufficient {0}, you need {1} to create a guild.": {
     "Source": "Insufficient {0}, you need {1} to create a guild.",
-    "Text": "{0} 不足，创建行会需要 {1}。"
+    "Text": "{0} 不足，创建公会需要 {1}。"
   },
   "Intelligent creatures are not allowed on this map. Your companion has been dismissed.": {
     "Source": "Intelligent creatures are not allowed on this map. Your companion has been dismissed.",
@@ -6069,7 +6069,7 @@
   },
   "NO GUILD": {
     "Source": "NO GUILD",
-    "Text": "无行会"
+    "Text": "无公会"
   },
   "NPC Export complete": {
     "Source": "NPC Export complete",
@@ -6149,19 +6149,19 @@
   },
   "No GT Maps found, contact GM!": {
     "Source": "No GT Maps found, contact GM!",
-    "Text": "未找到行会领地地图，请联系GM！"
+    "Text": "未找到公会领地地图，请联系GM！"
   },
   "No GT's found, contact GM!": {
     "Source": "No GT's found, contact GM!",
-    "Text": "未找到行会领地，请联系GM！"
+    "Text": "未找到公会领地，请联系GM！"
   },
   "No Guild": {
     "Source": "No Guild",
-    "Text": "无行会"
+    "Text": "无公会"
   },
   "No Guild Territory's available!": {
     "Source": "No Guild Territory's available!",
-    "Text": "没有可用的行会领地！"
+    "Text": "没有可用的公会领地！"
   },
   "No Helmet": {
     "Source": "No Helmet",
@@ -6281,11 +6281,11 @@
   },
   "Not enough funds in guild bank.": {
     "Source": "Not enough funds in guild bank.",
-    "Text": "行会银行资金不足。"
+    "Text": "公会银行资金不足。"
   },
   "Not enough guild spare points (requires {0}).": {
     "Source": "Not enough guild spare points (requires {0}).",
-    "Text": "行会剩余点数不足（需要 {0}）。"
+    "Text": "公会剩余点数不足（需要 {0}）。"
   },
   "Not enough jumping power.": {
     "Source": "Not enough jumping power.",
@@ -6345,7 +6345,7 @@
   },
   "Owner guild not found.": {
     "Source": "Owner guild not found.",
-    "Text": "未找到所属行会。"
+    "Text": "未找到所属公会。"
   },
   "Owner: {0}": {
     "Source": "Owner: {0}",
@@ -6501,7 +6501,7 @@
   },
   "Player {0} is already in a guild.": {
     "Source": "Player {0} is already in a guild.",
-    "Text": "玩家 {0} 已在行会中。"
+    "Text": "玩家 {0} 已在公会中。"
   },
   "Player {0} is already trading.": {
     "Source": "Player {0} is already trading.",
@@ -6713,7 +6713,7 @@
   },
   "Remove guildbuff?": {
     "Source": "Remove guildbuff?",
-    "Text": "移除行会增益？"
+    "Text": "移除公会增益？"
   },
   "Remove selected records?": {
     "Source": "Remove selected records?",
@@ -6833,7 +6833,7 @@
   },
   "Successfully created guild {0}": {
     "Source": "Successfully created guild {0}",
-    "Text": "成功创建行会 {0}"
+    "Text": "成功创建公会 {0}"
   },
   "Target slot not empty.": {
     "Source": "Target slot not empty.",
@@ -6869,7 +6869,7 @@
   },
   "The Guild Territory has expired.": {
     "Source": "The Guild Territory has expired.",
-    "Text": "行会领地已过期。"
+    "Text": "公会领地已过期。"
   },
   "The Syntax is /ResetConquest [ConquestID]": {
     "Source": "The Syntax is /ResetConquest [ConquestID]",
@@ -6925,11 +6925,11 @@
   },
   "To summon a guild member, one first must be in a guild.": {
     "Source": "To summon a guild member, one first must be in a guild.",
-    "Text": "召唤行会成员前必须先加入行会。"
+    "Text": "召唤公会成员前必须先加入公会。"
   },
   "To summon guild members, one first must be in a guild.": {
     "Source": "To summon guild members, one first must be in a guild.",
-    "Text": "召唤行会成员前必须先加入行会。"
+    "Text": "召唤公会成员前必须先加入公会。"
   },
   "Too many Wrong Login Attempts.": {
     "Source": "Too many Wrong Login Attempts.",
@@ -7133,7 +7133,7 @@
   },
   "You already own a Guild Territory!": {
     "Source": "You already own a Guild Territory!",
-    "Text": "你已拥有行会领地！"
+    "Text": "你已拥有公会领地！"
   },
   "You already own a territory.": {
     "Source": "You already own a territory.",
@@ -7149,7 +7149,7 @@
   },
   "You are already part of a guild.": {
     "Source": "You are already part of a guild.",
-    "Text": "你已在行会中。"
+    "Text": "你已在公会中。"
   },
   "You are already renting an item to another player.": {
     "Source": "You are already renting an item to another player.",
@@ -7197,7 +7197,7 @@
   },
   "You are not allowed to change the guild notice!": {
     "Source": "You are not allowed to change the guild notice!",
-    "Text": "你无权更改行会公告！"
+    "Text": "你无权更改公会公告！"
   },
   "You are not allowed to recruit new members!": {
     "Source": "You are not allowed to recruit new members!",
@@ -7213,7 +7213,7 @@
   },
   "You are not part of a guild.": {
     "Source": "You are not part of a guild.",
-    "Text": "你不属于任何行会。"
+    "Text": "你不属于任何公会。"
   },
   "You are not the group leader.": {
     "Source": "You are not the group leader.",
@@ -7377,7 +7377,7 @@
   },
   "You cannot make the newbie guild. Nice try mortal.": {
     "Source": "You cannot make the newbie guild. Nice try mortal.",
-    "Text": "你无法创建新手行会。想得美，凡人。"
+    "Text": "你无法创建新手公会。想得美，凡人。"
   },
   "You cannot position move on this map": {
     "Source": "You cannot position move on this map",
@@ -7465,7 +7465,7 @@
   },
   "You cannot use guild storage outside safezones.": {
     "Source": "You cannot use guild storage outside safezones.",
-    "Text": "安全区外无法使用行会仓库。"
+    "Text": "安全区外无法使用公会仓库。"
   },
   "You cannot use this type of ring.": {
     "Source": "You cannot use this type of ring.",
@@ -7489,19 +7489,19 @@
   },
   "You do not have permission to move items in guild storage.": {
     "Source": "You do not have permission to move items in guild storage.",
-    "Text": "你无权在行会仓库中移动物品。"
+    "Text": "你无权在公会仓库中移动物品。"
   },
   "You do not have permission to retrieve items from guild storage.": {
     "Source": "You do not have permission to retrieve items from guild storage.",
-    "Text": "你无权从行会仓库取出物品。"
+    "Text": "你无权从公会仓库取出物品。"
   },
   "You do not have permission to store items in guild storage.": {
     "Source": "You do not have permission to store items in guild storage.",
-    "Text": "你无权将物品存入行会仓库。"
+    "Text": "你无权将物品存入公会仓库。"
   },
   "You do not have the correct guild rank.": {
     "Source": "You do not have the correct guild rank.",
-    "Text": "你的行会等级不正确。"
+    "Text": "你的公会等级不正确。"
   },
   "You do not own any nearby carcasses.": {
     "Source": "You do not own any nearby carcasses.",
@@ -7525,11 +7525,11 @@
   },
   "You dont own a Guild Territory!": {
     "Source": "You dont own a Guild Territory!",
-    "Text": "你没有行会领地！"
+    "Text": "你没有公会领地！"
   },
   "You dont own any GT!": {
     "Source": "You dont own any GT!",
-    "Text": "你没有拥有任何行会领地！"
+    "Text": "你没有拥有任何公会领地！"
   },
   "You found {0}.": {
     "Source": "You found {0}.",
@@ -7569,11 +7569,11 @@
   },
   "You have been removed from the guild.": {
     "Source": "You have been removed from the guild.",
-    "Text": "你已被移出行会。"
+    "Text": "你已被移出公会。"
   },
   "You have been removed from your guild.": {
     "Source": "You have been removed from your guild.",
-    "Text": "你已被移出自己的行会。"
+    "Text": "你已被移出自己的公会。"
   },
   "You have been summoned by ": {
     "Source": "You have been summoned by ",
@@ -7589,7 +7589,7 @@
   },
   "You have disbanded the guild": {
     "Source": "You have disbanded the guild",
-    "Text": "你已解散行会"
+    "Text": "你已解散公会"
   },
   "You have learned {0} at level {1}": {
     "Source": "You have learned {0} at level {1}",
@@ -7597,7 +7597,7 @@
   },
   "You have left your guild.": {
     "Source": "You have left your guild.",
-    "Text": "你已离开行会。"
+    "Text": "你已离开公会。"
   },
   "You have murdered {0}": {
     "Source": "You have murdered {0}",
@@ -7609,7 +7609,7 @@
   },
   "You have not been invited to a guild.": {
     "Source": "You have not been invited to a guild.",
-    "Text": "你未被邀请加入行会。"
+    "Text": "你未被邀请加入公会。"
   },
   "You have rented {0} from {1} until {2}": {
     "Source": "You have rented {0} from {1} until {2}",
@@ -7617,7 +7617,7 @@
   },
   "You have to be at least level {0} to create a guild.": {
     "Source": "You have to be at least level {0} to create a guild.",
-    "Text": "至少需要 {0} 级才能创建行会。"
+    "Text": "至少需要 {0} 级才能创建公会。"
   },
   "You have to be at least level {0} to create a hero.": {
     "Source": "You have to be at least level {0} to create a hero.",
@@ -7633,7 +7633,7 @@
   },
   "You must be a guild leader to purchase a territory.": {
     "Source": "You must be a guild leader to purchase a territory.",
-    "Text": "必须是行会会长才能购买领地。"
+    "Text": "必须是公会会长才能购买领地。"
   },
   "You must be a leader to start a war.": {
     "Source": "You must be a leader to start a war.",
@@ -7645,11 +7645,11 @@
   },
   "You must be in a guild to use this skill": {
     "Source": "You must be in a guild to use this skill",
-    "Text": "必须加入行会才能使用此技能"
+    "Text": "必须加入公会才能使用此技能"
   },
   "You must be the guild leader to use this skill": {
     "Source": "You must be the guild leader to use this skill",
-    "Text": "必须是行会会长才能使用此技能"
+    "Text": "必须是公会会长才能使用此技能"
   },
   "You must be the leader to request a war.": {
     "Source": "You must be the leader to request a war.",
@@ -7681,7 +7681,7 @@
   },
   "You need to be Guild Leader!": {
     "Source": "You need to be Guild Leader!",
-    "Text": "你必须是行会会长！"
+    "Text": "你必须是公会会长！"
   },
   "You need to be at least level {0} to get married.": {
     "Source": "You need to be at least level {0} to get married.",
@@ -7701,11 +7701,11 @@
   },
   "You need to be in a Guild!": {
     "Source": "You need to be in a Guild!",
-    "Text": "你必须加入行会！"
+    "Text": "你必须加入公会！"
   },
   "You need to be in a guild to start a War": {
     "Source": "You need to be in a guild to start a War",
-    "Text": "必须加入行会才能发起战争"
+    "Text": "必须加入公会才能发起战争"
   },
   "You need to be level 8 before you can shout.": {
     "Source": "You need to be level 8 before you can shout.",
@@ -7717,7 +7717,7 @@
   },
   "You need to be the last leading member of the guild to disband the guild.": {
     "Source": "You need to be the last leading member of the guild to disband the guild.",
-    "Text": "必须是行会最后一名会长才能解散行会。"
+    "Text": "必须是公会最后一名会长才能解散公会。"
   },
   "You need to be wearing a Wedding Ring for recall.": {
     "Source": "You need to be wearing a Wedding Ring for recall.",
@@ -7745,11 +7745,11 @@
   },
   "You purchased the Guild Territory! Process will take 24 hours": {
     "Source": "You purchased the Guild Territory! Process will take 24 hours",
-    "Text": "你已购买行会领地！处理需要 24 小时"
+    "Text": "你已购买公会领地！处理需要 24 小时"
   },
   "You rented a Guild Territory!": {
     "Source": "You rented a Guild Territory!",
-    "Text": "你已租用行会领地！"
+    "Text": "你已租用公会领地！"
   },
   "You sold {0} for {1:#,##0} Gold": {
     "Source": "You sold {0} for {1:#,##0} Gold",
@@ -7861,7 +7861,7 @@
   },
   "Your guild already has this skill": {
     "Source": "Your guild already has this skill",
-    "Text": "你的行会已拥有此技能"
+    "Text": "你的公会已拥有此技能"
   },
   "Your item has been returned to you.": {
     "Source": "Your item has been returned to you.",
@@ -7869,7 +7869,7 @@
   },
   "Your level is not high enough to create a guild, required: {0}": {
     "Source": "Your level is not high enough to create a guild, required: {0}",
-    "Text": "你的等级不足以创建行会，需要 {0} 级"
+    "Text": "你的等级不足以创建公会，需要 {0} 级"
   },
   "Your lover needs to be at least level {0} to get married.": {
     "Source": "Your lover needs to be at least level {0} to get married.",
@@ -8157,7 +8157,7 @@
   },
   "{0} already has a guild invite pending.": {
     "Source": "{0} already has a guild invite pending.",
-    "Text": "{0} 已有待处理的行会邀请。"
+    "Text": "{0} 已有待处理的公会邀请。"
   },
   "{0} already has a marriage invitation.": {
     "Source": "{0} already has a marriage invitation.",
@@ -8209,7 +8209,7 @@
   },
   "{0} guild will be deleted from the server.": {
     "Source": "{0} guild will be deleted from the server.",
-    "Text": "{0} 行会将从服务器中删除。"
+    "Text": "{0} 公会将从服务器中删除。"
   },
   "{0} had gender change to {1} by GM: {2}": {
     "Source": "{0} had gender change to {1} by GM: {2}",
@@ -8305,7 +8305,7 @@
   },
   "{0} is already in a guild!": {
     "Source": "{0} is already in a guild!",
-    "Text": "{0} 已在行会中！"
+    "Text": "{0} 已在公会中！"
   },
   "{0} is already in another group.": {
     "Source": "{0} is already in another group.",
@@ -8337,7 +8337,7 @@
   },
   "{0} is disabling guild invites!": {
     "Source": "{0} is disabling guild invites!",
-    "Text": "{0} 正在关闭行会邀请！"
+    "Text": "{0} 正在关闭公会邀请！"
   },
   "{0} is full.": {
     "Source": "{0} is full.",
@@ -8381,7 +8381,7 @@
   },
   "{0} is not in a guild": {
     "Source": "{0} is not in a guild",
-    "Text": "{0} 不在行会中"
+    "Text": "{0} 不在公会中"
   },
   "{0} is not in your group.": {
     "Source": "{0} is not in your group.",
@@ -8417,7 +8417,7 @@
   },
   "{0} is required to create a guild.": {
     "Source": "{0} is required to create a guild.",
-    "Text": "创建行会需要 {0}。"
+    "Text": "创建公会需要 {0}。"
   },
   "{0} is trying to buy Something that doesn't exist.": {
     "Source": "{0} is trying to buy Something that doesn't exist.",
@@ -8469,19 +8469,19 @@
   },
   "{0} purchased guild buff {1} for the guild.": {
     "Source": "{0} purchased guild buff {1} for the guild.",
-    "Text": "{0} 为行会购买了增益 {1}。"
+    "Text": "{0} 为公会购买了增益 {1}。"
   },
   "{0} purchased guild buff {1}, spending {2:#,##0} gold.": {
     "Source": "{0} purchased guild buff {1}, spending {2:#,##0} gold.",
-    "Text": "{0} 购买了行会增益 {1}，花费 {2:#,##0} 金币。"
+    "Text": "{0} 购买了公会增益 {1}，花费 {2:#,##0} 金币。"
   },
   "{0} purchased guild buff {1}, spending {2} points and {3:#,##0} gold.": {
     "Source": "{0} purchased guild buff {1}, spending {2} points and {3:#,##0} gold.",
-    "Text": "{0} 购买了行会增益 {1}，花费 {2} 点数和 {3:#,##0} 金币。"
+    "Text": "{0} 购买了公会增益 {1}，花费 {2} 点数和 {3:#,##0} 金币。"
   },
   "{0} purchased guild buff {1}, spending {2} points.": {
     "Source": "{0} purchased guild buff {1}, spending {2} points.",
-    "Text": "{0} 购买了行会增益 {1}，花费 {2} 点数。"
+    "Text": "{0} 购买了公会增益 {1}，花费 {2} 点数。"
   },
   "{0} was revived to full health by GM: {1}": {
     "Source": "{0} was revived to full health by GM: {1}",
@@ -8493,7 +8493,7 @@
   },
   "{0} with purity {1} is recuired to create a guild.": {
     "Source": "{0} with purity {1} is recuired to create a guild.",
-    "Text": "创建行会需要纯度 {1} 的 {0}。"
+    "Text": "创建公会需要纯度 {1} 的 {0}。"
   },
   "{0} x{1} has been created.": {
     "Source": "{0} x{1} has been created.",

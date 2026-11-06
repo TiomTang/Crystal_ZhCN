@@ -8724,7 +8724,7 @@
   },
   "Are you sure you want to remove the selected guildbuff?": {
     "Source": "Are you sure you want to remove the selected guildbuff?",
-    "Text": "确定要移除选中的行会增益吗？"
+    "Text": "确定要移除选中的公会增益吗？"
   },
   "Are you sure you want to remove the selected maps?": {
     "Source": "Are you sure you want to remove the selected maps?",
@@ -10064,7 +10064,7 @@
   },
   "Guild": {
     "Source": "Guild",
-    "Text": "行会增益"
+    "Text": "公会增益"
   },
   "Guild ({0})": {
     "Source": "Guild ({0})",
@@ -11656,7 +11656,7 @@
   },
   "Remove guildbuff?": {
     "Source": "Remove guildbuff?",
-    "Text": "移除行会增益？"
+    "Text": "移除公会增益？"
   },
   "Remove selected records?": {
     "Source": "Remove selected records?",
@@ -13376,6 +13376,6 @@
   },
   "Guild {0} is not available. Please contact an administrator.": {
     "Source": "Guild {0} is not available. Please contact an administrator.",
-    "Text": "行会 {0} 不可用，请联系管理员。"
+    "Text": "公会 {0} 不可用，请联系管理员。"
   }
 }
