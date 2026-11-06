@@ -355,12 +355,18 @@ namespace Client.MirObjects
         #region Quest System
         public void UpdateBestQuestIcon()
         {
-            ClientQuestProgress quests = GetAvailableQuests(true).FirstOrDefault();
             QuestIcon bestIcon = QuestIcon.None;
 
-            if (quests != null)
+            foreach (ClientQuestProgress quest in GetAvailableQuests())
             {
-                bestIcon = quests.Icon;
+                if (quest.Completed)
+                {
+                    bestIcon = quest.Icon;
+                    break;
+                }
+
+                if (bestIcon == QuestIcon.None)
+                    bestIcon = quest.Icon;
             }
 
             QuestIcon = bestIcon;
