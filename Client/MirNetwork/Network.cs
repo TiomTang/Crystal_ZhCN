@@ -133,6 +133,9 @@ namespace Client.MirNetwork
 
         private static void Adopt(Socket socket)
         {
+            // MaxAttempts limits consecutive failures; a connection that comes up clears them.
+            ConnectAttempt = 0;
+
             _client = new TcpClient { Client = socket, NoDelay = true };
             _receiveList = new ConcurrentQueue<Packet>();
             _sendList = new ConcurrentQueue<Packet>();
