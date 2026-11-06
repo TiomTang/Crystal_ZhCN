@@ -2836,22 +2836,38 @@ namespace Server.MirEnvir
             Saving = true;
 
 
-            using (var mStream = new MemoryStream())
+            FileStream fStream = null;
+            try
             {
-                if (File.Exists(AccountPath))
+                using (var mStream = new MemoryStream())
                 {
-                    if (!Directory.Exists(AccountsBackUpPath)) Directory.CreateDirectory(AccountsBackUpPath);
-                    var fileName =
-                        $"Accounts {Now.Year:0000}-{Now.Month:00}-{Now.Day:00} {Now.Hour:00}-{Now.Minute:00}-{Now.Second:00}.bak";
-                    if (File.Exists(Path.Combine(AccountsBackUpPath, fileName))) File.Delete(Path.Combine(AccountsBackUpPath, fileName));
-                    File.Move(AccountPath, Path.Combine(AccountsBackUpPath, fileName));
+                    if (File.Exists(AccountPath))
+                    {
+                        if (!Directory.Exists(AccountsBackUpPath)) Directory.CreateDirectory(AccountsBackUpPath);
+                        var fileName =
+                            $"Accounts {Now.Year:0000}-{Now.Month:00}-{Now.Day:00} {Now.Hour:00}-{Now.Minute:00}-{Now.Second:00}.bak";
+                        if (File.Exists(Path.Combine(AccountsBackUpPath, fileName))) File.Delete(Path.Combine(AccountsBackUpPath, fileName));
+                        File.Move(AccountPath, Path.Combine(AccountsBackUpPath, fileName));
+                    }
+
+                    SaveAccounts(mStream);
+                    fStream = new FileStream(AccountPath + "n", FileMode.Create);
+
+                    var data = mStream.ToArray();
+                    fStream.BeginWrite(data, 0, data.Length, EndSaveAccounts, fStream);
                 }
-
-                SaveAccounts(mStream);
-                var fStream = new FileStream(AccountPath + "n", FileMode.Create);
-
-                var data = mStream.ToArray();
-                fStream.BeginWrite(data, 0, data.Length, EndSaveAccounts, fStream);
+            }
+            catch
+            {
+                try
+                {
+                    fStream?.Dispose();
+                }
+                finally
+                {
+                    Saving = false;
+                }
+                throw;
             }
         }
 
@@ -2873,11 +2889,21 @@ namespace Server.MirEnvir
                         File.Delete(oldfilename + "o");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageQueue.Enqueue(ex);
             }
-
-            Saving = false;
+            finally
+            {
+                try
+                {
+                    fStream?.Dispose();
+                }
+                finally
+                {
+                    Saving = false;
+                }
+            }
         }
 
         public bool LoadDB()
