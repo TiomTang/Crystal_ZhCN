@@ -134,7 +134,7 @@ namespace Client.MirScenes
         {
             _connectBox.Label.Text = GameLanguage.ClientTextMap.GetLocalization(ClientTextKeys.SendingClientVersion);
 
-            C.ClientVersion p = new C.ClientVersion();
+            C.ClientVersion p = new C.ClientVersion { ProtocolVersion = Globals.ProtocolVersion };
             try
             {
                 byte[] sum;
@@ -152,6 +152,13 @@ namespace Client.MirScenes
         }
         private void ClientVersion(S.ClientVersion p)
         {
+            if (p.ProtocolVersion != Globals.ProtocolVersion)
+            {
+                MirMessageBox.Show(GameLanguage.ClientTextMap.GetLocalization(ClientTextKeys.WrongVersionPleaseUpdateGame), true);
+                Network.Disconnect();
+                return;
+            }
+
             switch (p.Result)
             {
                 case 0:

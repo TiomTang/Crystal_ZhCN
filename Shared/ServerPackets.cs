@@ -44,6 +44,7 @@ namespace ServerPackets
         }
 
         public byte Result;
+        public int ProtocolVersion;
         /*
          * 0: Wrong Version
          * 1: Correct Version
@@ -52,11 +53,14 @@ namespace ServerPackets
         protected override void ReadPacket(BinaryReader reader)
         {
             Result = reader.ReadByte();
+            // Legacy handshakes have no protocol version; incomplete versions are invalid.
+            ProtocolVersion = reader.BaseStream.Position == reader.BaseStream.Length ? 0 : reader.ReadInt32();
         }
 
         protected override void WritePacket(BinaryWriter writer)
         {
             writer.Write(Result);
+            writer.Write(ProtocolVersion);
         }
     }
     public sealed class Disconnect : Packet

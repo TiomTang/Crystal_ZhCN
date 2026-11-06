@@ -2,6 +2,9 @@
 {
     public const string ProductCodename = "Crystal";
 
+    // Increment when packet layouts require coordinated client and server updates.
+    public const int ProtocolVersion = 1;
+
     public const int
 
         MinAccountIDLength = 3,

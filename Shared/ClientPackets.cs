@@ -10,15 +10,19 @@ namespace ClientPackets
         }
 
         public byte[] VersionHash;
+        public int ProtocolVersion;
 
         protected override void ReadPacket(BinaryReader reader)
         {
             VersionHash = reader.ReadBytes(reader.ReadInt32());
+            // Legacy handshakes have no protocol version; incomplete versions are invalid.
+            ProtocolVersion = reader.BaseStream.Position == reader.BaseStream.Length ? 0 : reader.ReadInt32();
         }
         protected override void WritePacket(BinaryWriter writer)
         {
             writer.Write(VersionHash.Length);
             writer.Write(VersionHash);
+            writer.Write(ProtocolVersion);
         }
     }
     public sealed class Disconnect : Packet

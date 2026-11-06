@@ -837,36 +837,37 @@ namespace Server.MirNetwork
         {
             if (Stage != GameStage.None) return;
 
+            bool protocolMatch = p.ProtocolVersion == Globals.ProtocolVersion;
+            bool hashMatch = !Settings.CheckVersion;
+
             if (Settings.CheckVersion)
             {
-                bool match = false;
-
                 foreach (var hash in Settings.VersionHashes)
                 {
                     if (Functions.CompareBytes(hash, p.VersionHash))
                     {
-                        match = true;
+                        hashMatch = true;
                         break;
                     }
                 }
+            }
 
-                if (!match)
-                {
-                    Disconnecting = true;
+            if (!protocolMatch || !hashMatch)
+            {
+                Disconnecting = true;
 
-                    List<byte> data = new List<byte>();
+                List<byte> data = new List<byte>();
 
-                    data.AddRange(new S.ClientVersion { Result = 0 }.GetPacketBytes());
+                data.AddRange(new S.ClientVersion { Result = 0, ProtocolVersion = Globals.ProtocolVersion }.GetPacketBytes());
 
-                    BeginSend(data);
-                    SoftDisconnect(10);
-                    MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerDisconnectedWrongClientVersion), SessionID));
-                    return;
-                }
+                BeginSend(data);
+                SoftDisconnect(10);
+                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerDisconnectedWrongClientVersion), SessionID));
+                return;
             }
 
             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ClientVersionMatched), SessionID, IPAddress));
-            Enqueue(new S.ClientVersion { Result = 1 });
+            Enqueue(new S.ClientVersion { Result = 1, ProtocolVersion = Globals.ProtocolVersion });
 
             Stage = GameStage.Login;
         }
