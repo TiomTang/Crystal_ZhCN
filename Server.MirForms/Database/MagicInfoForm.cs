@@ -26,7 +26,7 @@ namespace Server
             if (_selectedMagicInfo == null)
             {
                 tabControl1.Enabled = false;
-                lblBookValid.Text = "Searching";
+                    lblBookValid.Text = "Searching";
                 lblSelected.Text = "Selected Skill: none";
                 lblDamageExample.Text = "";
                 lblDamageExplained.Text = "";
@@ -99,65 +99,69 @@ namespace Server
             return (int)Math.Round(((_selectedMagicInfo.MPowerBase / 4F) * (level + 1) + _selectedMagicInfo.PowerBase) * (_selectedMagicInfo.MultiplierBase + (level * _selectedMagicInfo.MultiplierBonus)));
         }
 
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            MagiclistBox = new ListBox();
-            tabControl1 = new TabControl();
-            tabPage1 = new TabPage();
-            label24 = new Label();
-            label23 = new Label();
-            textBoxName = new TextBox();
-            lblDamageExample = new Label();
-            lblDamageExplained = new Label();
-            lblSelected = new Label();
-            panel4 = new Panel();
-            txtDmgMultBoost = new TextBox();
-            txtDmgMultBase = new TextBox();
-            label21 = new Label();
-            label22 = new Label();
-            txtDmgBonusMax = new TextBox();
-            txtDmgBonusMin = new TextBox();
-            label18 = new Label();
-            label19 = new Label();
-            txtDmgBaseMax = new TextBox();
-            txtDmgBaseMin = new TextBox();
-            label17 = new Label();
-            label16 = new Label();
-            label15 = new Label();
-            panel3 = new Panel();
-            label20 = new Label();
-            txtRange = new TextBox();
-            txtDelayReduction = new TextBox();
-            txtDelayBase = new TextBox();
-            label14 = new Label();
-            label13 = new Label();
-            label12 = new Label();
-            panel2 = new Panel();
-            txtMPIncrease = new TextBox();
-            txtMPBase = new TextBox();
-            label11 = new Label();
-            label10 = new Label();
-            label9 = new Label();
-            panel1 = new Panel();
-            txtSkillLvl3Points = new TextBox();
-            txtSkillLvl2Points = new TextBox();
-            txtSkillLvl1Points = new TextBox();
-            label6 = new Label();
-            label7 = new Label();
-            label8 = new Label();
-            txtSkillLvl3Req = new TextBox();
-            txtSkillLvl2Req = new TextBox();
-            txtSkillLvl1Req = new TextBox();
-            label5 = new Label();
-            label4 = new Label();
-            label3 = new Label();
-            label2 = new Label();
-            txtSkillIcon = new TextBox();
-            label1 = new Label();
-            lblBookValid = new Label();
-            toolTip1 = new ToolTip(components);
-            MagicSearchBox = new TextBox();
+            MagiclistBox = new System.Windows.Forms.ListBox();
+            tabControl1 = new System.Windows.Forms.TabControl();
+            tabPage1 = new System.Windows.Forms.TabPage();
+            label24 = new System.Windows.Forms.Label();
+            label23 = new System.Windows.Forms.Label();
+            textBoxName = new System.Windows.Forms.TextBox();
+            lblDamageExample = new System.Windows.Forms.Label();
+            lblDamageExplained = new System.Windows.Forms.Label();
+            lblSelected = new System.Windows.Forms.Label();
+            panel4 = new System.Windows.Forms.Panel();
+            txtDmgMultBoost = new System.Windows.Forms.TextBox();
+            txtDmgMultBase = new System.Windows.Forms.TextBox();
+            label21 = new System.Windows.Forms.Label();
+            label22 = new System.Windows.Forms.Label();
+            txtDmgBonusMax = new System.Windows.Forms.TextBox();
+            txtDmgBonusMin = new System.Windows.Forms.TextBox();
+            label18 = new System.Windows.Forms.Label();
+            label19 = new System.Windows.Forms.Label();
+            txtDmgBaseMax = new System.Windows.Forms.TextBox();
+            txtDmgBaseMin = new System.Windows.Forms.TextBox();
+            label17 = new System.Windows.Forms.Label();
+            label16 = new System.Windows.Forms.Label();
+            label15 = new System.Windows.Forms.Label();
+            panel3 = new System.Windows.Forms.Panel();
+            label20 = new System.Windows.Forms.Label();
+            txtRange = new System.Windows.Forms.TextBox();
+            txtDelayReduction = new System.Windows.Forms.TextBox();
+            txtDelayBase = new System.Windows.Forms.TextBox();
+            label14 = new System.Windows.Forms.Label();
+            label13 = new System.Windows.Forms.Label();
+            label12 = new System.Windows.Forms.Label();
+            panel2 = new System.Windows.Forms.Panel();
+            txtMPIncrease = new System.Windows.Forms.TextBox();
+            txtMPBase = new System.Windows.Forms.TextBox();
+            label11 = new System.Windows.Forms.Label();
+            label10 = new System.Windows.Forms.Label();
+            label9 = new System.Windows.Forms.Label();
+            panel1 = new System.Windows.Forms.Panel();
+            txtSkillLvl3Points = new System.Windows.Forms.TextBox();
+            txtSkillLvl2Points = new System.Windows.Forms.TextBox();
+            txtSkillLvl1Points = new System.Windows.Forms.TextBox();
+            label6 = new System.Windows.Forms.Label();
+            label7 = new System.Windows.Forms.Label();
+            label8 = new System.Windows.Forms.Label();
+            txtSkillLvl3Req = new System.Windows.Forms.TextBox();
+            txtSkillLvl2Req = new System.Windows.Forms.TextBox();
+            txtSkillLvl1Req = new System.Windows.Forms.TextBox();
+            label5 = new System.Windows.Forms.Label();
+            label4 = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
+            txtSkillIcon = new System.Windows.Forms.TextBox();
+            label1 = new System.Windows.Forms.Label();
+            lblBookValid = new System.Windows.Forms.Label();
+            toolTip1 = new System.Windows.Forms.ToolTip(components);
+            MagicSearchBox = new System.Windows.Forms.TextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             panel4.SuspendLayout();
@@ -168,23 +172,23 @@ namespace Server
             // 
             // MagiclistBox
             // 
-            MagiclistBox.Dock = DockStyle.Left;
+            MagiclistBox.Dock = System.Windows.Forms.DockStyle.Left;
             MagiclistBox.FormattingEnabled = true;
-            MagiclistBox.ItemHeight = 15;
-            MagiclistBox.Location = new Point(0, 0);
+            MagiclistBox.ItemHeight = 17;
+            MagiclistBox.Location = new System.Drawing.Point(0, 0);
             MagiclistBox.Name = "MagiclistBox";
-            MagiclistBox.Size = new Size(225, 542);
+            MagiclistBox.Size = new System.Drawing.Size(225, 542);
             MagiclistBox.TabIndex = 0;
             MagiclistBox.SelectedIndexChanged += MagiclistBox_SelectedIndexChanged;
             // 
             // tabControl1
             // 
             tabControl1.Controls.Add(tabPage1);
-            tabControl1.Dock = DockStyle.Fill;
-            tabControl1.Location = new Point(225, 0);
+            tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            tabControl1.Location = new System.Drawing.Point(225, 0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(702, 542);
+            tabControl1.Size = new System.Drawing.Size(702, 542);
             tabControl1.TabIndex = 1;
             // 
             // tabPage1
@@ -202,10 +206,10 @@ namespace Server
             tabPage1.Controls.Add(txtSkillIcon);
             tabPage1.Controls.Add(label1);
             tabPage1.Controls.Add(lblBookValid);
-            tabPage1.Location = new Point(4, 24);
+            tabPage1.Location = new System.Drawing.Point(4, 26);
             tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(694, 514);
+            tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            tabPage1.Size = new System.Drawing.Size(694, 512);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Basics";
             tabPage1.UseVisualStyleBackColor = true;
@@ -213,59 +217,59 @@ namespace Server
             // label24
             // 
             label24.AutoSize = true;
-            label24.Location = new Point(20, 23);
+            label24.Location = new System.Drawing.Point(20, 30);
             label24.Name = "label24";
-            label24.Size = new Size(63, 15);
+            label24.Size = new System.Drawing.Size(69, 17);
             label24.TabIndex = 12;
             label24.Text = "SkillName:";
             // 
             // label23
             // 
             label23.AutoSize = true;
-            label23.Location = new Point(181, 3);
+            label23.Location = new System.Drawing.Point(181, 3);
             label23.Name = "label23";
-            label23.Size = new Size(37, 15);
+            label23.Size = new System.Drawing.Size(42, 17);
             label23.TabIndex = 11;
             label23.Text = "book:";
             // 
             // textBoxName
             // 
-            textBoxName.Location = new Point(89, 18);
+            textBoxName.Location = new System.Drawing.Point(89, 27);
             textBoxName.Name = "textBoxName";
-            textBoxName.Size = new Size(112, 23);
+            textBoxName.Size = new System.Drawing.Size(112, 23);
             textBoxName.TabIndex = 10;
             textBoxName.TextChanged += textBoxName_TextChanged;
             // 
             // lblDamageExample
             // 
             lblDamageExample.AutoSize = true;
-            lblDamageExample.Location = new Point(11, 394);
+            lblDamageExample.Location = new System.Drawing.Point(11, 394);
             lblDamageExample.Name = "lblDamageExample";
-            lblDamageExample.Size = new Size(98, 15);
+            lblDamageExample.Size = new System.Drawing.Size(110, 17);
             lblDamageExample.TabIndex = 0;
             lblDamageExample.Text = "Damage example";
             // 
             // lblDamageExplained
             // 
             lblDamageExplained.AutoSize = true;
-            lblDamageExplained.Location = new Point(11, 366);
+            lblDamageExplained.Location = new System.Drawing.Point(11, 366);
             lblDamageExplained.Name = "lblDamageExplained";
-            lblDamageExplained.Size = new Size(54, 15);
+            lblDamageExplained.Size = new System.Drawing.Size(60, 17);
             lblDamageExplained.TabIndex = 9;
             lblDamageExplained.Text = "Damage:";
             // 
             // lblSelected
             // 
             lblSelected.AutoSize = true;
-            lblSelected.Location = new Point(20, 3);
+            lblSelected.Location = new System.Drawing.Point(20, 3);
             lblSelected.Name = "lblSelected";
-            lblSelected.Size = new Size(80, 15);
+            lblSelected.Size = new System.Drawing.Size(90, 17);
             lblSelected.TabIndex = 8;
             lblSelected.Text = "Selected skill: ";
             // 
             // panel4
             // 
-            panel4.BorderStyle = BorderStyle.FixedSingle;
+            panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             panel4.Controls.Add(txtDmgMultBoost);
             panel4.Controls.Add(txtDmgMultBase);
             panel4.Controls.Add(label21);
@@ -279,25 +283,25 @@ namespace Server
             panel4.Controls.Add(label17);
             panel4.Controls.Add(label16);
             panel4.Controls.Add(label15);
-            panel4.Location = new Point(14, 166);
+            panel4.Location = new System.Drawing.Point(14, 166);
             panel4.Name = "panel4";
-            panel4.Size = new Size(233, 191);
+            panel4.Size = new System.Drawing.Size(320, 191);
             panel4.TabIndex = 6;
             // 
             // txtDmgMultBoost
             // 
-            txtDmgMultBoost.Location = new Point(168, 157);
+            txtDmgMultBoost.Location = new System.Drawing.Point(211, 157);
             txtDmgMultBoost.Name = "txtDmgMultBoost";
-            txtDmgMultBoost.Size = new Size(46, 23);
+            txtDmgMultBoost.Size = new System.Drawing.Size(81, 23);
             txtDmgMultBoost.TabIndex = 14;
             toolTip1.SetToolTip(txtDmgMultBoost, "extra multiplyer apply'd for every skill level");
             txtDmgMultBoost.TextChanged += txtDmgMultBoost_TextChanged;
             // 
             // txtDmgMultBase
             // 
-            txtDmgMultBase.Location = new Point(168, 131);
+            txtDmgMultBase.Location = new System.Drawing.Point(211, 131);
             txtDmgMultBase.Name = "txtDmgMultBase";
-            txtDmgMultBase.Size = new Size(46, 23);
+            txtDmgMultBase.Size = new System.Drawing.Size(81, 23);
             txtDmgMultBase.TabIndex = 13;
             toolTip1.SetToolTip(txtDmgMultBase, "multiplier apply'd to total skill dmg");
             txtDmgMultBase.TextChanged += txtDmgMultBase_TextChanged;
@@ -305,71 +309,71 @@ namespace Server
             // label21
             // 
             label21.AutoSize = true;
-            label21.Location = new Point(12, 160);
+            label21.Location = new System.Drawing.Point(12, 160);
             label21.Name = "label21";
-            label21.Size = new Size(178, 15);
+            label21.Size = new System.Drawing.Size(195, 17);
             label21.TabIndex = 12;
             label21.Text = "Damage multiplyer boost/skilllvl";
             // 
             // label22
             // 
             label22.AutoSize = true;
-            label22.Location = new Point(12, 134);
+            label22.Location = new System.Drawing.Point(12, 134);
             label22.Name = "label22";
-            label22.Size = new Size(135, 15);
+            label22.Size = new System.Drawing.Size(150, 17);
             label22.TabIndex = 11;
             label22.Text = "Damage multiplyer base";
             // 
             // txtDmgBonusMax
             // 
-            txtDmgBonusMax.Location = new Point(168, 105);
+            txtDmgBonusMax.Location = new System.Drawing.Point(211, 105);
             txtDmgBonusMax.Name = "txtDmgBonusMax";
-            txtDmgBonusMax.Size = new Size(46, 23);
+            txtDmgBonusMax.Size = new System.Drawing.Size(81, 23);
             txtDmgBonusMax.TabIndex = 10;
             toolTip1.SetToolTip(txtDmgBonusMax, "Damage bonus at skill level '4' ");
             txtDmgBonusMax.TextChanged += txtDmgBonusMax_TextChanged;
             // 
             // txtDmgBonusMin
             // 
-            txtDmgBonusMin.Location = new Point(168, 79);
+            txtDmgBonusMin.Location = new System.Drawing.Point(211, 79);
             txtDmgBonusMin.Name = "txtDmgBonusMin";
-            txtDmgBonusMin.Size = new Size(46, 23);
+            txtDmgBonusMin.Size = new System.Drawing.Size(81, 23);
             txtDmgBonusMin.TabIndex = 9;
-            toolTip1.SetToolTip(txtDmgBonusMin, "Damage bonus at skill level '4' \r\nyou will get 1/4th of this bonus for every skill level\r\nnote ingame level 0 = 1 bonus, so level 3 = max bonus (4)");
+            toolTip1.SetToolTip(txtDmgBonusMin, ("Damage bonus at skill level '4' \r\nyou will get 1/4th of this bonus for every skil" + "l level\r\nnote ingame level 0 = 1 bonus, so level 3 = max bonus (4)"));
             txtDmgBonusMin.TextChanged += txtDmgBonusMin_TextChanged;
             // 
             // label18
             // 
             label18.AutoSize = true;
-            label18.Location = new Point(12, 108);
+            label18.Location = new System.Drawing.Point(12, 108);
             label18.Name = "label18";
-            label18.Size = new Size(154, 15);
+            label18.Size = new System.Drawing.Size(170, 17);
             label18.TabIndex = 8;
             label18.Text = "Maximum skill lvl 3 damage";
             // 
             // label19
             // 
             label19.AutoSize = true;
-            label19.Location = new Point(12, 82);
+            label19.Location = new System.Drawing.Point(12, 82);
             label19.Name = "label19";
-            label19.Size = new Size(156, 15);
+            label19.Size = new System.Drawing.Size(170, 17);
             label19.TabIndex = 7;
             label19.Text = "Minimum skill lvl 3 damage:";
             // 
             // txtDmgBaseMax
             // 
-            txtDmgBaseMax.Location = new Point(168, 53);
+            txtDmgBaseMax.Location = new System.Drawing.Point(211, 53);
             txtDmgBaseMax.Name = "txtDmgBaseMax";
-            txtDmgBaseMax.Size = new Size(46, 23);
+            txtDmgBaseMax.Size = new System.Drawing.Size(81, 23);
             txtDmgBaseMax.TabIndex = 6;
             toolTip1.SetToolTip(txtDmgBaseMax, "Damage at skill level 0");
             txtDmgBaseMax.TextChanged += txtDmgBaseMax_TextChanged;
             // 
             // txtDmgBaseMin
             // 
-            txtDmgBaseMin.Location = new Point(168, 27);
+            txtDmgBaseMin.Location = new System.Drawing.Point(211, 27);
             txtDmgBaseMin.Name = "txtDmgBaseMin";
-            txtDmgBaseMin.Size = new Size(46, 23);
+            txtDmgBaseMin.Size = new System.Drawing.Size(81, 23);
             txtDmgBaseMin.TabIndex = 5;
             toolTip1.SetToolTip(txtDmgBaseMin, "Damage at skill level 0");
             txtDmgBaseMin.TextChanged += txtDmgBaseMin_TextChanged;
@@ -377,33 +381,33 @@ namespace Server
             // label17
             // 
             label17.AutoSize = true;
-            label17.Location = new Point(12, 56);
+            label17.Location = new System.Drawing.Point(12, 56);
             label17.Name = "label17";
-            label17.Size = new Size(134, 15);
+            label17.Size = new System.Drawing.Size(149, 17);
             label17.TabIndex = 2;
             label17.Text = "Maximum base damage";
             // 
             // label16
             // 
             label16.AutoSize = true;
-            label16.Location = new Point(12, 30);
+            label16.Location = new System.Drawing.Point(12, 30);
             label16.Name = "label16";
-            label16.Size = new Size(136, 15);
+            label16.Size = new System.Drawing.Size(149, 17);
             label16.TabIndex = 1;
             label16.Text = "Minimum base damage:";
             // 
             // label15
             // 
             label15.AutoSize = true;
-            label15.Location = new Point(5, 8);
+            label15.Location = new System.Drawing.Point(5, 8);
             label15.Name = "label15";
-            label15.Size = new Size(95, 15);
+            label15.Size = new System.Drawing.Size(106, 17);
             label15.TabIndex = 0;
             label15.Text = "Damage settings";
             // 
             // panel3
             // 
-            panel3.BorderStyle = BorderStyle.FixedSingle;
+            panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             panel3.Controls.Add(label20);
             panel3.Controls.Add(txtRange);
             panel3.Controls.Add(txtDelayReduction);
@@ -411,43 +415,43 @@ namespace Server
             panel3.Controls.Add(label14);
             panel3.Controls.Add(label13);
             panel3.Controls.Add(label12);
-            panel3.Location = new Point(253, 166);
+            panel3.Location = new System.Drawing.Point(356, 166);
             panel3.Name = "panel3";
-            panel3.Size = new Size(216, 191);
+            panel3.Size = new System.Drawing.Size(320, 191);
             panel3.TabIndex = 5;
             toolTip1.SetToolTip(panel3, "delay = <base delay> - (skill level * <decrease>)");
             // 
             // label20
             // 
             label20.AutoSize = true;
-            label20.Location = new Point(12, 77);
+            label20.Location = new System.Drawing.Point(12, 77);
             label20.Name = "label20";
-            label20.Size = new Size(103, 15);
+            label20.Size = new System.Drawing.Size(114, 17);
             label20.TabIndex = 15;
             label20.Text = "Range (0 No limit)";
             // 
             // txtRange
             // 
-            txtRange.Location = new Point(121, 74);
+            txtRange.Location = new System.Drawing.Point(178, 74);
             txtRange.Name = "txtRange";
-            txtRange.Size = new Size(79, 23);
+            txtRange.Size = new System.Drawing.Size(93, 23);
             txtRange.TabIndex = 14;
             txtRange.TextChanged += txtRange_TextChanged;
             // 
             // txtDelayReduction
             // 
-            txtDelayReduction.Location = new Point(121, 47);
+            txtDelayReduction.Location = new System.Drawing.Point(178, 47);
             txtDelayReduction.Name = "txtDelayReduction";
-            txtDelayReduction.Size = new Size(79, 23);
+            txtDelayReduction.Size = new System.Drawing.Size(93, 23);
             txtDelayReduction.TabIndex = 13;
             toolTip1.SetToolTip(txtDelayReduction, "delay = <base delay> - (skill level * <decrease>)");
             txtDelayReduction.TextChanged += txtDelayReduction_TextChanged;
             // 
             // txtDelayBase
             // 
-            txtDelayBase.Location = new Point(121, 22);
+            txtDelayBase.Location = new System.Drawing.Point(178, 22);
             txtDelayBase.Name = "txtDelayBase";
-            txtDelayBase.Size = new Size(79, 23);
+            txtDelayBase.Size = new System.Drawing.Size(93, 23);
             txtDelayBase.TabIndex = 12;
             toolTip1.SetToolTip(txtDelayBase, "delay = <base delay> - (skill level * <decrease>)");
             txtDelayBase.TextChanged += txtDelayBase_TextChanged;
@@ -455,57 +459,57 @@ namespace Server
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new Point(12, 50);
+            label14.Location = new System.Drawing.Point(12, 50);
             label14.Name = "label14";
-            label14.Size = new Size(112, 15);
+            label14.Size = new System.Drawing.Size(127, 17);
             label14.TabIndex = 2;
             label14.Text = "Decrease / skill level";
             // 
             // label13
             // 
             label13.AutoSize = true;
-            label13.Location = new Point(12, 25);
+            label13.Location = new System.Drawing.Point(12, 25);
             label13.Name = "label13";
-            label13.Size = new Size(62, 15);
+            label13.Size = new System.Drawing.Size(71, 17);
             label13.TabIndex = 1;
             label13.Text = "Base delay";
             // 
             // label12
             // 
             label12.AutoSize = true;
-            label12.Location = new Point(12, 8);
+            label12.Location = new System.Drawing.Point(12, 8);
             label12.Name = "label12";
-            label12.Size = new Size(129, 15);
+            label12.Size = new System.Drawing.Size(141, 17);
             label12.TabIndex = 0;
             label12.Text = "Delay (in milliseconds!)";
             // 
             // panel2
             // 
-            panel2.BorderStyle = BorderStyle.FixedSingle;
+            panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             panel2.Controls.Add(txtMPIncrease);
             panel2.Controls.Add(txtMPBase);
             panel2.Controls.Add(label11);
             panel2.Controls.Add(label10);
             panel2.Controls.Add(label9);
-            panel2.Location = new Point(253, 53);
+            panel2.Location = new System.Drawing.Point(356, 53);
             panel2.Name = "panel2";
-            panel2.Size = new Size(216, 107);
+            panel2.Size = new System.Drawing.Size(320, 107);
             panel2.TabIndex = 4;
             // 
             // txtMPIncrease
             // 
-            txtMPIncrease.Location = new Point(135, 47);
+            txtMPIncrease.Location = new System.Drawing.Point(178, 47);
             txtMPIncrease.Name = "txtMPIncrease";
-            txtMPIncrease.Size = new Size(46, 23);
+            txtMPIncrease.Size = new System.Drawing.Size(93, 23);
             txtMPIncrease.TabIndex = 12;
             toolTip1.SetToolTip(txtMPIncrease, "extra amount of mp used each level");
             txtMPIncrease.TextChanged += txtMPIncrease_TextChanged;
             // 
             // txtMPBase
             // 
-            txtMPBase.Location = new Point(135, 22);
+            txtMPBase.Location = new System.Drawing.Point(178, 22);
             txtMPBase.Name = "txtMPBase";
-            txtMPBase.Size = new Size(46, 23);
+            txtMPBase.Size = new System.Drawing.Size(93, 23);
             txtMPBase.TabIndex = 11;
             toolTip1.SetToolTip(txtMPBase, "Mp usage when skill is level 0");
             txtMPBase.TextChanged += txtMPBase_TextChanged;
@@ -513,33 +517,33 @@ namespace Server
             // label11
             // 
             label11.AutoSize = true;
-            label11.Location = new Point(12, 50);
+            label11.Location = new System.Drawing.Point(12, 50);
             label11.Name = "label11";
-            label11.Size = new Size(126, 15);
+            label11.Size = new System.Drawing.Size(140, 17);
             label11.TabIndex = 2;
             label11.Text = "MP increase each level";
             // 
             // label10
             // 
             label10.AutoSize = true;
-            label10.Location = new Point(12, 25);
+            label10.Location = new System.Drawing.Point(12, 25);
             label10.Name = "label10";
-            label10.Size = new Size(86, 15);
+            label10.Size = new System.Drawing.Size(98, 17);
             label10.TabIndex = 1;
             label10.Text = "Base mp usage";
             // 
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(12, 6);
+            label9.Location = new System.Drawing.Point(12, 6);
             label9.Name = "label9";
-            label9.Size = new Size(59, 15);
+            label9.Size = new System.Drawing.Size(66, 17);
             label9.TabIndex = 0;
             label9.Text = "MP usage";
             // 
             // panel1
             // 
-            panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             panel1.Controls.Add(txtSkillLvl3Points);
             panel1.Controls.Add(txtSkillLvl2Points);
             panel1.Controls.Add(txtSkillLvl1Points);
@@ -553,164 +557,163 @@ namespace Server
             panel1.Controls.Add(label4);
             panel1.Controls.Add(label3);
             panel1.Controls.Add(label2);
-            panel1.Location = new Point(13, 53);
+            panel1.Location = new System.Drawing.Point(14, 53);
             panel1.Name = "panel1";
-            panel1.Size = new Size(234, 107);
+            panel1.Size = new System.Drawing.Size(320, 107);
             panel1.TabIndex = 3;
             // 
             // txtSkillLvl3Points
             // 
-            txtSkillLvl3Points.Location = new Point(169, 72);
+            txtSkillLvl3Points.Location = new System.Drawing.Point(212, 72);
             txtSkillLvl3Points.Name = "txtSkillLvl3Points";
-            txtSkillLvl3Points.Size = new Size(46, 23);
+            txtSkillLvl3Points.Size = new System.Drawing.Size(80, 23);
             txtSkillLvl3Points.TabIndex = 12;
             txtSkillLvl3Points.TextChanged += txtSkillLvl3Points_TextChanged;
             // 
             // txtSkillLvl2Points
             // 
-            txtSkillLvl2Points.Location = new Point(169, 47);
+            txtSkillLvl2Points.Location = new System.Drawing.Point(212, 47);
             txtSkillLvl2Points.Name = "txtSkillLvl2Points";
-            txtSkillLvl2Points.Size = new Size(46, 23);
+            txtSkillLvl2Points.Size = new System.Drawing.Size(80, 23);
             txtSkillLvl2Points.TabIndex = 11;
             txtSkillLvl2Points.TextChanged += txtSkillLvl2Points_TextChanged;
             // 
             // txtSkillLvl1Points
             // 
-            txtSkillLvl1Points.Location = new Point(169, 22);
+            txtSkillLvl1Points.Location = new System.Drawing.Point(212, 22);
             txtSkillLvl1Points.Name = "txtSkillLvl1Points";
-            txtSkillLvl1Points.Size = new Size(46, 23);
+            txtSkillLvl1Points.Size = new System.Drawing.Size(80, 23);
             txtSkillLvl1Points.TabIndex = 10;
             txtSkillLvl1Points.TextChanged += txtSkillLvl1Points_TextChanged;
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(110, 75);
+            label6.Location = new System.Drawing.Point(110, 75);
             label6.Name = "label6";
-            label6.Size = new Size(64, 15);
+            label6.Size = new System.Drawing.Size(71, 17);
             label6.TabIndex = 9;
             label6.Text = "Skill points";
             // 
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(110, 50);
+            label7.Location = new System.Drawing.Point(110, 50);
             label7.Name = "label7";
-            label7.Size = new Size(64, 15);
+            label7.Size = new System.Drawing.Size(71, 17);
             label7.TabIndex = 8;
             label7.Text = "Skill points";
             // 
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(110, 25);
+            label8.Location = new System.Drawing.Point(110, 25);
             label8.Name = "label8";
-            label8.Size = new Size(64, 15);
+            label8.Size = new System.Drawing.Size(71, 17);
             label8.TabIndex = 7;
             label8.Text = "Skill points";
             // 
             // txtSkillLvl3Req
             // 
-            txtSkillLvl3Req.Location = new Point(57, 72);
+            txtSkillLvl3Req.Location = new System.Drawing.Point(57, 72);
             txtSkillLvl3Req.Name = "txtSkillLvl3Req";
-            txtSkillLvl3Req.Size = new Size(46, 23);
+            txtSkillLvl3Req.Size = new System.Drawing.Size(46, 23);
             txtSkillLvl3Req.TabIndex = 6;
             txtSkillLvl3Req.TextChanged += txtSkillLvl3Req_TextChanged;
             // 
             // txtSkillLvl2Req
             // 
-            txtSkillLvl2Req.Location = new Point(57, 47);
+            txtSkillLvl2Req.Location = new System.Drawing.Point(57, 47);
             txtSkillLvl2Req.Name = "txtSkillLvl2Req";
-            txtSkillLvl2Req.Size = new Size(46, 23);
+            txtSkillLvl2Req.Size = new System.Drawing.Size(46, 23);
             txtSkillLvl2Req.TabIndex = 5;
             txtSkillLvl2Req.TextChanged += txtSkillLvl2Req_TextChanged;
             // 
             // txtSkillLvl1Req
             // 
-            txtSkillLvl1Req.Location = new Point(57, 22);
+            txtSkillLvl1Req.Location = new System.Drawing.Point(57, 22);
             txtSkillLvl1Req.Name = "txtSkillLvl1Req";
-            txtSkillLvl1Req.Size = new Size(46, 23);
+            txtSkillLvl1Req.Size = new System.Drawing.Size(46, 23);
             txtSkillLvl1Req.TabIndex = 4;
             txtSkillLvl1Req.TextChanged += txtSkillLvl1Req_TextChanged;
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(13, 75);
+            label5.Location = new System.Drawing.Point(13, 75);
             label5.Name = "label5";
-            label5.Size = new Size(40, 15);
+            label5.Size = new System.Drawing.Size(45, 17);
             label5.TabIndex = 3;
             label5.Text = "level 3";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(13, 50);
+            label4.Location = new System.Drawing.Point(13, 50);
             label4.Name = "label4";
-            label4.Size = new Size(40, 15);
+            label4.Size = new System.Drawing.Size(45, 17);
             label4.TabIndex = 2;
             label4.Text = "level 2";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(13, 25);
+            label3.Location = new System.Drawing.Point(13, 25);
             label3.Name = "label3";
-            label3.Size = new Size(40, 15);
+            label3.Size = new System.Drawing.Size(45, 17);
             label3.TabIndex = 1;
             label3.Text = "level 1";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(6, 6);
+            label2.Location = new System.Drawing.Point(6, 6);
             label2.Name = "label2";
-            label2.Size = new Size(174, 15);
+            label2.Size = new System.Drawing.Size(194, 17);
             label2.TabIndex = 0;
             label2.Text = "Skill level increase requirements";
             // 
             // txtSkillIcon
             // 
-            txtSkillIcon.Location = new Point(311, 20);
+            txtSkillIcon.Location = new System.Drawing.Point(311, 27);
             txtSkillIcon.Name = "txtSkillIcon";
-            txtSkillIcon.Size = new Size(41, 23);
+            txtSkillIcon.Size = new System.Drawing.Size(105, 23);
             txtSkillIcon.TabIndex = 2;
             txtSkillIcon.TextChanged += txtSkillIcon_TextChanged;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(250, 23);
+            label1.Location = new System.Drawing.Point(250, 30);
             label1.Name = "label1";
-            label1.Size = new Size(60, 15);
+            label1.Size = new System.Drawing.Size(66, 17);
             label1.TabIndex = 1;
             label1.Text = "Skill icon: ";
             // 
             // lblBookValid
             // 
             lblBookValid.AutoSize = true;
-            lblBookValid.Location = new Point(222, 3);
+            lblBookValid.Location = new System.Drawing.Point(237, 3);
             lblBookValid.Name = "lblBookValid";
-            lblBookValid.Size = new Size(112, 15);
+            lblBookValid.Size = new System.Drawing.Size(127, 17);
             lblBookValid.TabIndex = 0;
             lblBookValid.Text = "Searching for books";
             // 
             // MagicSearchBox
             // 
-            MagicSearchBox.Location = new Point(276, 0);
+            MagicSearchBox.Location = new System.Drawing.Point(276, 0);
             MagicSearchBox.Name = "MagicSearchBox";
             MagicSearchBox.PlaceholderText = "Search...";
-            MagicSearchBox.Size = new Size(201, 23);
+            MagicSearchBox.Size = new System.Drawing.Size(201, 23);
             MagicSearchBox.TabIndex = 2;
             MagicSearchBox.TextChanged += MagicSearchBox_TextChanged;
             // 
             // MagicInfoForm
             // 
-            ClientSize = new Size(927, 542);
+            ClientSize = new System.Drawing.Size(927, 542);
             Controls.Add(MagicSearchBox);
             Controls.Add(tabControl1);
             Controls.Add(MagiclistBox);
-            Name = "MagicInfoForm";
             Text = "Magic Settings";
             FormClosed += MagicInfoForm_FormClosed;
             tabControl1.ResumeLayout(false);
