@@ -1062,6 +1062,7 @@ public enum SpecialItemMode : short
     Skill = 0x0200,
     NoDuraLoss = 0x0400,
     Blink = 0x800,
+    CarryEffect = 0x1000,
 }
 
 [Flags]
@@ -1398,6 +1399,7 @@ public enum BuffType : byte
     Knapsack,
     Accuracy,
     Luck,
+    ExpStone,
 }
 
 [Flags]

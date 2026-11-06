@@ -184,7 +184,7 @@ namespace Server.MirObjects
         public LevelEffects LevelEffects = LevelEffects.None;
 
         public const long LoyaltyDelay = 1000, ItemExpireDelay = 60000, DuraDelay = 10000, RegenDelay = 10000, PotDelay = 200, HealDelay = 600, VampDelay = 500, MoveDelay = 600;
-        public long StruckTime, RunTime, ActionTime, AttackTime, RegenTime, SpellTime, StackingTime, IncreaseLoyaltyTime, ItemExpireTime, TorchTime, DuraTime, PotTime, HealTime, VampTime, LogTime, DecreaseLoyaltyTime, SearchTime;
+        public long StruckTime, RunTime, ActionTime, AttackTime, RegenTime, SpellTime, StackingTime, IncreaseLoyaltyTime, ItemExpireTime, TorchTime, DuraTime, PotTime, HealTime, VampTime, LogTime, DecreaseLoyaltyTime, SearchTime, CarryBuffTime;
 
         protected int _stepCounter, _runCounter;
 
@@ -394,8 +394,60 @@ namespace Server.MirObjects
             OperateTime = Envir.Time;
         }
         public override void Die() { }
+        // A carried token item grants its buff only while it stays in the bag.
+        public static int GetCarriedExpBonus(UserItem[] inventory, DateTime now)
+        {
+            for (int i = 0; i < inventory.Length; i++)
+            {
+                UserItem item = inventory[i];
+
+                if (item?.Info == null) continue;
+                if (!item.Info.Unique.HasFlag(SpecialItemMode.CarryEffect)) continue;
+                if (item.ExpireInfo != null && item.ExpireInfo.ExpiryDate <= now) continue;
+
+                return item.Info.Stats[Stat.ExpRatePercent];
+            }
+
+            return 0;
+        }
+
+        protected void ProcessCarryBuffs()
+        {
+            int value = GetCarriedExpBonus(Info.Inventory, Envir.Now);
+
+            bool has = HasBuff(BuffType.ExpStone, out Buff buff);
+
+            if (value == 0)
+            {
+                if (has) RemoveBuff(BuffType.ExpStone);
+
+                return;
+            }
+
+            if (has)
+            {
+                if (buff.Stats[Stat.ExpRatePercent] == value) return;
+
+                buff.Stats[Stat.ExpRatePercent] = value;
+
+                Enqueue(new S.AddBuff { Buff = buff.ToClientBuff() });
+                RefreshStats();
+
+                return;
+            }
+
+            AddBuff(BuffType.ExpStone, this, 0, new Stats { [Stat.ExpRatePercent] = value });
+        }
+
         protected virtual void ProcessBuffs()
         {
+            if (Envir.Time > CarryBuffTime)
+            {
+                CarryBuffTime = Envir.Time + 1000;
+
+                ProcessCarryBuffs();
+            }
+
             bool refresh = false;
             bool clearRing = false, skill = false, gm = false, mentor = false, lover = false;
 
