@@ -2027,7 +2027,8 @@ namespace Server.MirEnvir
                 if (canstartserver != "true")
                 {
                     MessageQueue.Enqueue(canstartserver);
-                    StopEnvir();
+                    // World is only partially loaded here: discard it instead of saving.
+                    // The finally block below releases the references.
                     return;
                 }
 
@@ -2207,6 +2208,18 @@ namespace Server.MirEnvir
                 }
                 finally
                 {
+                    // The work loop, its Parallel.For passes and the network have all
+                    // returned by now, so nothing is still walking the world and the
+                    // previous world can be dropped before another Start is allowed.
+                    try
+                    {
+                        ReleaseRuntimeState();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageQueue.Enqueue(GameLanguage.Get("[runtime release error]{0}", ex));
+                    }
+
                     lock (_lifecycleLock)
                         _thread = null;
                 }
@@ -3394,15 +3407,46 @@ namespace Server.MirEnvir
         {
             SaveGoods(true);
 
+            CleanUp();
+        }
+
+        // Drops every reference Envir.Main keeps to the previous world so it can be
+        // collected. Saving is deliberately NOT done here: callers must have finished
+        // SaveGoods/SaveAccounts/SaveGuilds/SaveConquests before this runs, because
+        // SaveGuilds still reads Guilds for live guild data.
+        private void ReleaseRuntimeState()
+        {
+            for (var i = 0; i < MobThreads.Length; i++)
+                MobThreads[i]?.ObjectsList.Clear();
+
+            // Maps (and everything they own: Cells, Doors, NPCs, Respawns) are only
+            // reachable through these roots once the world is torn down.
             MapList.Clear();
             StartPoints.Clear();
             StartItems.Clear();
+            GTMapList.Clear();
+
             Objects.Clear();
             Players.Clear();
             Heroes.Clear();
-            GTMapList.Clear();
+            Spells.Clear();
+            NPCs.Clear();
 
-            CleanUp();
+            // SavedSpawns hold MapRespawn.Map, Scripts hold every parsed NPC script,
+            // Spells hold SpellObject.CurrentMap and Caster.
+            SavedSpawns.Clear();
+            Scripts.Clear();
+            Timers.Clear();
+            Guilds.Clear();
+            GuildsAtWar.Clear();
+            Conquests.Clear();
+
+            DefaultNPC = null;
+            MonsterNPC = null;
+            RobotNPC = null;
+            DragonSystem = null;
+
+            Robot.Clear();
 
             GC.Collect();
 
