@@ -2412,15 +2412,8 @@ namespace Client.MirScenes
         {
             MirItemCell fromCell, toCell;
 
-            switch (p.Grid)
-            {
-                case MirGridType.HeroInventory:
-                    toCell = HeroDialog.Grid[p.To];
-                    break;
-                default:
-                    toCell = CharacterDialog.Grid[p.To];
-                    break;
-            }
+            bool toHero = p.ToHero || p.Grid == MirGridType.HeroInventory;
+            toCell = toHero ? HeroDialog.Grid[p.To] : CharacterDialog.Grid[p.To];
 
             switch (p.Grid)
             {
@@ -2447,11 +2440,17 @@ namespace Client.MirScenes
             UserItem i = fromCell.Item;
             fromCell.Item = toCell.Item;
             toCell.Item = i;
-            CharacterDuraPanel.UpdateCharacterDura(i);
-            if (p.Grid == MirGridType.HeroInventory)
+            if (toHero)
+            {
                 Hero.RefreshStats();
+                if (p.Grid == MirGridType.Inventory)
+                    User.RefreshStats();
+            }
             else
+            {
+                CharacterDuraPanel.UpdateCharacterDura(i);
                 User.RefreshStats();
+            }
         }
         private void EquipSlotItem(S.EquipSlotItem p)
         {

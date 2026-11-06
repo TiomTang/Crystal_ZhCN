@@ -5567,9 +5567,18 @@ namespace Server.MirObjects
             }
             Enqueue(p);
         }
-        public void EquipItem(MirGridType grid, ulong id, int to)
+        public void EquipItem(MirGridType grid, ulong id, int to, bool toHero = false)
         {
-            S.EquipItem p = new S.EquipItem { Grid = grid, UniqueID = id, To = to, Success = false };
+            bool targetsHero = toHero || grid == MirGridType.HeroInventory;
+            bool transfersToHero = toHero && grid == MirGridType.Inventory;
+            S.EquipItem p = new S.EquipItem { Grid = grid, UniqueID = id, To = to, ToHero = targetsHero, Success = false };
+
+            if ((toHero && grid != MirGridType.Inventory && grid != MirGridType.HeroInventory) ||
+                (targetsHero && (!HasHero || !HeroSpawned || Hero.Dead)))
+            {
+                Enqueue(p);
+                return;
+            }
 
             if ((grid == MirGridType.Inventory || grid == MirGridType.Storage) && Fishing)
             {
@@ -5584,7 +5593,14 @@ namespace Server.MirObjects
             {
                 case MirGridType.Inventory:
                 case MirGridType.Storage:
-                    toArray = Info.Equipment;
+                    if (transfersToHero)
+                    {
+                        toArray = CurrentHero.Equipment;
+                        toGrid = MirGridType.HeroEquipment;
+                        actor = Hero;
+                    }
+                    else
+                        toArray = Info.Equipment;
                     break;
                 case MirGridType.HeroInventory:
                     if (HasHero && HeroSpawned && !Hero.Dead)
@@ -5699,6 +5715,23 @@ namespace Server.MirObjects
                 return;
             }
 
+            if (transfersToHero)
+            {
+                UserItem returnedItem = toArray[to];
+                if (temp.Info.Bind.HasFlag(BindMode.NoHero) ||
+                    (temp.RentalInformation != null && temp.RentalInformation.BindingFlags != BindMode.None))
+                {
+                    Enqueue(p);
+                    return;
+                }
+
+                if ((long)CurrentBagWeight - temp.Weight + (returnedItem != null ? returnedItem.Weight : 0) > Stats[Stat.BagWeight])
+                {
+                    Enqueue(p);
+                    return;
+                }
+            }
+
             if (actor.CanEquipItem(temp, to))
             {
                 if (temp.Info.NeedIdentify && !temp.Identified)
@@ -5722,6 +5755,9 @@ namespace Server.MirObjects
                 toArray[to] = temp;
 
                 Report.ItemMoved(temp, grid, toGrid, index, to);
+
+                if (transfersToHero)
+                    RefreshBagWeight();
 
                 p.Success = true;
                 Enqueue(p);

@@ -1298,7 +1298,7 @@ namespace Server.MirNetwork
         {
             if (Stage != GameStage.Game) return;
 
-            Player.EquipItem(p.Grid, p.UniqueID, p.To);
+            Player.EquipItem(p.Grid, p.UniqueID, p.To, p.ToHero);
         }
         private void RemoveItem(C.RemoveItem p)
         {

@@ -1964,11 +1964,13 @@ namespace Client.MirControls
                     #region To Hero Equipment
                     case MirGridType.HeroEquipment:
 
-                        if (GameScene.SelectedCell.GridType != MirGridType.HeroInventory) return;
+                        if (GameScene.SelectedCell.GridType != MirGridType.HeroInventory &&
+                            GameScene.SelectedCell.GridType != MirGridType.Inventory) return;
                         if (GameScene.Hero == null || GameScene.Hero.Dead)
                             return;
 
-                        if (Item != null && GameScene.SelectedCell.Item.Info.Type == ItemType.Amulet)
+                        if (GameScene.SelectedCell.GridType == MirGridType.HeroInventory &&
+                            Item != null && GameScene.SelectedCell.Item.Info.Type == ItemType.Amulet)
                         {
                             if (GameScene.SelectedCell.Item.Info == Item.Info && Item.Count < Item.Info.StackSize)
                             {
@@ -1985,7 +1987,7 @@ namespace Client.MirControls
                         {
                             if (CanWearItem(GameScene.Hero, GameScene.SelectedCell.Item))
                             {
-                                Network.Enqueue(new C.EquipItem { Grid = GameScene.SelectedCell.GridType, UniqueID = GameScene.SelectedCell.Item.UniqueID, To = ItemSlot });
+                                Network.Enqueue(new C.EquipItem { Grid = GameScene.SelectedCell.GridType, UniqueID = GameScene.SelectedCell.Item.UniqueID, To = ItemSlot, ToHero = true });
                                 Locked = true;
                                 GameScene.SelectedCell.Locked = true;
                             }
@@ -2085,7 +2087,7 @@ namespace Client.MirControls
                         return false;
                     break;
                 case MirGridType.HeroEquipment:
-                    if (grid != MirGridType.HeroInventory)
+                    if (grid != MirGridType.HeroInventory && grid != MirGridType.Inventory)
                         return false;
                     break;                
             }
