@@ -24,6 +24,8 @@ namespace Client.MirNetwork
         static byte[] _rawData = new byte[0];
         static readonly byte[] _rawBytes = new byte[8 * 1024];
 
+        private static CancellationTokenSource _connectCancellation;
+
         public static void Connect()
         {
             if (_client != null)
@@ -47,24 +49,32 @@ namespace Client.MirNetwork
 
             ConnectAttempt++;
 
-            try
-            {
-                string host = ResolveConnectHost(Settings.IPAddress);
+            string host = ResolveConnectHost(Settings.IPAddress);
 
-                if (Settings.LogErrors && !_targetLogged)
-                {
-                    _targetLogged = true;
-                    CMain.SaveError($"[Network] Connecting to {host}:{Settings.Port} (configured: {Settings.IPAddress})");
-                }
-
-                _client = new TcpClient { NoDelay = true };
-                _client?.BeginConnect(host, Settings.Port, Connection, null);
-            }
-            catch (ObjectDisposedException ex)
+            if (Settings.LogErrors && !_targetLogged)
             {
-                if (Settings.LogErrors) CMain.SaveError(ex.ToString());
-                Disconnect();
+                _targetLogged = true;
+                CMain.SaveError($"[Network] Connecting to {host}:{Settings.Port} (configured: {Settings.IPAddress})");
             }
+
+            IPAddress[] addresses = ConnectionCandidates.Resolve(host);
+
+            if (addresses.Length == 0)
+            {
+                if (Settings.LogErrors) CMain.SaveError($"[Network] {host} did not resolve to any address");
+                return;
+            }
+
+            CancellationTokenSource previous = _connectCancellation;
+            var cancellation = new CancellationTokenSource();
+            _connectCancellation = cancellation;
+
+            previous?.Cancel();
+            previous?.Dispose();
+
+            CancellationToken token = cancellation.Token;
+
+            Task.Run(() => ConnectToAny(addresses, token));
         }
 
         /// <summary>
@@ -85,39 +95,55 @@ namespace Client.MirNetwork
             return configured;
         }
 
-        private static void Connection(IAsyncResult result)
+        private static void ConnectToAny(IPAddress[] addresses, CancellationToken token)
         {
+            Socket socket;
+
             try
             {
-                _client?.EndConnect(result);
-
-                if ((_client != null &&
-                    !_client.Connected) ||
-                    _client == null)
-                {
-                    Connect();
-                    return;
-                }
-
-                _receiveList = new ConcurrentQueue<Packet>();
-                _sendList = new ConcurrentQueue<Packet>();
-                _rawData = new byte[0];
-
-                TimeOutTime = CMain.Time + Settings.TimeOut;
-                TimeConnected = CMain.Time;
-
-                BeginReceive();
+                socket = ConnectionCandidates.ConnectAsync(addresses, Settings.Port,
+                                                          ConnectionCandidates.AttemptTimeout,
+                                                          ConnectionCandidates.FinalAttemptTimeout,
+                                                          token).GetAwaiter().GetResult();
             }
-            catch (SocketException)
+            catch (OperationCanceledException)
             {
-                Thread.Sleep(100);
-                Connect();
+                return;
             }
             catch (Exception ex)
             {
-                if (Settings.LogErrors) CMain.SaveError(ex.ToString());
-                Disconnect();
+                if (token.IsCancellationRequested) return;
+
+                if (Settings.LogErrors)
+                    CMain.SaveError($"[Network] Tried {string.Join(", ", addresses.Select(address => address.ToString()))}: {ex.GetBaseException().Message}");
+
+                // Next sweep; ConnectAttempt still caps the total number of attempts.
+                Connect();
+                return;
             }
+
+            if (token.IsCancellationRequested)
+            {
+                socket.Dispose();
+                return;
+            }
+
+            Adopt(socket);
+        }
+
+        private static void Adopt(Socket socket)
+        {
+            _client = new TcpClient { Client = socket, NoDelay = true };
+            _receiveList = new ConcurrentQueue<Packet>();
+            _sendList = new ConcurrentQueue<Packet>();
+            _rawData = new byte[0];
+
+            TimeOutTime = CMain.Time + Settings.TimeOut;
+            TimeConnected = CMain.Time;
+
+            if (Settings.LogErrors) CMain.SaveError($"[Network] Connected to {socket.RemoteEndPoint}");
+
+            BeginReceive();
         }
 
         private static void BeginReceive()
@@ -200,6 +226,12 @@ namespace Client.MirNetwork
 
         public static void Disconnect()
         {
+            CancellationTokenSource cancellation = _connectCancellation;
+            _connectCancellation = null;
+
+            cancellation?.Cancel();
+            cancellation?.Dispose();
+
             if (_client == null) return;
 
             _client?.Close();
