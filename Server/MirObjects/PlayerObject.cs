@@ -5680,7 +5680,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            if ((toArray[to] != null) && (toArray[to].Cursed) && (!UnlockCurse))
+            if ((toArray[to] != null) && (toArray[to].Cursed) && (!actor.UnlockCurse))
             {
                 Enqueue(p);
                 return;
@@ -5745,8 +5745,8 @@ namespace Server.MirObjects
                     Enqueue(new S.RefreshItem { Item = temp });
                 }
 
-                if ((toArray[to] != null) && (toArray[to].Cursed) && (UnlockCurse))
-                    UnlockCurse = false;
+                if ((toArray[to] != null) && (toArray[to].Cursed) && (actor.UnlockCurse))
+                    actor.UnlockCurse = false;
 
                 array[index] = toArray[to];
 
