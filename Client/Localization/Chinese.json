@@ -869,7 +869,7 @@
     "AddsDC": "攻击 +{0}",
     "AddsMC": "魔法 +{0}",
     "AddsSC": "道术 +{0}",
-    "BagWeightPercent": "负重上限 + {0}%",
+    "BagWeightPercent": "负重上限 + {0}",
     "ExpPercent": "经验值 + {0}%",
     "DropPercent": "掉落率 + {0}%",
     "CursePlusValue": "诅咒 + {0}",

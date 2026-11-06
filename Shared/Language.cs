@@ -3879,7 +3879,7 @@ public static class GameLanguage
             { nameof(ClientTextKeys.AddsDC), "Adds +{0} DC" },
             { nameof(ClientTextKeys.AddsMC), "Adds +{0} MC" },
             { nameof(ClientTextKeys.AddsSC), "Adds +{0} SC" },
-            { nameof(ClientTextKeys.BagWeightPercent), "BagWeight + {0}% " },
+            { nameof(ClientTextKeys.BagWeightPercent), "BagWeight + {0}" },
             { nameof(ClientTextKeys.ExpPercent), "Exp + {0}% " },
             { nameof(ClientTextKeys.DropPercent), "Drop + {0}% " },
             { nameof(ClientTextKeys.CursePlusValue), "Curse + {0}" },

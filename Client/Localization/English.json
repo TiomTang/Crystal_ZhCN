@@ -869,7 +869,7 @@
     "AddsDC": "Adds +{0} DC",
     "AddsMC": "Adds +{0} MC",
     "AddsSC": "Adds +{0} SC",
-    "BagWeightPercent": "BagWeight + {0}% ",
+    "BagWeightPercent": "BagWeight + {0}",
     "ExpPercent": "Exp + {0}% ",
     "DropPercent": "Drop + {0}% ",
     "CursePlusValue": "Curse + {0}",
