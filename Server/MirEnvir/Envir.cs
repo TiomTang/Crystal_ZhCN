@@ -2522,9 +2522,8 @@ namespace Server.MirEnvir
 
                 RespawnTick.Save(writer);
 
-                writer.Write(GTMapList.Count);
-                for (var i = 0; i < GTMapList.Count; i++)
-                    GTMapList[i].Save(writer);
+                // GT map state is rebuilt from MapInfoList and the guild rentals in StartEnvir,
+                // so it is not written here: nothing ever read that section back.
             }
             stream.SetLength(stream.Position);
             stream.Flush(true);
