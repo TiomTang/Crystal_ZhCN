@@ -6131,20 +6131,20 @@ namespace Server.MirObjects
                                 switch (result)
                                 {
                                     case GuildHomeTeleportResult.NotInGuild:
-                                        message = "You are not in a guild.";
+                                        message = GameLanguage.Get("You are not in a guild.");
                                         break;
                                     case GuildHomeTeleportResult.NotOwner:
                                     case GuildHomeTeleportResult.PalaceUnavailable:
-                                        message = "Your guild does not currently own the palace.";
+                                        message = GameLanguage.Get("Your guild does not currently own the palace.");
                                         break;
                                     case GuildHomeTeleportResult.WarInProgress:
-                                        message = "You cannot return to the palace while the war is in progress.";
+                                        message = GameLanguage.Get("You cannot return to the palace while the war is in progress.");
                                         break;
                                 }
 
                                 if (message != null)
                                 {
-                                    ReceiveChat(GameLanguage.Get(message), ChatType.Hint);
+                                    ReceiveChat(message, ChatType.Hint);
                                     Enqueue(p);
                                     return;
                                 }
