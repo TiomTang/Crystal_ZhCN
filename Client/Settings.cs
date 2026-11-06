@@ -68,7 +68,21 @@ namespace Client
         public static int RemainingErrorLogs = 100;
 
         //Graphics
-        public static bool FullScreen = true, Borderless = true, TopMost = true, MouseClip = false;
+        public static DisplayMode Mode = DisplayMode.FullScreen;
+        public static bool Borderless = true, TopMost = true, MouseClip = false;
+
+        public static bool FullScreen
+        {
+            get { return Mode == DisplayMode.FullScreen; }
+            set { Mode = value ? DisplayMode.FullScreen : DisplayMode.Windowed; }
+        }
+
+        public static bool Maximized
+        {
+            get { return Mode == DisplayMode.Maximized; }
+            set { Mode = value ? DisplayMode.Maximized : DisplayMode.Windowed; }
+        }
+
         public static string FontName = "Arial"; //"MS Sans Serif"
         public static float FontSize = 8F;
         public static bool UseMouseCursors = true;
@@ -209,7 +223,18 @@ namespace Client
             if (!Directory.Exists(SoundPath)) Directory.CreateDirectory(SoundPath);
 
             //Graphics
-            FullScreen = Reader.ReadBoolean("Graphics", "FullScreen", FullScreen);
+            int displayMode = Reader.ReadInt32("Graphics", "DisplayMode", -1);
+            if (displayMode < 0 || !Enum.IsDefined(typeof(DisplayMode), (DisplayMode)displayMode))
+            {
+                // Older configs have no DisplayMode entry; migrate them as FullScreen
+                Mode = Reader.ReadBoolean("Graphics", "FullScreen", Mode == DisplayMode.FullScreen)
+                    ? DisplayMode.FullScreen
+                    : DisplayMode.Windowed;
+            }
+            else
+            {
+                Mode = (DisplayMode)displayMode;
+            }
             Borderless = Reader.ReadBoolean("Graphics", "Borderless", Borderless);
             MouseClip = Reader.ReadBoolean("Graphics", "MouseClip", MouseClip);
             TopMost = Reader.ReadBoolean("Graphics", "AlwaysOnTop", TopMost);
@@ -336,6 +361,7 @@ namespace Client
         {
             //Graphics
             Reader.Write("Graphics", "FullScreen", FullScreen);
+            Reader.Write("Graphics", "DisplayMode", (int)Mode);
             Reader.Write("Graphics", "Borderless", Borderless);
             Reader.Write("Graphics", "MouseClip", MouseClip);
             Reader.Write("Graphics", "AlwaysOnTop", TopMost);

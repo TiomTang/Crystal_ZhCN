@@ -55,6 +55,8 @@
             this.Res4_pb = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.Res5_pb = new System.Windows.Forms.PictureBox();
+            this.Maximized_label = new System.Windows.Forms.Label();
+            this.Maximized_pb = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.Res3_pb)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Res2_pb)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.AutoStart_pb)).BeginInit();
@@ -65,6 +67,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Res4_pb)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Res5_pb)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Maximized_pb)).BeginInit();
             this.SuspendLayout();
             // 
             // AccountLogin_txt
@@ -244,7 +247,7 @@
             this.OnTop_label.BackColor = System.Drawing.Color.Transparent;
             this.OnTop_label.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.OnTop_label.ForeColor = System.Drawing.Color.Gray;
-            this.OnTop_label.Location = new System.Drawing.Point(40, 113);
+            this.OnTop_label.Location = new System.Drawing.Point(40, 127);
             this.OnTop_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.OnTop_label.Name = "OnTop_label";
             this.OnTop_label.Size = new System.Drawing.Size(72, 13);
@@ -256,7 +259,7 @@
             // 
             this.OnTop_pb.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.OnTop_pb.Image = global::Client.Resources.Images.Config_Check_Off1;
-            this.OnTop_pb.Location = new System.Drawing.Point(23, 113);
+            this.OnTop_pb.Location = new System.Drawing.Point(23, 127);
             this.OnTop_pb.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.OnTop_pb.Name = "OnTop_pb";
             this.OnTop_pb.Size = new System.Drawing.Size(12, 12);
@@ -270,7 +273,7 @@
             this.FPScap_label.BackColor = System.Drawing.Color.Transparent;
             this.FPScap_label.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.FPScap_label.ForeColor = System.Drawing.Color.Gray;
-            this.FPScap_label.Location = new System.Drawing.Point(40, 84);
+            this.FPScap_label.Location = new System.Drawing.Point(40, 107);
             this.FPScap_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.FPScap_label.Name = "FPScap_label";
             this.FPScap_label.Size = new System.Drawing.Size(42, 13);
@@ -282,7 +285,7 @@
             // 
             this.FPScap_pb.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.FPScap_pb.Image = global::Client.Resources.Images.Config_Check_Off1;
-            this.FPScap_pb.Location = new System.Drawing.Point(23, 85);
+            this.FPScap_pb.Location = new System.Drawing.Point(23, 107);
             this.FPScap_pb.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.FPScap_pb.Name = "FPScap_pb";
             this.FPScap_pb.Size = new System.Drawing.Size(12, 12);
@@ -417,6 +420,32 @@
             this.Res5_pb.TabStop = false;
             this.Res5_pb.Click += new System.EventHandler(this.Res5_pb_Click);
             // 
+            // Maximized_label
+            // 
+            this.Maximized_label.AutoSize = true;
+            this.Maximized_label.BackColor = System.Drawing.Color.Transparent;
+            this.Maximized_label.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.Maximized_label.ForeColor = System.Drawing.Color.Gray;
+            this.Maximized_label.Location = new System.Drawing.Point(40, 87);
+            this.Maximized_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.Maximized_label.Name = "Maximized_label";
+            this.Maximized_label.Size = new System.Drawing.Size(89, 13);
+            this.Maximized_label.TabIndex = 30;
+            this.Maximized_label.Text = "Maximized window";
+            this.Maximized_label.Click += new System.EventHandler(this.Maximized_pb_Click);
+            // 
+            // Maximized_pb
+            // 
+            this.Maximized_pb.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.Maximized_pb.Image = global::Client.Resources.Images.Config_Check_Off1;
+            this.Maximized_pb.Location = new System.Drawing.Point(23, 87);
+            this.Maximized_pb.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.Maximized_pb.Name = "Maximized_pb";
+            this.Maximized_pb.Size = new System.Drawing.Size(12, 12);
+            this.Maximized_pb.TabIndex = 29;
+            this.Maximized_pb.TabStop = false;
+            this.Maximized_pb.Click += new System.EventHandler(this.Maximized_pb_Click);
+            // 
             // Config
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -426,6 +455,8 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(257, 315);
             this.Controls.Add(this.Res5_pb);
+            this.Controls.Add(this.Maximized_label);
+            this.Controls.Add(this.Maximized_pb);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.Res4_pb);
@@ -476,6 +507,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Res4_pb)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Res5_pb)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Maximized_pb)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -510,5 +542,7 @@
         private System.Windows.Forms.PictureBox Res4_pb;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox Res5_pb;
+        private System.Windows.Forms.Label Maximized_label;
+        private System.Windows.Forms.PictureBox Maximized_pb;
     }
 }

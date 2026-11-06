@@ -66,7 +66,7 @@ namespace Client
 
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Selectable, true);
-            FormBorderStyle = Settings.FullScreen || Settings.Borderless ? FormBorderStyle.None : FormBorderStyle.FixedDialog;
+            FormBorderStyle = Settings.Mode == DisplayMode.Windowed && !Settings.Borderless ? FormBorderStyle.FixedDialog : FormBorderStyle.None;
 
             Graphics = CreateGraphics();
             Graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -82,7 +82,7 @@ namespace Client
             this.Text = GameLanguage.ClientTextMap.GetLocalization(ClientTextKeys.GameName);
             try
             {
-                ClientSize = new Size(Settings.ScreenWidth, Settings.ScreenHeight);
+                ApplyDisplayMode();
 
                 LoadMouseCursors();
                 SetMouseCursor(MouseCursor.Default);
@@ -91,7 +91,6 @@ namespace Client
 
                 DXManager.Create();
                 SoundManager.Create();
-                CenterToScreen();
             }
             catch (Exception ex)
             {
@@ -155,7 +154,7 @@ namespace Client
             {
                 if (e.Alt && e.KeyCode == Keys.Enter)
                 {
-                    ToggleFullScreen();
+                    ToggleDisplayMode();
                     return;
                 }
 
@@ -170,15 +169,17 @@ namespace Client
         }
         public static void CMain_MouseMove(object sender, MouseEventArgs e)
         {
-            if (Settings.FullScreen || Settings.MouseClip)
+            if (Settings.Mode == DisplayMode.FullScreen || Settings.MouseClip)
                 Cursor.Clip = Program.Form.RectangleToScreen(Program.Form.ClientRectangle);
+            else if (!Cursor.Clip.IsEmpty)
+                Cursor.Clip = Rectangle.Empty;
 
-            MPoint = Program.Form.PointToClient(Cursor.Position);
+            MPoint = ToGamePoint(Program.Form.PointToClient(Cursor.Position));
 
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseMove(e);
+                    MirScene.ActiveScene.OnMouseMove(ScaleMouseArgs(e));
             }
             catch (Exception ex)
             {
@@ -247,7 +248,7 @@ namespace Client
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseClick(e);
+                    MirScene.ActiveScene.OnMouseClick(ScaleMouseArgs(e));
             }
             catch (Exception ex)
             {
@@ -263,7 +264,7 @@ namespace Client
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseUp(e);
+                    MirScene.ActiveScene.OnMouseUp(ScaleMouseArgs(e));
             }
             catch (Exception ex)
             {
@@ -290,7 +291,7 @@ namespace Client
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseDown(e);
+                    MirScene.ActiveScene.OnMouseDown(ScaleMouseArgs(e));
             }
             catch (Exception ex)
             {
@@ -302,7 +303,7 @@ namespace Client
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseClick(e);
+                    MirScene.ActiveScene.OnMouseClick(ScaleMouseArgs(e));
             }
             catch (Exception ex)
             {
@@ -314,7 +315,7 @@ namespace Client
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseWheel(e);
+                    MirScene.ActiveScene.OnMouseWheel(ScaleMouseArgs(e));
             }
             catch (Exception ex)
             {
@@ -463,7 +464,7 @@ namespace Client
             text += string.Format(", TLC: {0}", DXManager.TextureList.Count(x => x.TextureValid));
             text += string.Format(", CLC: {0}", DXManager.ControlList.Count(x => x.IsDisposed == false));
 
-            if (Settings.FullScreen)
+            if (Settings.Mode != DisplayMode.Windowed)
             {
                 if (DebugBaseLabel == null || DebugBaseLabel.IsDisposed)
                 {
@@ -567,27 +568,95 @@ namespace Client
             HintBaseLabel.Location = point;
         }
 
-        private static void ToggleFullScreen()
+        private static void ToggleDisplayMode()
         {
-            Settings.FullScreen = !Settings.FullScreen;
-
-            Program.Form.FormBorderStyle = Settings.FullScreen || Settings.Borderless ? FormBorderStyle.None : FormBorderStyle.FixedDialog;
-
-            Program.Form.TopMost = Settings.FullScreen;
-
-            DXManager.Parameters.Windowed = !Settings.FullScreen;
-
-            Program.Form.ClientSize = new Size(Settings.ScreenWidth, Settings.ScreenHeight);
-
-            DXManager.ResetDevice();
-
-            if (MirScene.ActiveScene == GameScene.Scene)
+            switch (Settings.Mode)
             {
-                GameScene.Scene.MapControl.FloorValid = false; 
-                GameScene.Scene.TextureValid = false;
+                case DisplayMode.Windowed:
+                    Settings.Mode = DisplayMode.Maximized;
+                    break;
+                case DisplayMode.Maximized:
+                    Settings.Mode = DisplayMode.FullScreen;
+                    break;
+                default:
+                    Settings.Mode = DisplayMode.Windowed;
+                    break;
             }
 
-            Program.Form.CenterToScreen();
+            ApplyDisplayMode();
+        }
+
+        public static void SetDisplayMode(DisplayMode mode)
+        {
+            if (Settings.Mode == mode) return;
+
+            Settings.Mode = mode;
+            ApplyDisplayMode();
+        }
+
+        /// <summary>
+        /// Places the window according to Settings.Mode and recreates the device. In windowed and
+        /// maximized modes the client area may exceed the render resolution; the back buffer
+        /// always stays at the logical resolution and D3D9 windowed Present stretches it to fit.
+        /// </summary>
+        private static void ApplyDisplayMode()
+        {
+            // Program.Form is CMain and CenterToScreen is protected, so a Form-typed reference cannot call it
+            CMain form = Program.Form;
+            if (form == null) return;
+
+            form.FormBorderStyle = Settings.Mode == DisplayMode.Windowed && !Settings.Borderless
+                ? FormBorderStyle.FixedDialog
+                : FormBorderStyle.None;
+
+            form.TopMost = Settings.Mode == DisplayMode.FullScreen;
+            form.WindowState = FormWindowState.Normal;
+
+            if (Settings.Mode == DisplayMode.Maximized)
+            {
+                // Borderless fills the whole screen including the taskbar area, so do not centre it
+                form.Bounds = Screen.FromControl(form).Bounds;
+            }
+            else
+            {
+                form.ClientSize = new Size(Settings.ScreenWidth, Settings.ScreenHeight);
+                form.CenterToScreen();
+            }
+
+            DXManager.ResetDevice();
+        }
+
+        /// <summary>
+        /// Converts client-area coordinates into game logical coordinates (the render resolution).
+        /// In maximized mode the client area is larger than the render resolution, so input has
+        /// to be scaled down or every click lands off target.
+        /// </summary>
+        public static Point ToGamePoint(Point clientPoint)
+        {
+            Size size = Program.Form == null ? Size.Empty : Program.Form.ClientSize;
+
+            if (size.Width <= 0 || size.Height <= 0) return clientPoint;
+            if (size.Width == Settings.ScreenWidth && size.Height == Settings.ScreenHeight) return clientPoint;
+
+            int x = (int)((long)clientPoint.X * Settings.ScreenWidth / size.Width);
+            int y = (int)((long)clientPoint.Y * Settings.ScreenHeight / size.Height);
+
+            return new Point(Math.Clamp(x, 0, Settings.ScreenWidth - 1), Math.Clamp(y, 0, Settings.ScreenHeight - 1));
+        }
+
+        private static MouseEventArgs ScaleMouseArgs(MouseEventArgs e)
+        {
+            Point point = ToGamePoint(e.Location);
+
+            return new MouseEventArgs(e.Button, e.Clicks, point.X, point.Y, e.Delta);
+        }
+
+        public static void InvalidateSceneTextures()
+        {
+            if (GameScene.Scene == null || MirScene.ActiveScene != GameScene.Scene) return;
+
+            GameScene.Scene.MapControl.FloorValid = false;
+            GameScene.Scene.TextureValid = false;
         }
 
         public void CreateScreenShot()
@@ -650,14 +719,20 @@ namespace Client
 
             Settings.ScreenWidth = width;
             Settings.ScreenHeight = height;
-            Program.Form.ClientSize = new Size(width, height);
 
-            DXManager.Device.Clear(ClearFlags.Target, Color.Black, 0, 0);
-            DXManager.Device.Present();
-            DXManager.ResetDevice();
+            try
+            {
+                if (DXManager.Device != null && !DXManager.DeviceLost)
+                {
+                    DXManager.Device.Clear(ClearFlags.Target, Color.Black, 0, 0);
+                    DXManager.Device.Present();
+                }
+            }
+            catch
+            {
+            }
 
-            if (!Settings.FullScreen)
-                Program.Form.CenterToScreen();
+            ApplyDisplayMode();
         }
 
         #region ScreenCapture
@@ -723,7 +798,7 @@ namespace Client
                 }
                 else if (m.WParam.ToInt32() == 0xF030) // SC_MAXIMISE
                 {
-                    ToggleFullScreen();
+                    SetDisplayMode(DisplayMode.Maximized);
                     return;
                 }
             }

@@ -65,7 +65,7 @@ namespace Client.MirGraphics
                 BackBufferHeight = Settings.ScreenHeight,
                 SwapEffect = SwapEffect.Discard,
                 PresentationInterval = Settings.FPSCap ? PresentInterval.One : PresentInterval.Immediate,
-                Windowed = !Settings.FullScreen,
+                Windowed = Settings.Mode != DisplayMode.FullScreen,
             };
 
 
@@ -255,23 +255,34 @@ namespace Client.MirGraphics
             CMain.DPSCounter++;
         }
 
+        private static bool NeedsReset;
+
         public static void AttemptReset()
         {
             try
             {
                 Result result = DXManager.Device.TestCooperativeLevel();
 
-                if (result.Code == ResultCode.DeviceLost.Code) return;
-
-                if (result.Code == ResultCode.DeviceNotReset.Code)
+                if (!NeedsReset)
                 {
-                    DXManager.ResetDevice();
+                    if (result.Code == ResultCode.DeviceLost.Code) return;
+
+                    if (result.Code == ResultCode.Success.Code)
+                    {
+                        DXManager.DeviceLost = false;
+                        return;
+                    }
+
+                    if (result.Code != ResultCode.DeviceNotReset.Code) return;
+
+                    // Device lost but ready to reset: release default-pool resources once, then retry Reset each frame
+                    TearDown();
                     return;
                 }
 
-                if (result.Code != ResultCode.Success.Code) return;
+                if (result.Code == ResultCode.DeviceLost.Code) return;
 
-                DXManager.DeviceLost = false;
+                TryReset();
             }
             catch
             {
@@ -280,22 +291,67 @@ namespace Client.MirGraphics
 
         public static void ResetDevice()
         {
-            DXManager.CleanUp();
+            if (DXManager.Device == null || DXManager.Parameters == null) return;
+
+            TearDown();
+        }
+
+        private static void TearDown()
+        {
+            try
+            {
+                DXManager.CleanUp();
+            }
+            catch
+            {
+            }
+
             DXManager.DeviceLost = true;
+            NeedsReset = true;
 
-            if (DXManager.Parameters == null) return;
+            TryReset();
+        }
 
-            Size clientSize = Program.Form.ClientSize;
+        private static bool TryReset()
+        {
+            if (!NeedsReset) return false;
 
-            if (clientSize.Width == 0 || clientSize.Height == 0) return;
+            if (Settings.ScreenWidth <= 0 || Settings.ScreenHeight <= 0) return false;
 
-            DXManager.Parameters.Windowed = !Settings.FullScreen;
-            DXManager.Parameters.BackBufferWidth = clientSize.Width;
-            DXManager.Parameters.BackBufferHeight = clientSize.Height;
-            DXManager.Parameters.PresentationInterval = Settings.FPSCap ? PresentInterval.Default : PresentInterval.Immediate;
-            DXManager.Device.Reset(DXManager.Parameters);
+            // The back buffer stays at the game logical resolution; in maximized mode the client area
+            // is larger and D3D9 windowed Present stretches the back buffer to fill it.
+            DXManager.Parameters.Windowed = Settings.Mode != DisplayMode.FullScreen;
+            DXManager.Parameters.BackBufferWidth = Settings.ScreenWidth;
+            DXManager.Parameters.BackBufferHeight = Settings.ScreenHeight;
+            DXManager.Parameters.PresentationInterval = Settings.FPSCap ? PresentInterval.One : PresentInterval.Immediate;
+
+            try
+            {
+                DXManager.Device.Reset(DXManager.Parameters);
+            }
+            catch (Exception)
+            {
+                // DEVICELOST / DEVICENOTRESET: keep NeedsReset so the Idle loop retries on the next frame.
+                // Sprites and other resources are null here, so RenderEnvironment does not draw.
+                return false;
+            }
 
             DXManager.LoadTextures();
+
+            try
+            {
+                DXManager.Device.SetDialogBoxMode(true);
+            }
+            catch
+            {
+            }
+
+            NeedsReset = false;
+            DXManager.DeviceLost = false;
+
+            CMain.InvalidateSceneTextures();
+
+            return true;
         }
 
         public static void AttemptRecovery()
@@ -489,6 +545,16 @@ namespace Client.MirGraphics
                 }
 
                 CurrentSurface = null;
+            }
+
+            if (MainSurface != null)
+            {
+                if (!MainSurface.Disposed)
+                {
+                    MainSurface.Dispose();
+                }
+
+                MainSurface = null;
             }
 
             if (PoisonDotBackground != null)

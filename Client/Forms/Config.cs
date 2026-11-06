@@ -74,9 +74,7 @@ namespace Launcher
                 AccountPass_txt.Text = Settings.Password;
                 resolutionChoice((eSupportedResolution)Settings.Resolution);
 
-                Fullscreen_pb.Image = Settings.FullScreen
-                    ? Client.Resources.Images.Config_Check_On
-                    : Client.Resources.Images.Config_Check_Off1;
+                RefreshDisplayModeImages();
 
                 FPScap_pb.Image = Settings.FPSCap
                     ? Client.Resources.Images.Config_Check_On
@@ -133,7 +131,24 @@ namespace Launcher
         {
             Settings.FullScreen = !Settings.FullScreen;
 
+            RefreshDisplayModeImages();
+        }
+
+        private void Maximized_pb_Click(object sender, EventArgs e)
+        {
+            Settings.Maximized = !Settings.Maximized;
+
+            RefreshDisplayModeImages();
+        }
+
+        private void RefreshDisplayModeImages()
+        {
+            // Fullscreen and maximized are mutually exclusive; both checkboxes follow the current mode
             Fullscreen_pb.Image = Settings.FullScreen
+                    ? Client.Resources.Images.Config_Check_On
+                    : Client.Resources.Images.Config_Check_Off1;
+
+            Maximized_pb.Image = Settings.Maximized
                     ? Client.Resources.Images.Config_Check_On
                     : Client.Resources.Images.Config_Check_Off1;
         }
