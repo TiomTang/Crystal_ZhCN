@@ -8758,5 +8758,33 @@
   "Cat Tongue\n\nActive Skill\nMana Cost {2}\n\nAttack one enemy, then randomly inflict stun or slow.\nFreezing players depends on the server setting.\n\nCurrent Skill Level {0}\nNext Level {1}": {
     "Source": "Cat Tongue\n\nActive Skill\nMana Cost {2}\n\nAttack one enemy, then randomly inflict stun or slow.\nFreezing players depends on the server setting.\n\nCurrent Skill Level {0}\nNext Level {1}",
     "Text": "猫舌术\n\n主动技能\n法力消耗 {2}\n\n攻击一个敌人，造成伤害后\n随机附加眩晕或减速；\n服务器开启玩家冰冻时，\n也可能使玩家冰冻。\n\n当前技能等级 {0}\n下一级 {1}"
+  },
+  "Drop rate must be a positive whole number.": {
+    "Source": "Drop rate must be a positive whole number.",
+    "Text": "掉落率必须是正整数。"
+  },
+  "Gold rate and amount must be positive numbers.": {
+    "Source": "Gold rate and amount must be positive numbers.",
+    "Text": "金币倍率与数量必须是正数。"
+  },
+  "Guild {0} is not available. Please contact an administrator.": {
+    "Source": "Guild {0} is not available. Please contact an administrator.",
+    "Text": "公会 {0} 不可用，请联系管理员。"
+  },
+  "POST request: {0}": {
+    "Source": "POST request: {0}",
+    "Text": "POST 请求：{0}"
+  },
+  "SYSTEM: {0}": {
+    "Source": "SYSTEM: {0}",
+    "Text": "系统：{0}"
+  },
+  "[Hero] Hero forcibly despawned and removed.": {
+    "Source": "[Hero] Hero forcibly despawned and removed.",
+    "Text": "[英雄] 英雄已被强制移除。"
+  },
+  "[Load] Skipped orphan QuestProgress (Index={0}) for character: {1}": {
+    "Source": "[Load] Skipped orphan QuestProgress (Index={0}) for character: {1}",
+    "Text": "[加载] 跳过孤立的任务进度（索引={0}），角色：{1}"
   }
 }

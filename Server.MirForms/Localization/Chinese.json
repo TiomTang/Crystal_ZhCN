@@ -13481,5 +13481,21 @@
   "Gold rate and amount must be positive numbers.": {
     "Source": "Gold rate and amount must be positive numbers.",
     "Text": "金币倍率与数量必须是正数。"
+  },
+  "Failed to close AutoPatcher during update.": {
+    "Source": "Failed to close AutoPatcher during update.",
+    "Text": "更新时无法关闭自动更新程序。"
+  },
+  "Internet Explorer is not installed in the system. Do you want to download and install it?": {
+    "Source": "Internet Explorer is not installed in the system. Do you want to download and install it?",
+    "Text": "系统中未安装 Internet Explorer。是否要下载并安装？"
+  },
+  "Wrong version, expecting lib version: {0} found version: {1}.": {
+    "Source": "Wrong version, expecting lib version: {0} found version: {1}.",
+    "Text": "版本错误，需要库版本 {0}，实际版本 {1}。"
+  },
+  "ui.ConfigForm.label24": {
+    "Source": "(IPv4/IPv6. \"::\" = both stacks, \"0.0.0.0\" = IPv4 only)",
+    "Text": "（IPv4/IPv6。\"::\" = 双栈，\"0.0.0.0\" = 仅 IPv4）"
   }
 }
