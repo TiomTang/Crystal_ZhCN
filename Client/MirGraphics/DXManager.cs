@@ -19,6 +19,10 @@ namespace Client.MirGraphics
 
         public static Surface CurrentSurface;
         public static Surface MainSurface;
+        public static Surface OutputSurface;
+        public static PresentationLayout Layout { get; private set; }
+        private static SlimDX.Direct3D9.DisplayMode _desktopMode;
+        private static Rectangle _desktopBounds;
         public static PresentParameters Parameters;
         public static bool DeviceLost;
         public static float Opacity = 1F;
@@ -61,8 +65,6 @@ namespace Client.MirGraphics
             {
                 BackBufferFormat = Format.X8R8G8B8,
                 PresentFlags = PresentFlags.LockableBackBuffer,
-                BackBufferWidth = Settings.ScreenWidth,
-                BackBufferHeight = Settings.ScreenHeight,
                 SwapEffect = SwapEffect.Discard,
                 PresentationInterval = Settings.FPSCap ? PresentInterval.One : PresentInterval.Immediate,
                 Windowed = Settings.Mode != DisplayMode.FullScreen,
@@ -70,6 +72,7 @@ namespace Client.MirGraphics
 
 
             Direct3D d3d = new Direct3D();
+            ConfigurePresentation();
 
             Capabilities devCaps = d3d.GetDeviceCaps(0, DeviceType.Hardware);
             DeviceType devType = DeviceType.Reference;
@@ -86,12 +89,135 @@ namespace Client.MirGraphics
                 devFlags |= CreateFlags.PureDevice;
 
 
-            Device = new Device(d3d, d3d.Adapters.DefaultAdapter.Adapter, devType, Program.Form.Handle, devFlags, Parameters);
+            try
+            {
+                Device = new Device(d3d, d3d.Adapters.DefaultAdapter.Adapter, devType, Program.Form.Handle, devFlags, Parameters);
+            }
+            catch (Direct3D9Exception ex)
+            {
+                if (!TryWindowedFallback("Create", ex)) throw;
+                ConfigurePresentation();
+                Device = new Device(d3d, d3d.Adapters.DefaultAdapter.Adapter, devType, Program.Form.Handle, devFlags, Parameters);
+            }
 
             Device.SetDialogBoxMode(true);
 
-            LoadTextures();
+            // Shaders survive Reset and must also exist if the first canvas allocation needs a retry.
             LoadPixelsShaders();
+            try
+            {
+                LoadTextures();
+            }
+            catch (Exception ex)
+            {
+                CleanUp();
+                DeviceLost = true;
+                NeedsReset = true;
+                LogGraphicsDiagnostics("Initial display resources could not be created: " + ex);
+                throw;
+            }
+            LogPresentationState("Create");
+        }
+
+        public static bool TryGetDesktopBounds(out Rectangle bounds)
+        {
+            bounds = _desktopBounds;
+            // Do not mistake the active exclusive mode for the original desktop mode.
+            if (Device != null && Parameters != null && !Parameters.Windowed && _desktopMode.Width > 0)
+                return true;
+
+            try
+            {
+                using (Direct3D d3d = new Direct3D())
+                {
+                    var adapter = d3d.Adapters.DefaultAdapter;
+                    _desktopMode = adapter.CurrentDisplayMode;
+                    if (_desktopMode.Width <= 0 || _desktopMode.Height <= 0) return false;
+
+                    Screen screen = Screen.AllScreens.FirstOrDefault(s => s.DeviceName == adapter.Details.DeviceName)
+                        ?? Screen.FromControl(Program.Form);
+                    _desktopBounds = new Rectangle(screen.Bounds.Location, new Size(_desktopMode.Width, _desktopMode.Height));
+                    bounds = _desktopBounds;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogGraphicsDiagnostics("Desktop mode query failed: " + ex.GetType().Name + ": " + ex.Message);
+                return false;
+            }
+        }
+
+        private static void ConfigurePresentation()
+        {
+            Size outputSize = Program.Form == null ? Size.Empty : Program.Form.ClientSize;
+            if (Settings.Mode == DisplayMode.FullScreen)
+                outputSize = new Size(_desktopMode.Width, _desktopMode.Height);
+            if (outputSize.Width <= 0 || outputSize.Height <= 0)
+                throw new InvalidOperationException("The display output size is unavailable.");
+
+            Parameters.Windowed = Settings.Mode != DisplayMode.FullScreen;
+            Parameters.BackBufferWidth = outputSize.Width;
+            Parameters.BackBufferHeight = outputSize.Height;
+            Parameters.BackBufferFormat = Parameters.Windowed ? Format.X8R8G8B8 : _desktopMode.Format;
+            Parameters.FullScreenRefreshRateInHertz = Parameters.Windowed ? 0 : _desktopMode.RefreshRate;
+            Parameters.PresentationInterval = Settings.FPSCap ? PresentInterval.One : PresentInterval.Immediate;
+        }
+
+        private static bool TryWindowedFallback(string operation, Direct3D9Exception ex)
+        {
+            if (Settings.Mode == DisplayMode.Windowed || ex.ResultCode.Code == ResultCode.DeviceLost.Code ||
+                ex.ResultCode.Code == ResultCode.DeviceNotReset.Code)
+                return false;
+
+            LogGraphicsDiagnostics(operation + " failed; falling back to windowed mode: " + ex);
+            CMain.SetDisplayMode(DisplayMode.Windowed);
+            return true;
+        }
+
+        public static void BeginFrame()
+        {
+            // Bind before Clear and Sprite.Begin so both use the logical target's dimensions.
+            Device.SetRenderTarget(0, MainSurface);
+            CurrentSurface = MainSurface;
+            Device.Clear(ClearFlags.Target, Color.Black, 0, 0);
+            Device.BeginScene();
+            Sprite.Begin(SpriteFlags.AlphaBlend);
+            ResetDrawingState();
+        }
+
+        private static void ResetDrawingState()
+        {
+            // Sprite.Begin establishes normal alpha blending. Keep the software cache in sync,
+            // including after an interrupted nested draw or a recreated device.
+            Opacity = 1F;
+            Blending = false;
+            BlendingRate = 1F;
+            BlendingMode = BlendMode.NORMAL;
+            GrayScale = false;
+            Device.PixelShader = null;
+        }
+
+        public static void PresentFrame()
+        {
+            // Sprite.End and EndScene have already run; the copy does not use scene shaders.
+            try
+            {
+                if (MainSurface != OutputSurface)
+                {
+                    Device.SetRenderTarget(0, OutputSurface);
+                    CurrentSurface = OutputSurface;
+                    Device.Clear(ClearFlags.Target, Color.Black, 0, 0);
+                    Device.StretchRectangle(MainSurface, new Rectangle(Point.Empty, Layout.LogicalSize),
+                        OutputSurface, Layout.Viewport, TextureFilter.None);
+                }
+
+                Device.Present();
+            }
+            catch (Direct3D9Exception ex)
+            {
+                if (!TryWindowedFallback("Present", ex)) throw;
+            }
         }
 
         private static unsafe void LoadPixelsShaders()
@@ -121,10 +247,17 @@ namespace Client.MirGraphics
         {
             Sprite = new Sprite(Device);
             Line = new Line(Device) { Width = 1F };
+            ResetDrawingState();
 
-            MainSurface = Device.GetBackBuffer(0, 0);
-            CurrentSurface = MainSurface;
+            OutputSurface = Device.GetBackBuffer(0, 0);
+            SurfaceDescription output = OutputSurface.Description;
+            Layout = new PresentationLayout(new Size(Settings.ScreenWidth, Settings.ScreenHeight), new Size(output.Width, output.Height));
+            MainSurface = Layout.LogicalSize == Layout.OutputSize ? OutputSurface
+                : Surface.CreateRenderTarget(Device, Settings.ScreenWidth, Settings.ScreenHeight,
+                    output.Format, MultisampleType.None, 0, false);
             Device.SetRenderTarget(0, MainSurface);
+            CurrentSurface = MainSurface;
+            Device.Clear(ClearFlags.Target, Color.Black, 0, 0);
 
             if (RadarTexture == null || RadarTexture.Disposed)
             {
@@ -222,8 +355,24 @@ namespace Client.MirGraphics
                 return;
 
             Sprite.Flush();
+
+            try
+            {
+                Device.SetRenderTarget(0, surface);
+            }
+            catch (Exception ex)
+            {
+                LogGraphicsDiagnostics(string.Format(
+                    "SetRenderTarget failed: isMain={0} isFloor={1} isLight={2} isNull={3} isDisposed={4} error={5}",
+                    surface == MainSurface, surface == FloorSurface, surface == LightSurface,
+                    surface == null, surface != null && surface.Disposed, ex.Message));
+                throw;
+            }
+
+            // Cache the surface only after D3D accepted it. If SetRenderTarget throws, keeping the
+            // old value keeps the cache in sync with the device; updating it first makes every later
+            // call skip SetRenderTarget because the target looks unchanged.
             CurrentSurface = surface;
-            Device.SetRenderTarget(0, surface);
         }
         public static void SetGrayscale(bool value)
         {
@@ -298,6 +447,10 @@ namespace Client.MirGraphics
 
         private static void TearDown()
         {
+            // Close a possibly open scene before the device is recreated, otherwise the leftover
+            // BeginScene keeps failing after the Reset.
+            SafeEndScene();
+
             try
             {
                 DXManager.CleanUp();
@@ -312,57 +465,43 @@ namespace Client.MirGraphics
             TryReset();
         }
 
-        private static bool TryReset()
+        private static string _lastGraphicsLog;
+        private static int _resetCount;
+
+        /// <summary>
+        /// Records transitions and failures without letting diagnostics interrupt the game.
+        /// D3D display modes in this log are not measurements of the physical scanout signal.
+        /// </summary>
+        public static void LogGraphicsDiagnostics(string message)
         {
-            if (!NeedsReset) return false;
-
-            if (Settings.ScreenWidth <= 0 || Settings.ScreenHeight <= 0) return false;
-
-            // The back buffer stays at the game logical resolution; in maximized mode the client area
-            // is larger and D3D9 windowed Present stretches the back buffer to fill it.
-            DXManager.Parameters.Windowed = Settings.Mode != DisplayMode.FullScreen;
-            DXManager.Parameters.BackBufferWidth = Settings.ScreenWidth;
-            DXManager.Parameters.BackBufferHeight = Settings.ScreenHeight;
-            DXManager.Parameters.PresentationInterval = Settings.FPSCap ? PresentInterval.One : PresentInterval.Immediate;
+            if (message == _lastGraphicsLog) return;
+            _lastGraphicsLog = message;
 
             try
             {
-                DXManager.Device.Reset(DXManager.Parameters);
-            }
-            catch (Exception)
-            {
-                // DEVICELOST / DEVICENOTRESET: keep NeedsReset so the Idle loop retries on the next frame.
-                // Sprites and other resources are null here, so RenderEnvironment does not draw.
-                return false;
-            }
-
-            DXManager.LoadTextures();
-
-            try
-            {
-                DXManager.Device.SetDialogBoxMode(true);
+                System.IO.File.AppendAllText(@".\Graphics.log",
+                    string.Format("[{0:yyyy-MM-dd HH:mm:ss}] {1}{2}", DateTime.Now, message, Environment.NewLine));
             }
             catch
             {
             }
-
-            NeedsReset = false;
-            DXManager.DeviceLost = false;
-
-            CMain.InvalidateSceneTextures();
-
-            return true;
         }
 
-        public static void AttemptRecovery()
+        /// <summary>
+        /// Best-effort cleanup when a drawing exception skips Sprite.End/EndScene.
+        /// Cleanup failures must not mask the original drawing or device error.
+        /// </summary>
+        public static void SafeEndScene()
         {
             try
             {
-                Sprite.End();
+                if (Sprite != null) Sprite.End();
             }
             catch
             {
             }
+
+            if (Device == null || Device.Disposed) return;
 
             try
             {
@@ -371,15 +510,111 @@ namespace Client.MirGraphics
             catch
             {
             }
+        }
+
+        private static bool TryReset()
+        {
+            if (!NeedsReset) return false;
+
+            if (Settings.ScreenWidth <= 0 || Settings.ScreenHeight <= 0) return false;
+
+            int clientWidth = 0, clientHeight = 0;
+
+            if (Program.Form != null)
+            {
+                clientWidth = Program.Form.ClientSize.Width;
+                clientHeight = Program.Form.ClientSize.Height;
+            }
 
             try
             {
-                MainSurface = Device.GetBackBuffer(0, 0);
-                CurrentSurface = MainSurface;
-                Device.SetRenderTarget(0, MainSurface);
+                ConfigurePresentation();
+                DXManager.Device.Reset(DXManager.Parameters);
+            }
+            catch (Exception ex)
+            {
+                // DEVICELOST / DEVICENOTRESET: keep NeedsReset so the Idle loop retries on the next frame.
+                // Sprites and other resources are null here, so RenderEnvironment does not draw.
+                LogGraphicsDiagnostics(string.Format(
+                    "Reset FAILED mode={0} windowed={1} requested={2}x{3} client={4}x{5} error={6}: {7}",
+                    Settings.Mode, DXManager.Parameters.Windowed,
+                    DXManager.Parameters.BackBufferWidth, DXManager.Parameters.BackBufferHeight,
+                    clientWidth, clientHeight, ex.GetType().Name, ex.Message));
+                if (ex is Direct3D9Exception d3dException && TryWindowedFallback("Reset", d3dException))
+                    return !NeedsReset;
+                return false;
+            }
+
+            // Keep the Create order. Discarding back-buffer contents is not object disposal.
+            try
+            {
+                DXManager.Device.SetDialogBoxMode(true);
             }
             catch
             {
+            }
+
+            try
+            {
+                DXManager.LoadTextures();
+            }
+            catch (Exception ex)
+            {
+                CleanUp();
+                LogGraphicsDiagnostics("Display resources could not be rebuilt: " + ex);
+                if (ex is Direct3D9Exception d3dException && TryWindowedFallback("LoadTextures", d3dException))
+                    return !NeedsReset;
+                return false;
+            }
+
+            NeedsReset = false;
+            DXManager.DeviceLost = false;
+
+            CMain.InvalidateSceneTextures();
+
+            SafeEndScene();
+            _resetCount++;
+            LogPresentationState("Reset OK");
+
+            return true;
+        }
+
+        private static string _lastPresentationState;
+
+        private static void LogPresentationState(string operation)
+        {
+            try
+            {
+                var displayMode = Device.GetDisplayMode(0);
+                var clientSize = Program.Form == null ? Size.Empty : Program.Form.ClientSize;
+                string state = string.Format(
+                    "mode={0} windowed={1} logical={2}x{3} client={4}x{5} output={6}x{7} viewport={8} d3dMode={9}x{10}@{11}Hz",
+                    Settings.Mode, Parameters.Windowed, Layout.LogicalSize.Width, Layout.LogicalSize.Height,
+                    clientSize.Width, clientSize.Height, Layout.OutputSize.Width, Layout.OutputSize.Height,
+                    Layout.Viewport, displayMode.Width, displayMode.Height, displayMode.RefreshRate);
+                if (state == _lastPresentationState && _resetCount > 3 && _resetCount % 100 != 0) return;
+                _lastPresentationState = state;
+                LogGraphicsDiagnostics(operation + " #" + _resetCount + " " + state);
+            }
+            catch (Exception ex)
+            {
+                LogGraphicsDiagnostics("Display diagnostics failed: " + ex.GetType().Name + ": " + ex.Message);
+            }
+        }
+
+        public static void AttemptRecovery()
+        {
+            SafeEndScene();
+            try
+            {
+                Device.SetRenderTarget(0, MainSurface);
+                CurrentSurface = MainSurface;
+                MirScene.ActiveScene?.Redraw();
+                CMain.InvalidateSceneTextures();
+            }
+            catch
+            {
+                ResetDevice();
             }
         }
         public static void SetOpacity(float opacity)
@@ -537,15 +772,8 @@ namespace Client.MirGraphics
                 Line = null;
             }
 
-            if (CurrentSurface != null)
-            {
-                if (!CurrentSurface.Disposed)
-                {
-                    CurrentSurface.Dispose();
-                }
-
-                CurrentSurface = null;
-            }
+            // CurrentSurface borrows a canvas or scene-cache surface; it owns no extra wrapper.
+            CurrentSurface = null;
 
             if (MainSurface != null)
             {
@@ -556,6 +784,14 @@ namespace Client.MirGraphics
 
                 MainSurface = null;
             }
+
+            if (OutputSurface != null)
+            {
+                if (!OutputSurface.Disposed)
+                    OutputSurface.Dispose();
+                OutputSurface = null;
+            }
+            Layout = default;
 
             if (PoisonDotBackground != null)
             {

@@ -8,6 +8,7 @@ using System.Security;
 using Client.MirControls;
 using Client.MirGraphics;
 using Client.MirNetwork;
+using Client.MirObjects;
 using Client.MirScenes;
 using Client.MirSounds;
 using SlimDX.Direct3D9;
@@ -22,6 +23,10 @@ namespace Client
         public static MirLabel DebugTextLabel, HintTextLabel, ScreenshotTextLabel;
         public static Graphics Graphics;
         public static Point MPoint;
+        private static bool _applyingDisplayMode;
+        private static bool _outputSizeChanged;
+        private static bool _pointerInViewport;
+        private static MouseButtons _pressedMouseButtons;
 
         public readonly static Stopwatch Timer = Stopwatch.StartNew();
         public readonly static DateTime StartTime = DateTime.UtcNow;
@@ -63,6 +68,9 @@ namespace Client
             KeyUp += CMain_KeyUp;
             Deactivate += CMain_Deactivate;
             MouseWheel += CMain_MouseWheel;
+            ClientSizeChanged += CMain_ClientSizeChanged;
+            MouseLeave += CMain_MouseLeave;
+            MouseCaptureChanged += CMain_MouseCaptureChanged;
 
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Selectable, true);
@@ -123,7 +131,7 @@ namespace Client
 
         private static void CMain_Deactivate(object sender, EventArgs e)
         {
-            MapControl.MapButtons = MouseButtons.None;
+            CancelMouseInput();
             Shift = false;
             Alt = false;
             Ctrl = false;
@@ -169,17 +177,21 @@ namespace Client
         }
         public static void CMain_MouseMove(object sender, MouseEventArgs e)
         {
+            Rectangle viewport = GetPresentationLayout().GetClientViewport(Program.Form.ClientSize);
             if (Settings.Mode == DisplayMode.FullScreen || Settings.MouseClip)
-                Cursor.Clip = Program.Form.RectangleToScreen(Program.Form.ClientRectangle);
+                Cursor.Clip = viewport.IsEmpty ? Rectangle.Empty : Program.Form.RectangleToScreen(viewport);
             else if (!Cursor.Clip.IsEmpty)
                 Cursor.Clip = Rectangle.Empty;
 
-            MPoint = ToGamePoint(Program.Form.PointToClient(Cursor.Position));
+            Point clientPoint = Program.Form.PointToClient(Cursor.Position);
+            e = ScaleMouseArgs(new MouseEventArgs(e.Button, e.Clicks, clientPoint.X, clientPoint.Y, e.Delta), false);
 
             try
             {
-                if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseMove(ScaleMouseArgs(e));
+                if (!_pointerInViewport && MirControl.ActiveControl != null && MirControl.ActiveControl.Moving)
+                    MirControl.ActiveControl.OnMouseMove(e);
+                else if (_pointerInViewport && MirScene.ActiveScene != null)
+                    MirScene.ActiveScene.OnMouseMove(e);
             }
             catch (Exception ex)
             {
@@ -245,10 +257,12 @@ namespace Client
         }
         public static void CMain_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+            e = ScaleMouseArgs(e);
+            if (!_pointerInViewport || (_pressedMouseButtons & e.Button) == MouseButtons.None) return;
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseClick(ScaleMouseArgs(e));
+                    MirScene.ActiveScene.OnMouseClick(e);
             }
             catch (Exception ex)
             {
@@ -261,10 +275,18 @@ namespace Client
             if (e.Button != MouseButtons.Right || !Settings.NewMove)
                 GameScene.CanRun = false;
 
+            e = ScaleMouseArgs(e);
+            bool pressed = (_pressedMouseButtons & e.Button) != MouseButtons.None;
+            _pressedMouseButtons &= ~e.Button;
+            if (!pressed) return;
+
             try
             {
-                if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseUp(ScaleMouseArgs(e));
+                // Releasing in a black bar must still end an in-game drag or pressed button.
+                if (!_pointerInViewport && MirControl.ActiveControl != null)
+                    MirControl.CancelMouseInput(e);
+                else if (MirScene.ActiveScene != null)
+                    MirScene.ActiveScene.OnMouseUp(e);
             }
             catch (Exception ex)
             {
@@ -273,6 +295,10 @@ namespace Client
         }
         public static void CMain_MouseDown(object sender, MouseEventArgs e)
         {
+            e = ScaleMouseArgs(e);
+            if (!_pointerInViewport) return;
+            _pressedMouseButtons |= e.Button;
+
             if (Program.Form.ActiveControl is TextBox)
             {
                 MirTextBox textBox = Program.Form.ActiveControl.Tag as MirTextBox;
@@ -291,7 +317,7 @@ namespace Client
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseDown(ScaleMouseArgs(e));
+                    MirScene.ActiveScene.OnMouseDown(e);
             }
             catch (Exception ex)
             {
@@ -300,10 +326,13 @@ namespace Client
         }
         public static void CMain_MouseClick(object sender, MouseEventArgs e)
         {
+            e = ScaleMouseArgs(e);
+            // WinForms raises MouseClick before MouseUp, while the accepted press is still active.
+            if (!_pointerInViewport || (_pressedMouseButtons & e.Button) == MouseButtons.None) return;
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseClick(ScaleMouseArgs(e));
+                    MirScene.ActiveScene.OnMouseClick(e);
             }
             catch (Exception ex)
             {
@@ -312,10 +341,12 @@ namespace Client
         }
         public static void CMain_MouseWheel(object sender, MouseEventArgs e)
         {
+            e = ScaleMouseArgs(e);
+            if (!_pointerInViewport) return;
             try
             {
                 if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.OnMouseWheel(ScaleMouseArgs(e));
+                    MirScene.ActiveScene.OnMouseWheel(e);
             }
             catch (Exception ex)
             {
@@ -387,6 +418,13 @@ namespace Client
         {
             try
             {
+                if (_outputSizeChanged)
+                {
+                    _outputSizeChanged = false;
+                    CancelMouseInput();
+                    DXManager.ResetDevice();
+                }
+
                 if (DXManager.DeviceLost)
                 {
                     DXManager.AttemptReset();
@@ -394,20 +432,20 @@ namespace Client
                     return;
                 }
 
-                DXManager.Device.Clear(ClearFlags.Target, Color.Black, 0, 0);
-                DXManager.Device.BeginScene();
-                DXManager.Sprite.Begin(SpriteFlags.AlphaBlend);
-                DXManager.SetSurface(DXManager.MainSurface);
+                DXManager.BeginFrame();
 
                 if (MirScene.ActiveScene != null)
                     MirScene.ActiveScene.Draw();
 
                 DXManager.Sprite.End();
                 DXManager.Device.EndScene();
-                DXManager.Device.Present();
+                DXManager.PresentFrame();
             }
             catch (Direct3D9Exception ex)
             {
+                // A drawing exception may skip the matching Sprite.End/EndScene calls.
+                DXManager.SafeEndScene();
+
                 DXManager.DeviceLost = true;
                 SaveError(ex.ToString());
             }
@@ -595,60 +633,147 @@ namespace Client
         }
 
         /// <summary>
-        /// Places the window according to Settings.Mode and recreates the device. In windowed and
-        /// maximized modes the client area may exceed the render resolution; the back buffer
-        /// always stays at the logical resolution and D3D9 windowed Present stretches it to fit.
+        /// Places the output window without changing the game's logical canvas or field of view.
         /// </summary>
         private static void ApplyDisplayMode()
         {
             // Program.Form is CMain and CenterToScreen is protected, so a Form-typed reference cannot call it
             CMain form = Program.Form;
-            if (form == null) return;
+            if (form == null || _applyingDisplayMode) return;
 
-            form.FormBorderStyle = Settings.Mode == DisplayMode.Windowed && !Settings.Borderless
-                ? FormBorderStyle.FixedDialog
-                : FormBorderStyle.None;
-
-            form.TopMost = Settings.Mode == DisplayMode.FullScreen;
-            form.WindowState = FormWindowState.Normal;
-
-            if (Settings.Mode == DisplayMode.Maximized)
+            _applyingDisplayMode = true;
+            try
             {
-                // Borderless fills the whole screen including the taskbar area, so do not centre it
-                form.Bounds = Screen.FromControl(form).Bounds;
+                Rectangle bounds = Screen.FromControl(form).Bounds;
+                if (Settings.Mode == DisplayMode.FullScreen && !DXManager.TryGetDesktopBounds(out bounds))
+                {
+                    Settings.Mode = DisplayMode.Windowed;
+                    DXManager.LogGraphicsDiagnostics("Fullscreen desktop mode unavailable; using windowed mode.");
+                }
+
+                form.FormBorderStyle = Settings.Mode == DisplayMode.Windowed && !Settings.Borderless
+                    ? FormBorderStyle.FixedDialog : FormBorderStyle.None;
+                form.TopMost = Settings.Mode == DisplayMode.FullScreen;
+                form.WindowState = FormWindowState.Normal;
+                if (Settings.Mode == DisplayMode.Windowed)
+                {
+                    form.ClientSize = new Size(Settings.ScreenWidth, Settings.ScreenHeight);
+                    form.CenterToScreen();
+                }
+                else
+                    form.Bounds = bounds;
+                CancelMouseInput();
             }
-            else
+            finally
             {
-                form.ClientSize = new Size(Settings.ScreenWidth, Settings.ScreenHeight);
-                form.CenterToScreen();
+                _applyingDisplayMode = false;
             }
 
+            _outputSizeChanged = false;
             DXManager.ResetDevice();
         }
 
+        private static void CMain_ClientSizeChanged(object sender, EventArgs e)
+        {
+            if (_applyingDisplayMode || Program.Form == null || DXManager.Device == null || DXManager.DeviceLost ||
+                DXManager.Parameters == null || !DXManager.Parameters.Windowed ||
+                Program.Form.WindowState == FormWindowState.Minimized) return;
+            if (Program.Form.ClientSize.Width > 0 && Program.Form.ClientSize.Height > 0)
+                // WinForms can still be inside SetClientSizeCore. Defer until sizing is complete,
+                // otherwise a synchronous fallback window is overwritten by the outer resize.
+                _outputSizeChanged = true;
+        }
+
+        private static void CMain_MouseLeave(object sender, EventArgs e)
+        {
+            if (_pressedMouseButtons != MouseButtons.None) return;
+            _pointerInViewport = false;
+            MPoint = new Point(-1, -1);
+            InvalidateMouseTarget();
+        }
+
+        private static void CMain_MouseCaptureChanged(object sender, EventArgs e)
+        {
+            if (!Program.Form.Capture && _pressedMouseButtons != MouseButtons.None)
+                CancelMouseInput();
+        }
+
+        private static void InvalidateMouseTarget()
+        {
+            MapControl.MapButtons = MouseButtons.None;
+            MapControl.MouseLocation = new Point(-1, -1);
+            MapObject.MouseObjectID = 0;
+            MapObject.MouseObject = null;
+            try
+            {
+                MirControl.ClearMouseHover();
+            }
+            catch (Exception ex)
+            {
+                SaveError(ex.ToString());
+            }
+        }
+
+        private static void CancelMouseInput()
+        {
+            MouseButtons buttons = _pressedMouseButtons;
+            _pressedMouseButtons = MouseButtons.None;
+            _pointerInViewport = false;
+            MPoint = new Point(-1, -1);
+            MapControl.MapButtons = MouseButtons.None;
+            Cursor.Clip = Rectangle.Empty;
+            try
+            {
+                MirControl.CancelMouseInput(new MouseEventArgs(buttons, 0, -1, -1, 0));
+            }
+            catch (Exception ex)
+            {
+                SaveError(ex.ToString());
+            }
+            InvalidateMouseTarget();
+        }
+
         /// <summary>
-        /// Converts client-area coordinates into game logical coordinates (the render resolution).
-        /// In maximized mode the client area is larger than the render resolution, so input has
-        /// to be scaled down or every click lands off target.
+        /// Converts client pixels through the same viewport used by presentation.
+        /// Black bars and points outside the client area are not game coordinates.
         /// </summary>
         public static Point ToGamePoint(Point clientPoint)
         {
             Size size = Program.Form == null ? Size.Empty : Program.Form.ClientSize;
-
-            if (size.Width <= 0 || size.Height <= 0) return clientPoint;
-            if (size.Width == Settings.ScreenWidth && size.Height == Settings.ScreenHeight) return clientPoint;
-
-            int x = (int)((long)clientPoint.X * Settings.ScreenWidth / size.Width);
-            int y = (int)((long)clientPoint.Y * Settings.ScreenHeight / size.Height);
-
-            return new Point(Math.Clamp(x, 0, Settings.ScreenWidth - 1), Math.Clamp(y, 0, Settings.ScreenHeight - 1));
+            return GetPresentationLayout().ToGamePoint(clientPoint, size);
         }
 
-        private static MouseEventArgs ScaleMouseArgs(MouseEventArgs e)
+        private static PresentationLayout GetPresentationLayout()
+        {
+            return DXManager.Layout.IsValid ? DXManager.Layout : new PresentationLayout(
+                new Size(Settings.ScreenWidth, Settings.ScreenHeight), Program.Form == null ? Size.Empty : Program.Form.ClientSize);
+        }
+
+        private static MouseEventArgs ScaleMouseArgs(MouseEventArgs e, bool refreshTarget = true)
         {
             Point point = ToGamePoint(e.Location);
+            _pointerInViewport = point.X >= 0 && point.Y >= 0;
+            if (!_pointerInViewport && MirControl.ActiveControl != null && MirControl.ActiveControl.Moving)
+                point = GetPresentationLayout().ToGamePoint(e.Location, Program.Form.ClientSize, true);
+            MPoint = point;
 
-            return new MouseEventArgs(e.Button, e.Clicks, point.X, point.Y, e.Delta);
+            MouseEventArgs scaled = new MouseEventArgs(e.Button, e.Clicks, point.X, point.Y, e.Delta);
+            if (!_pointerInViewport)
+                InvalidateMouseTarget();
+            else if (refreshTarget)
+            {
+                try
+                {
+                    // Down, wheel and click can arrive without a preceding move after a resize.
+                    // Refresh the cached control and map hit at this event's logical position.
+                    MirScene.ActiveScene?.OnMouseMove(new MouseEventArgs(e.Button, 0, point.X, point.Y, 0));
+                }
+                catch (Exception ex)
+                {
+                    SaveError(ex.ToString());
+                }
+            }
+            return scaled;
         }
 
         public static void InvalidateSceneTextures()
@@ -667,7 +792,7 @@ namespace Client
                 Now.ToShortDateString(),
                 Now.TimeOfDay);
 
-            Surface backbuffer = DXManager.Device.GetBackBuffer(0, 0);
+            Surface backbuffer = DXManager.MainSurface;
 
             using (var stream = Surface.ToStream(backbuffer, ImageFileFormat.Png))
             {
@@ -724,6 +849,8 @@ namespace Client
             {
                 if (DXManager.Device != null && !DXManager.DeviceLost)
                 {
+                    DXManager.Device.SetRenderTarget(0, DXManager.OutputSurface);
+                    DXManager.CurrentSurface = DXManager.OutputSurface;
                     DXManager.Device.Clear(ClearFlags.Target, Color.Black, 0, 0);
                     DXManager.Device.Present();
                 }
@@ -789,6 +916,13 @@ namespace Client
 
         protected override void WndProc(ref Message m)
         {
+            if (m.Msg == 0x007E && Settings.Mode == DisplayMode.Maximized && !_applyingDisplayMode) // WM_DISPLAYCHANGE
+            {
+                base.WndProc(ref m);
+                ApplyDisplayMode();
+                return;
+            }
+
             if (m.Msg == 0x0112) // WM_SYSCOMMAND
             {
                 if (m.WParam.ToInt32() == 0xF100) // SC_KEYMENU

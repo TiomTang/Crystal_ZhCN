@@ -12,13 +12,13 @@ namespace Client
         Windowed = 0,
 
         /// <summary>
-        /// Borderless window covering the screen: the client area follows the monitor while the
-        /// back buffer stays at the render resolution, so D3D9 windowed Present stretches it to
-        /// fit. This is not exclusive fullscreen.
+        /// Borderless window covering the screen. The output follows the monitor and the game
+        /// canvas is fitted inside it without changing its aspect ratio or logical resolution.
+        /// This is not exclusive fullscreen.
         /// </summary>
         Maximized = 1,
 
-        /// <summary>Exclusive fullscreen.</summary>
+        /// <summary>Exclusive fullscreen at the desktop output mode, with an independent game canvas.</summary>
         FullScreen = 2
     }
 }

@@ -764,6 +764,29 @@ namespace Client.MirControls
             MouseControl.OnMouseLeave();
             MouseControl = null;
         }
+        internal static void ClearMouseHover()
+        {
+            try
+            {
+                MouseControl?.OnMouseLeave();
+            }
+            finally
+            {
+                MouseControl = null;
+            }
+        }
+        internal static void CancelMouseInput(MouseEventArgs e)
+        {
+            try
+            {
+                ActiveControl?.OnMouseUp(e);
+            }
+            finally
+            {
+                // Disabled controls and failing release handlers must not retain a drag.
+                ActiveControl?.Deactivate();
+            }
+        }
         protected virtual void Activate()
         {
             if (ActiveControl == this)
