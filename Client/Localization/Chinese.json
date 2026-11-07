@@ -551,6 +551,18 @@
     "Source": "Your character was created successfully.",
     "Text": "你的角色已成功创建。"
   },
+  "Fullscreen": {
+    "Source": "Fullscreen",
+    "Text": "全屏"
+  },
+  "Borderless window": {
+    "Source": "Borderless window",
+    "Text": "全屏窗口化"
+  },
+  "Windowed": {
+    "Source": "Windowed",
+    "Text": "窗口模式"
+  },
   "Resolution": {
     "Source": "Resolution",
     "Text": "分辨率"

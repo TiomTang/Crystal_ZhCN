@@ -90,6 +90,7 @@ namespace Client
         public static bool FPSCap = true;
         public static int MaxFPS = 100;
         public static int Resolution = 1024;
+        public static int ResolutionHeight = 768;
         public static bool DebugMode = false;
 
         //Network
@@ -240,6 +241,7 @@ namespace Client
             TopMost = Reader.ReadBoolean("Graphics", "AlwaysOnTop", TopMost);
             FPSCap = Reader.ReadBoolean("Graphics", "FPSCap", FPSCap);
             Resolution = Reader.ReadInt32("Graphics", "Resolution", Resolution);
+            ResolutionHeight = Reader.ReadInt32("Graphics", "ResolutionHeight", ResolutionHeight);
             DebugMode = Reader.ReadBoolean("Graphics", "DebugMode", DebugMode);
             UseMouseCursors = Reader.ReadBoolean("Graphics", "UseMouseCursors", UseMouseCursors);
 
@@ -367,6 +369,7 @@ namespace Client
             Reader.Write("Graphics", "AlwaysOnTop", TopMost);
             Reader.Write("Graphics", "FPSCap", FPSCap);
             Reader.Write("Graphics", "Resolution", Resolution);
+            Reader.Write("Graphics", "ResolutionHeight", ResolutionHeight);
             Reader.Write("Graphics", "DebugMode", DebugMode);
             Reader.Write("Graphics", "UseMouseCursors", UseMouseCursors);
 

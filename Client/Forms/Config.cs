@@ -8,6 +8,9 @@ namespace Launcher
 
     public partial class Config : Form
     {
+        // 填充下拉框时给 SelectedIndex 赋值会触发事件，先用标志跳过写回。
+        private bool _syncingChoices;
+
         public Config()
         {
             InitializeComponent();
@@ -20,50 +23,65 @@ namespace Launcher
             this.ID_l.Text = GameLanguage.Get("Username");
             this.Password_l.Text = GameLanguage.Get("Password");
 
-            DrawSupportedResolutions();
-        }
-                                   
-        private void Res1_pb_Click(object sender, EventArgs e)
-        {
-            resolutionChoice(eSupportedResolution.w1024h768);
-
+            FillResolutionChoices();
+            FillDisplayModeChoices();
         }
 
-        public void resolutionChoice(eSupportedResolution res)
+        private void FillResolutionChoices()
         {
-            Res2_pb.Image = Client.Resources.Images.Radio_Unactive;
-            Res3_pb.Image = Client.Resources.Images.Radio_Unactive;
-            Res4_pb.Image = Client.Resources.Images.Radio_Unactive;
-            Res5_pb.Image = Client.Resources.Images.Radio_Unactive;
+            _syncingChoices = true;
 
-            switch (res)
+            Resolution_cb.Items.Clear();
+
+            foreach (ResolutionOptions.Option option in ResolutionOptions.All)
+                Resolution_cb.Items.Add(option.Label);
+
+            Resolution_cb.SelectedIndex = ResolutionOptions.IndexOf(Settings.Resolution, Settings.ResolutionHeight);
+
+            _syncingChoices = false;
+        }
+
+        private void FillDisplayModeChoices()
+        {
+            _syncingChoices = true;
+
+            DisplayMode_cb.Items.Clear();
+            DisplayMode_cb.Items.Add(GameLanguage.Get("Fullscreen"));
+            DisplayMode_cb.Items.Add(GameLanguage.Get("Borderless window"));
+            DisplayMode_cb.Items.Add(GameLanguage.Get("Windowed"));
+
+            DisplayMode_cb.SelectedIndex = Settings.Mode switch
             {
-                case eSupportedResolution.w1024h768:
-                    Res2_pb.Image = Client.Resources.Images.Config_Radio_On;
-                    break;
-                case eSupportedResolution.w1366h768:
-                    Res3_pb.Image = Client.Resources.Images.Config_Radio_On;
-                    break;
-                case eSupportedResolution.w1280h720:
-                    Res4_pb.Image = Client.Resources.Images.Config_Radio_On;
-                    break;
-                case eSupportedResolution.w1920h1080:
-                    Res5_pb.Image = Client.Resources.Images.Config_Radio_On;
-                    break;
+                DisplayMode.FullScreen => 0,
+                DisplayMode.Maximized => 1,
+                _ => 2,
+            };
 
-            }
-
-            Settings.Resolution = (int)res;
+            _syncingChoices = false;
         }
 
-        private void Res2_pb_Click(object sender, EventArgs e)
+        private void Resolution_cb_SelectedIndexChanged(object sender, EventArgs e)
         {
-            resolutionChoice(eSupportedResolution.w1024h768);
+            if (_syncingChoices || Resolution_cb.SelectedIndex < 0)
+                return;
+
+            ResolutionOptions.Option option = ResolutionOptions.All[Resolution_cb.SelectedIndex];
+
+            Settings.Resolution = option.Width;
+            Settings.ResolutionHeight = option.Height;
         }
 
-        private void Res3_pb_Click(object sender, EventArgs e)
+        private void DisplayMode_cb_SelectedIndexChanged(object sender, EventArgs e)
         {
-            resolutionChoice(eSupportedResolution.w1366h768);
+            if (_syncingChoices || DisplayMode_cb.SelectedIndex < 0)
+                return;
+
+            Settings.Mode = DisplayMode_cb.SelectedIndex switch
+            {
+                0 => DisplayMode.FullScreen,
+                1 => DisplayMode.Maximized,
+                _ => DisplayMode.Windowed,
+            };
         }
 
         private void Config_VisibleChanged(object sender, EventArgs e)
@@ -72,9 +90,9 @@ namespace Launcher
             {
                 AccountLogin_txt.Text = Settings.AccountID;
                 AccountPass_txt.Text = Settings.Password;
-                resolutionChoice((eSupportedResolution)Settings.Resolution);
 
-                RefreshDisplayModeImages();
+                FillResolutionChoices();
+                FillDisplayModeChoices();
 
                 FPScap_pb.Image = Settings.FPSCap
                     ? Client.Resources.Images.Config_Check_On
@@ -125,32 +143,6 @@ namespace Launcher
         private void Config_Click(object sender, EventArgs e)
         {
             this.ActiveControl = label4;
-        }
-
-        private void Fullscreen_pb_Click(object sender, EventArgs e)
-        {
-            Settings.FullScreen = !Settings.FullScreen;
-
-            RefreshDisplayModeImages();
-        }
-
-        private void Maximized_pb_Click(object sender, EventArgs e)
-        {
-            Settings.Maximized = !Settings.Maximized;
-
-            RefreshDisplayModeImages();
-        }
-
-        private void RefreshDisplayModeImages()
-        {
-            // Fullscreen and maximized are mutually exclusive; both checkboxes follow the current mode
-            Fullscreen_pb.Image = Settings.FullScreen
-                    ? Client.Resources.Images.Config_Check_On
-                    : Client.Resources.Images.Config_Check_Off1;
-
-            Maximized_pb.Image = Settings.Maximized
-                    ? Client.Resources.Images.Config_Check_On
-                    : Client.Resources.Images.Config_Check_Off1;
         }
 
         private void FPScap_pb_Click(object sender, EventArgs e)
@@ -209,51 +201,6 @@ namespace Launcher
             Program.PForm.CleanFiles = true;
             Program.PForm._workThread = new Thread(Program.PForm.Start) { IsBackground = true };
             Program.PForm._workThread.Start();
-        }
-
-        private void Res4_pb_Click(object sender, EventArgs e)
-        {
-            resolutionChoice(eSupportedResolution.w1280h720);
-        }
-
-        private void Res5_pb_Click(object sender, EventArgs e)
-        {
-            resolutionChoice(eSupportedResolution.w1920h1080);
-        }
-
-        private void DrawSupportedResolutions()
-        {
-            Res2_pb.Enabled = false;
-            label2.ForeColor = Color.Red;
-            Res4_pb.Enabled = false;
-            label5.ForeColor = Color.Red;
-            Res3_pb.Enabled = false;
-            label3.ForeColor = Color.Red;
-            Res5_pb.Enabled = false;
-            label1.ForeColor = Color.Red;
-
-            foreach (eSupportedResolution supportedResolution in DisplayResolutions.DisplaySupportedResolutions)
-            {
-                switch (supportedResolution)
-                {
-                    case (eSupportedResolution.w1024h768):
-                        Res2_pb.Enabled = true;
-                        label2.ForeColor = Color.Gray;
-                        break;
-                    case (eSupportedResolution.w1280h720):
-                        Res4_pb.Enabled = true;
-                        label5.ForeColor = Color.Gray;
-                        break;
-                    case (eSupportedResolution.w1366h768):
-                        Res3_pb.Enabled = true;
-                        label3.ForeColor = Color.Gray;
-                        break;
-                    case (eSupportedResolution.w1920h1080):
-                        Res5_pb.Enabled = true;
-                        label1.ForeColor = Color.Gray;
-                        break;
-                }
-            }
         }
     }
 }
