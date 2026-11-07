@@ -38,7 +38,6 @@ namespace Client
 
         private static long _fpsTime;
         private static int _fps;
-        private static long _cleanTime;
         private static long _drawTime;
         public static int FPS;
         public static int DPS;
@@ -388,13 +387,6 @@ namespace Client
 
         private static void UpdateEnviroment()
         {
-            if (Time >= _cleanTime)
-            {
-                _cleanTime = Time + 1000;
-
-                DXManager.Clean(); // Clean once a second.
-            }
-
             Network.Process();
 
             if (MirScene.ActiveScene != null)
@@ -416,6 +408,7 @@ namespace Client
 
         private static void RenderEnvironment()
         {
+            long renderStarted = GraphicsDiagnostics.Timestamp();
             try
             {
                 if (_outputSizeChanged)
@@ -425,6 +418,7 @@ namespace Client
                     DXManager.ResetDevice();
                 }
 
+                DXManager.Clean(); // One bounded maintenance slice, including while the device is lost.
                 if (DXManager.DeviceLost)
                 {
                     DXManager.AttemptReset();
@@ -434,12 +428,21 @@ namespace Client
 
                 DXManager.BeginFrame();
 
-                if (MirScene.ActiveScene != null)
-                    MirScene.ActiveScene.Draw();
+                long sceneStarted = GraphicsDiagnostics.Timestamp();
+                try
+                {
+                    if (MirScene.ActiveScene != null)
+                        MirScene.ActiveScene.Draw();
 
-                DXManager.Sprite.End();
-                DXManager.Device.EndScene();
-                DXManager.PresentFrame();
+                    DXManager.Sprite.End();
+                    DXManager.Device.EndScene();
+                }
+                finally
+                {
+                    GraphicsDiagnostics.Record(GraphicsMetric.Scene, sceneStarted);
+                }
+                if (DXManager.PresentFrame())
+                    GraphicsDiagnostics.RecordFrame(GraphicsDiagnostics.Timestamp());
             }
             catch (Direct3D9Exception ex)
             {
@@ -454,6 +457,16 @@ namespace Client
                 SaveError(ex.ToString());
 
                 DXManager.AttemptRecovery();
+            }
+            finally
+            {
+                GraphicsDiagnostics.Record(GraphicsMetric.Render, renderStarted);
+                if (GraphicsDiagnostics.Enabled)
+                {
+                    GraphicsDiagnostics.UpdateResources(DXManager.TextureList.Count, DXManager.ControlList.Count,
+                        DXManager.TextureList.EstimatedBytes);
+                    GraphicsDiagnostics.PublishIfDue();
+                }
             }
         }
 

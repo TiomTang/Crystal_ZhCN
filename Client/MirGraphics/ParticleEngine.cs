@@ -423,8 +423,15 @@ namespace Client.MirGraphics
 
         public virtual void Draw()
         {
-            for (int index = 0; index < particles.Count; index++)
-                particles[index].Draw();
+            using (var batch = DXManager.BeginBlendBatch())
+            {
+                for (int index = 0; index < particles.Count; index++)
+                {
+                    // Normal particles must not inherit the preceding particle's additive blend.
+                    if (!particles[index].Blend) batch.Restore();
+                    particles[index].Draw();
+                }
+            }
         }
 
         public void ParticlesOffSet(Point offset)

@@ -701,12 +701,16 @@ namespace Client.MirGraphics
             if (point.X >= Settings.ScreenWidth || point.Y >= Settings.ScreenHeight || point.X + mi.Width < 0 || point.Y + mi.Height < 0)
                 return;
 
-            bool oldBlend = DXManager.Blending;
-            DXManager.SetBlend(true, rate);
-
-            DXManager.Draw(mi.Image, new Rectangle(0, 0, mi.Width, mi.Height), new Vector3((float)point.X, (float)point.Y, 0.0F), colour);
-
-            DXManager.SetBlend(oldBlend);
+            var oldBlend = DXManager.CaptureBlendState();
+            try
+            {
+                DXManager.SetBlend(true, rate);
+                DXManager.Draw(mi.Image, new Rectangle(0, 0, mi.Width, mi.Height), new Vector3((float)point.X, (float)point.Y, 0.0F), colour);
+            }
+            finally
+            {
+                if (!DXManager.IsBlendBatchActive) oldBlend.Restore();
+            }
             mi.CleanTime = CMain.Time + Settings.CleanDelay;
         }
         public void Draw(int index, Rectangle section, Point point, Color colour, bool offSet)
@@ -829,12 +833,16 @@ namespace Client.MirGraphics
             if (point.X >= Settings.ScreenWidth || point.Y >= Settings.ScreenHeight || point.X + mi.Width < 0 || point.Y + mi.Height < 0)
                 return;
 
-            bool oldBlend = DXManager.Blending;
-            DXManager.SetBlend(true, 1);
-
-            DXManager.Draw(mi.Image, new Rectangle(0, 0, mi.Width, mi.Height), new Vector3((float)point.X, (float)point.Y, 0.0F), Color.White);
-
-            DXManager.SetBlend(oldBlend);
+            var oldBlend = DXManager.CaptureBlendState();
+            try
+            {
+                DXManager.SetBlend(true, 1);
+                DXManager.Draw(mi.Image, new Rectangle(0, 0, mi.Width, mi.Height), new Vector3((float)point.X, (float)point.Y, 0.0F), Color.White);
+            }
+            finally
+            {
+                if (!DXManager.IsBlendBatchActive) oldBlend.Restore();
+            }
             mi.CleanTime = CMain.Time + Settings.CleanDelay;
         }
 
@@ -904,6 +912,14 @@ namespace Client.MirGraphics
 
         public unsafe void CreateTexture(BinaryReader reader)
         {
+            // Inclusive wall time: read and decode are also reported separately below.
+            long started = GraphicsDiagnostics.Timestamp();
+            try { CreateTextureCore(reader); }
+            finally { GraphicsDiagnostics.Record(GraphicsMetric.TextureUpload, started); }
+        }
+
+        private unsafe void CreateTextureCore(BinaryReader reader)
+        {
             int w = Width;// + (4 - Width % 4) % 4;
             int h = Height;// + (4 - Height % 4) % 4;
 
@@ -911,7 +927,7 @@ namespace Client.MirGraphics
             DataRectangle stream = Image.LockRectangle(0, LockFlags.Discard);
             Data = (byte*)stream.Data.DataPointer;
 
-            DecompressImage(reader.ReadBytes(Length), stream.Data);
+            DecompressImage(ReadImageBytes(reader, Length), stream.Data);
 
             stream.Data.Dispose();
             Image.UnlockRectangle(0);
@@ -925,7 +941,7 @@ namespace Client.MirGraphics
                 MaskImage = new Texture(DXManager.Device, w, h, 1, Usage.None, Format.A8R8G8B8, Pool.Managed);
                 stream = MaskImage.LockRectangle(0, LockFlags.Discard);
 
-                DecompressImage(reader.ReadBytes(Length), stream.Data);
+                DecompressImage(ReadImageBytes(reader, Length), stream.Data);
 
                 stream.Data.Dispose();
                 MaskImage.UnlockRectangle(0);
@@ -1082,11 +1098,24 @@ namespace Client.MirGraphics
             }
         }
 
+        private static byte[] ReadImageBytes(BinaryReader reader, int length)
+        {
+            long started = GraphicsDiagnostics.Timestamp();
+            try { return reader.ReadBytes(length); }
+            finally { GraphicsDiagnostics.Record(GraphicsMetric.TextureRead, started); }
+        }
+
         private static void DecompressImage(byte[] data, Stream destination)
         {
-            using (var stream = new GZipStream(new MemoryStream(data), CompressionMode.Decompress))
+            long started = GraphicsDiagnostics.Timestamp();
+            try
             {
-                stream.CopyTo(destination);
+                using (var stream = new GZipStream(new MemoryStream(data), CompressionMode.Decompress))
+                    stream.CopyTo(destination);
+            }
+            finally
+            {
+                GraphicsDiagnostics.Record(GraphicsMetric.TextureDecode, started);
             }
         }
     }

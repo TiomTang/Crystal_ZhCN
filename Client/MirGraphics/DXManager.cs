@@ -10,8 +10,15 @@ namespace Client.MirGraphics
 {
     class DXManager
     {
-        public static List<MImage> TextureList = new List<MImage>();
-        public static List<MirControl> ControlList = new List<MirControl>();
+        public static readonly ResourceRegistry<MImage> TextureList = new ResourceRegistry<MImage>(
+            image => image.CleanTime, image => image.DisposeTexture(),
+            image => (long)image.Width * image.Height * 4 * (image.HasMask ? 2 : 1));
+        public static readonly ResourceRegistry<MirControl> ControlList = new ResourceRegistry<MirControl>(
+            control => control.CleanTime, control => control.DisposeTexture());
+        private static long _nextCleanTime;
+        private static bool _cleanControlsNext;
+        private static int _blendBatchDepth;
+        private static bool _opacityOverride = true;
 
         public static Device Device;
         public static Sprite Sprite;
@@ -191,16 +198,19 @@ namespace Client.MirGraphics
             // Sprite.Begin establishes normal alpha blending. Keep the software cache in sync,
             // including after an interrupted nested draw or a recreated device.
             Opacity = 1F;
+            _opacityOverride = true;
             Blending = false;
             BlendingRate = 1F;
             BlendingMode = BlendMode.NORMAL;
             GrayScale = false;
+            _blendBatchDepth = 0;
             Device.PixelShader = null;
         }
 
-        public static void PresentFrame()
+        public static bool PresentFrame()
         {
             // Sprite.End and EndScene have already run; the copy does not use scene shaders.
+            long started = GraphicsDiagnostics.Timestamp();
             try
             {
                 if (MainSurface != OutputSurface)
@@ -213,10 +223,16 @@ namespace Client.MirGraphics
                 }
 
                 Device.Present();
+                return true;
             }
             catch (Direct3D9Exception ex)
             {
                 if (!TryWindowedFallback("Present", ex)) throw;
+                return false;
+            }
+            finally
+            {
+                GraphicsDiagnostics.Record(GraphicsMetric.Present, started);
             }
         }
 
@@ -354,7 +370,7 @@ namespace Client.MirGraphics
             if (CurrentSurface == surface)
                 return;
 
-            Sprite.Flush();
+            Flush();
 
             try
             {
@@ -373,6 +389,7 @@ namespace Client.MirGraphics
             // old value keeps the cache in sync with the device; updating it first makes every later
             // call skip SetRenderTarget because the target looks unchanged.
             CurrentSurface = surface;
+            GraphicsDiagnostics.RecordStateChange();
         }
         public static void SetGrayscale(bool value)
         {
@@ -381,14 +398,16 @@ namespace Client.MirGraphics
             if (value == true)
             {
                 if (Device.PixelShader == GrayScalePixelShader) return;
-                Sprite.Flush();
+                Flush();
                 Device.PixelShader = GrayScalePixelShader;
+                GraphicsDiagnostics.RecordStateChange();
             }
             else
             {
                 if (Device.PixelShader == null) return;
-                Sprite.Flush();
+                Flush();
                 Device.PixelShader = null;
+                GraphicsDiagnostics.RecordStateChange();
             }
         }
 
@@ -402,6 +421,13 @@ namespace Client.MirGraphics
         {
             Sprite.Draw(texture, sourceRect, Vector3.Zero, position, color);
             CMain.DPSCounter++;
+            GraphicsDiagnostics.RecordDraw();
+        }
+
+        private static void Flush()
+        {
+            Sprite.Flush();
+            GraphicsDiagnostics.RecordFlush();
         }
 
         private static bool NeedsReset;
@@ -619,10 +645,19 @@ namespace Client.MirGraphics
         }
         public static void SetOpacity(float opacity)
         {
-            if (Opacity == opacity)
+            if (Opacity == opacity && _opacityOverride)
                 return;
 
-            Sprite.Flush();
+            Flush();
+            ApplyOpacity(opacity);
+            Opacity = opacity;
+            _opacityOverride = true;
+            GraphicsDiagnostics.RecordStateChange();
+            Flush();
+        }
+
+        private static void ApplyOpacity(float opacity)
+        {
             Device.SetRenderState(RenderState.AlphaBlendEnable, true);
             if (opacity >= 1 || opacity < 0)
             {
@@ -638,27 +673,21 @@ namespace Client.MirGraphics
                 Device.SetRenderState(RenderState.SourceBlendAlpha, Blend.SourceAlpha);
                 Device.SetRenderState(RenderState.BlendFactor, Color.FromArgb((byte)(255 * opacity), (byte)(255 * opacity), (byte)(255 * opacity), (byte)(255 * opacity)).ToArgb());
             }
-            Opacity = opacity;
-            Sprite.Flush();
         }
         public static void SetBlend(bool value, float rate = 1F, BlendMode mode = BlendMode.NORMAL)
         {
-            if (value == Blending && BlendingRate == rate && BlendingMode == mode) return;
+            if (value == Blending && BlendingRate == rate && BlendingMode == mode && _opacityOverride == !value) return;
 
-            Blending = value;
-            BlendingRate = rate;
-            BlendingMode = mode;
-
-            Sprite.Flush();
+            Flush();
 
             Sprite.End();
 
-            if (Blending)
+            if (value)
             {
                 Sprite.Begin(SpriteFlags.DoNotSaveState);
                 Device.SetRenderState(RenderState.AlphaBlendEnable, true);
 
-                switch (BlendingMode)
+                switch (mode)
                 {
                     case BlendMode.INVLIGHT:
                         Device.SetRenderState(RenderState.BlendOperation, BlendOperation.Add);
@@ -671,13 +700,77 @@ namespace Client.MirGraphics
                         break;
                 }
 
-                Device.SetRenderState(RenderState.BlendFactor, Color.FromArgb((byte)(255 * BlendingRate), (byte)(255 * BlendingRate),
-                                                                (byte)(255 * BlendingRate), (byte)(255 * BlendingRate)).ToArgb());
+                Device.SetRenderState(RenderState.BlendFactor, Color.FromArgb((byte)(255 * rate), (byte)(255 * rate),
+                                                                (byte)(255 * rate), (byte)(255 * rate)).ToArgb());
             }
             else
+            {
                 Sprite.Begin(SpriteFlags.AlphaBlend);
+                // Sprite.Begin resets GPU blend state, even if the software opacity is unchanged.
+                ApplyOpacity(Opacity);
+            }
 
             Device.SetRenderTarget(0, CurrentSurface);
+            Blending = value;
+            BlendingRate = rate;
+            BlendingMode = mode;
+            _opacityOverride = !value;
+            GraphicsDiagnostics.RecordStateChange();
+        }
+
+        internal readonly struct BlendState
+        {
+            private readonly bool _enabled;
+            private readonly float _rate;
+            private readonly BlendMode _mode;
+            private readonly float _opacity;
+            private readonly bool _opacityOverride;
+
+            public BlendState(bool enabled, float rate, BlendMode mode, float opacity, bool opacityOverride)
+            {
+                _enabled = enabled;
+                _rate = rate;
+                _mode = mode;
+                _opacity = opacity;
+                _opacityOverride = opacityOverride;
+            }
+
+            public void Restore()
+            {
+                SetBlend(_enabled, _rate, _mode);
+                if (_opacityOverride) SetOpacity(_opacity);
+                else Opacity = _opacity;
+            }
+        }
+
+        internal static BlendState CaptureBlendState() => new BlendState(Blending, BlendingRate, BlendingMode, Opacity, _opacityOverride);
+        internal static bool IsBlendBatchActive => _blendBatchDepth > 0;
+
+        internal readonly struct BlendBatch : IDisposable
+        {
+            private readonly BlendState _state;
+            private readonly int _previousDepth;
+
+            public BlendBatch(BlendState state, int previousDepth)
+            {
+                _state = state;
+                _previousDepth = previousDepth;
+            }
+
+            public void Restore() => _state.Restore();
+
+            public void Dispose()
+            {
+                try { Restore(); }
+                finally { _blendBatchDepth = _previousDepth; }
+            }
+        }
+
+        internal static BlendBatch BeginBlendBatch()
+        {
+            var batch = new BlendBatch(CaptureBlendState(), _blendBatchDepth);
+            _blendBatchDepth++;
+            return batch;
         }
 
         public static void SetNormal(float blend, Color tintcolor)
@@ -685,11 +778,12 @@ namespace Client.MirGraphics
             if (Device.PixelShader == NormalPixelShader)
                 return;
 
-            Sprite.Flush();
+            Flush();
             Device.PixelShader = NormalPixelShader;
             Device.SetPixelShaderConstant(0, new Vector4[] { new Vector4(1.0F, 1.0F, 1.0F, blend) });
             Device.SetPixelShaderConstant(1, new Vector4[] { new Vector4(tintcolor.R / 255, tintcolor.G / 255, tintcolor.B / 255, 1.0F) });
-            Sprite.Flush();
+            GraphicsDiagnostics.RecordStateChange();
+            Flush();
         }
 
         public static void SetGrayscale(float blend, Color tintcolor)
@@ -697,11 +791,12 @@ namespace Client.MirGraphics
             if (Device.PixelShader == GrayScalePixelShader)
                 return;
 
-            Sprite.Flush();
+            Flush();
             Device.PixelShader = GrayScalePixelShader;
             Device.SetPixelShaderConstant(0, new Vector4[] { new Vector4(1.0F, 1.0F, 1.0F, blend) });
             Device.SetPixelShaderConstant(1, new Vector4[] { new Vector4(tintcolor.R / 255, tintcolor.G / 255, tintcolor.B / 255, 1.0F) });
-            Sprite.Flush();
+            GraphicsDiagnostics.RecordStateChange();
+            Flush();
         }
 
         public static void SetBlendMagic(float blend, Color tintcolor)
@@ -709,43 +804,44 @@ namespace Client.MirGraphics
             if (Device.PixelShader == MagicPixelShader || MagicPixelShader == null)
                 return;
 
-            Sprite.Flush();
+            Flush();
             Device.PixelShader = MagicPixelShader;
             Device.SetPixelShaderConstant(0, new Vector4[] { new Vector4(1.0F, 1.0F, 1.0F, blend) });
             Device.SetPixelShaderConstant(1, new Vector4[] { new Vector4(tintcolor.R / 255, tintcolor.G / 255, tintcolor.B / 255, 1.0F) });
-            Sprite.Flush();
+            GraphicsDiagnostics.RecordStateChange();
+            Flush();
         }
 
         public static void Clean()
         {
-            for (int i = TextureList.Count - 1; i >= 0; i--)
+            long now = CMain.Time;
+            if (now >= _nextCleanTime)
             {
-                MImage m = TextureList[i];
-
-                if (m == null)
-                {
-                    TextureList.RemoveAt(i);
-                    continue;
-                }
-
-                if (CMain.Time <= m.CleanTime) continue;
-
-                m.DisposeTexture();
+                _nextCleanTime = now + 1000;
+                TextureList.StartSweep();
+                ControlList.StartSweep();
             }
+            if (!TextureList.HasPendingSweep && !ControlList.HasPendingSweep) return;
 
-            for (int i = ControlList.Count - 1; i >= 0; i--)
+            long started = System.Diagnostics.Stopwatch.GetTimestamp();
+            int released = 0;
+            // The time limit is soft: a single driver disposal cannot be interrupted.
+            try
             {
-                MirControl c = ControlList[i];
-
-                if (c == null)
+                for (int inspected = 0; inspected < 64 && released < 16; inspected++)
                 {
-                    ControlList.RemoveAt(i);
-                    continue;
+                    bool texturesPending = TextureList.HasPendingSweep;
+                    bool controlsPending = ControlList.HasPendingSweep;
+                    if (!texturesPending && !controlsPending) break;
+                    bool cleanControl = controlsPending && (_cleanControlsNext || !texturesPending);
+                    if (cleanControl ? ControlList.CleanOne(now) : TextureList.CleanOne(now)) released++;
+                    _cleanControlsNext = !cleanControl;
+                    if (System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds >= 1) break;
                 }
-
-                if (CMain.Time <= c.CleanTime) continue;
-
-                c.DisposeTexture();
+            }
+            finally
+            {
+                GraphicsDiagnostics.Record(GraphicsMetric.Cleanup, started);
             }
         }
 
@@ -879,14 +975,21 @@ namespace Client.MirGraphics
 
         public static void Dispose()
         {
-            CleanUp();
+            try
+            {
+                CleanUp();
 
-            Device?.Direct3D?.Dispose();
-            Device?.Dispose();
+                Device?.Direct3D?.Dispose();
+                Device?.Dispose();
 
-            NormalPixelShader?.Dispose();
-            GrayScalePixelShader?.Dispose();
-            MagicPixelShader?.Dispose();
+                NormalPixelShader?.Dispose();
+                GrayScalePixelShader?.Dispose();
+                MagicPixelShader?.Dispose();
+            }
+            finally
+            {
+                GraphicsDiagnostics.Stop();
+            }
         }
     }
 }
