@@ -5044,17 +5044,25 @@ namespace Server.MirObjects
 
             Enqueue(p);
         }
-        public void RemoveItem(MirGridType grid, ulong id, int to)
+        public void RemoveItem(MirGridType grid, ulong id, int to, bool fromHero = false)
         {
-            S.RemoveItem p = new S.RemoveItem { Grid = grid, UniqueID = id, To = to, Success = false };
+            fromHero |= grid == MirGridType.HeroInventory;
+            S.RemoveItem p = new S.RemoveItem { Grid = grid, UniqueID = id, To = to, Success = false, FromHero = fromHero };
+            if (fromHero && ((!HasHero || !HeroSpawned) ||
+                (grid != MirGridType.Inventory && grid != MirGridType.HeroInventory)))
+            {
+                Enqueue(p);
+                return;
+            }
+            HumanObject actor = fromHero ? Hero : this;
             UserItem[] toArray, fromArray;
             MirGridType fromGrid;
             switch (grid)
             {
                 case MirGridType.Inventory:
                     toArray = Info.Inventory;
-                    fromArray = Info.Equipment;
-                    fromGrid = MirGridType.Equipment;
+                    fromArray = fromHero ? CurrentHero.Equipment : Info.Equipment;
+                    fromGrid = fromHero ? MirGridType.HeroEquipment : MirGridType.Equipment;
                     break;
                 case MirGridType.Storage:
                     if (NPCPage == null || !String.Equals(NPCPage.Key, NPCScript.StorageKey, StringComparison.CurrentCultureIgnoreCase))
@@ -5107,7 +5115,11 @@ namespace Server.MirObjects
                     return;
             }
 
-            if (to < 0 || to >= toArray.Length) return;
+            if (to < 0 || to >= toArray.Length)
+            {
+                Enqueue(p);
+                return;
+            }
 
             UserItem temp = null;
             int index = -1;
@@ -5126,7 +5138,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (temp.Cursed && !UnlockCurse)
+            if (temp.Cursed && !actor.UnlockCurse)
             {
                 Enqueue(p);
                 return;
@@ -5146,22 +5158,35 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (!CanRemoveItem(grid, temp)) return;
+            if ((actor.RidingMount && temp.Info.Type != ItemType.Torch) || FreeSpace(toArray) == 0)
+            {
+                if (fromHero && grid == MirGridType.Inventory && FreeSpace(toArray) == 0)
+                    ReceiveChat(GameLanguage.Get("You do not have enough space."), ChatType.System);
+                Enqueue(p);
+                return;
+            }
 
-            if (temp.Cursed)
-                UnlockCurse = false;
+            if (fromHero && grid == MirGridType.Inventory && (long)CurrentBagWeight + temp.Weight > Stats[Stat.BagWeight])
+            {
+                ReceiveChat(GameLanguage.Get("Too heavy to transfer."), ChatType.System);
+                Enqueue(p);
+                return;
+            }
 
             if (toArray[to] == null)
             {
+                if (temp.Cursed)
+                    actor.UnlockCurse = false;
                 fromArray[index] = null;
 
                 toArray[to] = temp;
                 p.Success = true;
                 Enqueue(p);
-                if (grid == MirGridType.HeroInventory)
+                if (fromHero)
                 {
                     Hero.RefreshStats();
-                    Hero.Broadcast(GetUpdateInfo());
+                    if (grid == MirGridType.Inventory)
+                        RefreshBagWeight();
                 }
                 else
                 {
@@ -5725,8 +5750,10 @@ namespace Server.MirObjects
                     return;
                 }
 
-                if ((long)CurrentBagWeight - temp.Weight + (returnedItem != null ? returnedItem.Weight : 0) > Stats[Stat.BagWeight])
+                long bagWeightAfter = (long)CurrentBagWeight - temp.Weight + (returnedItem != null ? returnedItem.Weight : 0);
+                if (bagWeightAfter > Stats[Stat.BagWeight] && bagWeightAfter > CurrentBagWeight)
                 {
+                    ReceiveChat(GameLanguage.Get("Too heavy to transfer."), ChatType.System);
                     Enqueue(p);
                     return;
                 }

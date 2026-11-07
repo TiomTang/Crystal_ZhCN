@@ -1376,7 +1376,7 @@ namespace Server.MirNetwork
         {
             if (Stage != GameStage.Game) return;
 
-            Player.RemoveItem(p.Grid, p.UniqueID, p.To);
+            Player.RemoveItem(p.Grid, p.UniqueID, p.To, p.FromHero);
         }
         private void RemoveSlotItem(C.RemoveSlotItem p)
         {

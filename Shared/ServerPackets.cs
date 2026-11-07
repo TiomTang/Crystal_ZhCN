@@ -1359,6 +1359,7 @@ namespace ServerPackets
         public ulong UniqueID;
         public int To;
         public bool Success;
+        public bool FromHero;
 
         protected override void ReadPacket(BinaryReader reader)
         {
@@ -1366,6 +1367,7 @@ namespace ServerPackets
             UniqueID = reader.ReadUInt64();
             To = reader.ReadInt32();
             Success = reader.ReadBoolean();
+            FromHero = reader.ReadBoolean();
         }
 
         protected override void WritePacket(BinaryWriter writer)
@@ -1374,6 +1376,7 @@ namespace ServerPackets
             writer.Write(UniqueID);
             writer.Write(To);
             writer.Write(Success);
+            writer.Write(FromHero);
         }
     }
     public sealed class RemoveSlotItem : Packet

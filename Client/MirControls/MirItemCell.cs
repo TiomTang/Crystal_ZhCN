@@ -117,6 +117,8 @@ namespace Client.MirControls
         }
 
         private bool _locked;
+        private UserItem _doubleClickItem;
+        private long _doubleClickTime;
 
         public bool Locked
         {
@@ -203,6 +205,9 @@ namespace Client.MirControls
 
         public override void OnMouseClick(MouseEventArgs e)
         {
+            var selectedCell = GameScene.SelectedCell;
+            _doubleClickItem = null;
+
             var invDlg = GameScene.Scene.InventoryDialog;
             if (invDlg.DeleteMode)
             {
@@ -315,10 +320,30 @@ namespace Client.MirControls
                     else MoveItem();
                     break;
             }
+
+            // Only picking up an item can start a double-click use, never placing one.
+            if (e.Button == MouseButtons.Left && selectedCell == null &&
+                GameScene.SelectedCell == this && !CMain.Shift && !CMain.Ctrl && !CMain.Alt)
+            {
+                _doubleClickItem = Item;
+                _doubleClickTime = CMain.Time;
+            }
         }
         public override void OnMouseDoubleClick(MouseEventArgs e)
         {
             if (Locked) return;
+
+            if (e.Button != MouseButtons.Left || _doubleClickItem == null ||
+                !ReferenceEquals(_doubleClickItem, Item) || GameScene.SelectedCell != this ||
+                CMain.Time - _doubleClickTime > Math.Min(250, SystemInformation.DoubleClickTime) ||
+                CMain.Shift || CMain.Ctrl || CMain.Alt || GameScene.Observing ||
+                GameScene.Scene.InventoryDialog.DeleteMode)
+            {
+                OnMouseClick(e);
+                return;
+            }
+
+            _doubleClickItem = null;
 
             if (GameScene.PickedUpGold || GridType == MirGridType.Inspect || GridType == MirGridType.TrustMerchant || GridType == MirGridType.Craft) return;
 
@@ -954,6 +979,27 @@ namespace Client.MirControls
                     case MirGridType.Inventory: // To Inventory
                         switch (GameScene.SelectedCell.GridType)
                         {
+                            case MirGridType.HeroEquipment:
+                                int destination = Item == null ? ItemSlot : -1;
+                                if (destination == -1)
+                                    for (int x = GameScene.User.BeltIdx; x < ItemArray.Length; x++)
+                                        if (ItemArray[x] == null)
+                                        {
+                                            destination = x;
+                                            break;
+                                        }
+                                if (destination == -1)
+                                {
+                                    GameScene.Scene.ChatDialog.ReceiveChat(GameLanguage.Get("You do not have enough space."), ChatType.System);
+                                    GameScene.SelectedCell = null;
+                                    return;
+                                }
+                                Network.Enqueue(new C.RemoveItem { Grid = GridType, UniqueID = GameScene.SelectedCell.Item.UniqueID, To = destination, FromHero = true });
+                                MirItemCell destinationCell = destination < GameScene.User.BeltIdx ? GameScene.Scene.BeltDialog.Grid[destination] : GameScene.Scene.InventoryDialog.Grid[destination - GameScene.User.BeltIdx];
+                                destinationCell.Locked = true;
+                                GameScene.SelectedCell.Locked = true;
+                                GameScene.SelectedCell = null;
+                                return;
                             #region From Inventory
                             case MirGridType.Inventory: //From Invenotry
                                 if (Item != null)

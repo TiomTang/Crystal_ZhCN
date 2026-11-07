@@ -2623,23 +2623,15 @@ namespace Client.MirScenes
 
             int index = -1;
             MirItemCell fromCell = null;
-            for (int i = 0; i < MapObject.User.Equipment.Length; i++)
+            bool fromHero = p.FromHero || p.Grid == MirGridType.HeroInventory;
+            UserItem[] equipment = fromHero ? Hero?.Equipment : User.Equipment;
+            if (equipment == null) return;
+            for (int i = 0; i < equipment.Length; i++)
             {
-                if (MapObject.User.Equipment[i] == null || MapObject.User.Equipment[i].UniqueID != p.UniqueID) continue;
+                if (equipment[i] == null || equipment[i].UniqueID != p.UniqueID) continue;
                 index = i;
-                fromCell = CharacterDialog.Grid[index];
+                fromCell = fromHero ? HeroDialog.Grid[index] : CharacterDialog.Grid[index];
                 break;
-            }
-
-            if (index == -1 && Hero != null)
-            {
-                for (int i = 0; i < MapObject.Hero.Equipment.Length; i++)
-                {
-                    if (MapObject.Hero.Equipment[i] == null || MapObject.Hero.Equipment[i].UniqueID != p.UniqueID) continue;
-                    index = i;
-                    fromCell = HeroDialog.Grid[index];
-                    break;
-                }
             }
 
             switch (p.Grid)
@@ -2666,9 +2658,9 @@ namespace Client.MirScenes
             toCell.Item = fromCell.Item;
             fromCell.Item = null;
             CharacterDuraPanel.GetCharacterDura();
-            if (p.Grid == MirGridType.HeroInventory)
+            if (fromHero)
                 Hero.RefreshStats();
-            else
+            if (!fromHero || p.Grid == MirGridType.Inventory)
                 User.RefreshStats();
 
         }
