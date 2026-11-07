@@ -295,6 +295,15 @@ namespace Client.MirScenes.Dialogs
                 return;
             }
             Reset();
+
+            int index = Quests.FindIndex(quest => quest.Completed);
+            if (index < 0) index = Quests.FindIndex(quest => !quest.Taken);
+            if (index < 0) index = 0;
+
+            StartIndex = Math.Min(index, Math.Max(0, Quests.Count - Rows.Length));
+            SelectedIndex = index - StartIndex;
+            SelectedQuest = Quests[index];
+
             RefreshInterface();
         }
 

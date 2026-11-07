@@ -356,17 +356,18 @@ namespace Client.MirObjects
         public void UpdateBestQuestIcon()
         {
             QuestIcon bestIcon = QuestIcon.None;
+            int bestPriority = 0;
 
             foreach (ClientQuestProgress quest in GetAvailableQuests())
             {
-                if (quest.Completed)
+                int priority = quest.Completed ? 3 : !quest.Taken ? 2 : 1;
+                if (priority > bestPriority)
                 {
                     bestIcon = quest.Icon;
-                    break;
+                    bestPriority = priority;
                 }
 
-                if (bestIcon == QuestIcon.None)
-                    bestIcon = quest.Icon;
+                if (quest.Completed) break;
             }
 
             QuestIcon = bestIcon;
