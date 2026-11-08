@@ -2818,6 +2818,9 @@ namespace Server.MirObjects
 
             if (target != null && !target.Dead && target.IsAttackTarget(this) && !target.IsFriendlyTarget(this))
             {
+                if (this is PlayerObject owner && owner.HeroSpawned && !owner.Hero.Dead)
+                    owner.Hero.AssistOwnerAttack(target);
+
                 if (this is PlayerObject player &&
                    player.PMode == PetMode.FocusMasterTarget)
                 {
@@ -2832,7 +2835,8 @@ namespace Server.MirObjects
                     if (player.HeroSpawned &&
                         !player.Hero.Dead)
                     {
-                        player.Hero.Target = target;
+                        if (player.Info.HeroBehaviour != HeroBehaviour.CounterAttack)
+                            player.Hero.Target = target;
                     }
                 }
             }
@@ -3087,6 +3091,9 @@ namespace Server.MirObjects
 
                 if (ob != null && !ob.Dead && ob.IsAttackTarget(this) && !ob.IsFriendlyTarget(this))
                 {
+                    if (this is PlayerObject owner && owner.HeroSpawned && !owner.Hero.Dead)
+                        owner.Hero.AssistOwnerAttack(ob);
+
                     if (this is PlayerObject player &&
                    player.PMode == PetMode.FocusMasterTarget)
                     {
@@ -3101,7 +3108,8 @@ namespace Server.MirObjects
                         if (player.HeroSpawned &&
                             !player.Hero.Dead)
                         {
-                            player.Hero.Target = ob;
+                            if (player.Info.HeroBehaviour != HeroBehaviour.CounterAttack)
+                                player.Hero.Target = ob;
                         }
                     }
                 }
@@ -3528,6 +3536,9 @@ namespace Server.MirObjects
 
             if (target != null && !target.Dead && target.IsAttackTarget(this) && !target.IsFriendlyTarget(this))
             {
+                if (this is PlayerObject owner && owner.HeroSpawned && !owner.Hero.Dead)
+                    owner.Hero.AssistOwnerAttack(target);
+
                 if (this is PlayerObject player &&
                    player.PMode == PetMode.FocusMasterTarget)
                 {
@@ -3542,7 +3553,8 @@ namespace Server.MirObjects
                     if (player.HeroSpawned &&
                         !player.Hero.Dead)
                     {
-                        player.Hero.Target = target;
+                        if (player.Info.HeroBehaviour != HeroBehaviour.CounterAttack)
+                            player.Hero.Target = target;
                     }
                 }
             }

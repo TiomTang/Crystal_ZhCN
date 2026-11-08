@@ -32,13 +32,19 @@ namespace Server.MirObjects
             }
         }
 
+        internal void AssistOwnerAttack(MapObject target)
+        {
+            if (Target != null) return;
+            ReactToAttack(target);
+        }
+
         internal void ReactToAttack(MapObject attacker)
         {
             if (Owner == null || Owner.Info.HeroBehaviour != HeroBehaviour.CounterAttack) return;
             if (attacker == null || !attacker.IsAttackTarget(Owner)) return;
             if (attacker.Hidden && (!CoolEye || Level < attacker.Level)) return;
 
-            // A received attack permits retaliation even when it deals no damage.
+            // Received attacks and the owner's attacks permit combat without HP loss.
             base.Target = attacker;
         }
 
