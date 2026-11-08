@@ -34,6 +34,10 @@
       "VForm"
     ]
   },
+  "Connection admission: connections={0}, handshakes={1}, timeouts={2}, rejected={3}, unauthenticated={4}, peak={5}, authenticated={6}.": {
+    "Source": "Connection admission: connections={0}, handshakes={1}, timeouts={2}, rejected={3}, unauthenticated={4}, peak={5}, authenticated={6}.",
+    "Text": "连接准入：新连接={0}，握手成功={1}，超时={2}，拒绝={3}，未认证={4}，未认证峰值={5}，已认证={6}。"
+  },
   "You are not a high enough level.": {
     "Source": "You are not a high enough level.",
     "Text": "你的等级不足。"

@@ -28,14 +28,19 @@ namespace Server.MirNetwork
         public readonly string IPAddress;
         public readonly string IPKey;
 
-        public GameStage Stage;
+        public volatile GameStage Stage;
+        // Connection admission hardening, modified 2026-11-08.
+        public bool IsAuthenticated => Stage == GameStage.Select || Stage == GameStage.Game || Stage == GameStage.Observer;
+        private long _authenticationDeadline;
+        private int _queuedPackets;
+        private readonly object _receiveLock = new object();
 
         private TcpClient _client;
         private ConcurrentQueue<Packet> _receiveList;
         private ConcurrentQueue<Packet> _sendList; 
         private Queue<Packet> _retryList;
 
-        private bool _disconnecting;
+        private volatile bool _disconnecting;
         // Disconnect state is guarded by AccountLock itself, not a new per-connection
         // lock: Login can call SoftDisconnect while already holding AccountLock.
         private bool _disconnectInProgress;
@@ -43,7 +48,7 @@ namespace Server.MirNetwork
         private bool _socketDisposed;
         private System.Runtime.ExceptionServices.ExceptionDispatchInfo _gameCleanupFailure;
         private PlayerObject _disconnectPlayer;
-        public bool Connected;
+        public volatile bool Connected;
         public bool Disconnecting
         {
             get { return _disconnecting; }
@@ -89,14 +94,11 @@ namespace Server.MirNetwork
             IPAddress = NetUtil.ClientIP(client);
             IPKey = NetUtil.AccessKey(client);
 
-            Envir.UpdateIPBlock(IPKey, TimeSpan.FromSeconds(Settings.IPBlockSeconds));
-
-            MessageQueue.Enqueue(GameLanguage.Get("{0}, Connected.", IPAddress));
-
             _client = client;
             _client.NoDelay = true;
 
             TimeConnected = Envir.Time;
+            _authenticationDeadline = TimeConnected + Settings.AuthenticationTimeout;
             TimeOutTime = TimeConnected + Settings.TimeOut;
 
             _lastPackets = new FixedSizedQueue<Packet>(10);
@@ -137,6 +139,11 @@ namespace Server.MirNetwork
 
         private void ReceiveData(IAsyncResult result)
         {
+            lock (_receiveLock) ReceiveDataCore(result);
+        }
+
+        private void ReceiveDataCore(IAsyncResult result)
+        {
             if (!Connected) return;
 
             int dataRead;
@@ -170,27 +177,43 @@ namespace Server.MirNetwork
                 byte[] rawBytes = result.AsyncState as byte[];
 
                 byte[] temp = _rawData;
+                if (dataRead > Settings.MaxReceiveBuffer - temp.Length)
+                {
+                    RejectReceive(false);
+                    return;
+                }
                 _rawData = new byte[dataRead + temp.Length];
                 Buffer.BlockCopy(temp, 0, _rawData, 0, temp.Length);
                 Buffer.BlockCopy(rawBytes, 0, _rawData, temp.Length, dataRead);
 
                 Packet p;
 
-                while ((p = Packet.ReceivePacket(_rawData, out _rawData)) != null)
+                while (_rawData.Length >= 4)
+                {
+                    int length = BitConverter.ToUInt16(_rawData, 0);
+                    short id = BitConverter.ToInt16(_rawData, 2);
+                    if (length < 4 || !Enum.IsDefined(typeof(ClientPacketIds), id))
+                        throw new InvalidDataException();
+                    if (length > _rawData.Length) break;
+                    p = Packet.ReceivePacket(_rawData, out _rawData);
+                    if (p == null) throw new InvalidDataException();
+                    if (Interlocked.Increment(ref _queuedPackets) > Settings.MaxReceiveQueue)
+                    {
+                        RejectReceive(false);
+                        return;
+                    }
                     _receiveList.Enqueue(p);
+                }
             }
             catch
             {
-                Envir.UpdateIPBlock(IPKey, TimeSpan.FromHours(24));
-
-                MessageQueue.Enqueue(GameLanguage.Get("{0} Disconnected, Invalid packet.", IPAddress));
-
-                Disconnecting = true;
+                RejectReceive(true);
                 return;
             }
 
             if (_dataCounter > Settings.MaxPacket)
             {
+                Envir.Admission.Reject();
                 Envir.UpdateIPBlock(IPKey, TimeSpan.FromHours(24));
 
                 List<string> packetList = new List<string>();
@@ -211,6 +234,15 @@ namespace Server.MirNetwork
             }
 
             BeginReceive();
+        }
+        private void RejectReceive(bool blockIP)
+        {
+            if (!Connected) return;
+            if (blockIP) Envir.UpdateIPBlock(IPKey, TimeSpan.FromHours(24));
+            Envir.Admission.Reject();
+            if (Stage != GameStage.None)
+                MessageQueue.Enqueue(GameLanguage.Get("{0} Disconnected, Invalid packet.", IPAddress));
+            Disconnecting = true;
         }
         private void BeginSend(List<byte> data)
         {
@@ -250,16 +282,26 @@ namespace Server.MirNetwork
 
         public void Process()
         {
+            if (!Disconnecting && !IsAuthenticated &&
+                (Envir.Time >= _authenticationDeadline ||
+                 (Stage == GameStage.None && Envir.Time - TimeConnected >= Settings.HandshakeTimeout)))
+            {
+                Envir.Admission.Timeout();
+                Disconnect(21);
+                return;
+            }
             if (_client == null || !_client.Connected)
             {
                 Disconnect(20);
                 return;
             }
 
-            while (!_receiveList.IsEmpty && !Disconnecting)
+            int receiveBudget = Settings.MaxReceiveQueue;
+            while (receiveBudget-- > 0 && !_receiveList.IsEmpty && !Disconnecting)
             {
                 Packet p;
                 if (!_receiveList.TryDequeue(out p)) continue;
+                Interlocked.Decrement(ref _queuedPackets);
 
                 _lastPackets.Enqueue(p);
 
@@ -271,10 +313,19 @@ namespace Server.MirNetwork
             }
 
             while (_retryList.Count > 0)
+            {
+                if (Interlocked.Increment(ref _queuedPackets) > Settings.MaxReceiveQueue)
+                {
+                    Envir.Admission.Reject();
+                    Disconnect(21);
+                    return;
+                }
                 _receiveList.Enqueue(_retryList.Dequeue());
+            }
 
             if (Envir.Time > TimeOutTime)
             {
+                if (!Disconnecting && !IsAuthenticated) Envir.Admission.Timeout();
                 Disconnect(21);
                 return;
             }
@@ -295,6 +346,17 @@ namespace Server.MirNetwork
         private void ProcessPacket(Packet p)
         {
             if (p == null || Disconnecting) return;
+
+            if ((Stage == GameStage.None && p is not C.ClientVersion && p is not C.Disconnect) ||
+                (Stage == GameStage.Login && p is not C.KeepAlive && p is not C.Login &&
+                 p is not C.NewAccount && p is not C.ChangePassword && p is not C.Disconnect))
+            {
+                Envir.Admission.Reject();
+                if (Stage != GameStage.None)
+                    MessageQueue.Enqueue(GameLanguage.Get("{0} Disconnected, Invalid packet.", IPAddress));
+                Disconnect(22);
+                return;
+            }
 
             switch (p.Index)
             {
@@ -838,12 +900,15 @@ namespace Server.MirNetwork
                 if (Observing != null)
                     Observing.Observers.Remove(this);
 
-                Account = null;
-                _sendList = null;
-                _receiveList = null;
-                _retryList = null;
-                _rawData = null;
-                _client = null;
+                lock (_receiveLock)
+                {
+                    Account = null;
+                    _sendList = null;
+                    _receiveList = null;
+                    _retryList = null;
+                    _rawData = null;
+                    _client = null;
+                }
             }
             finally
             {
@@ -941,6 +1006,7 @@ namespace Server.MirNetwork
             Enqueue(new S.ClientVersion { Result = 1, ProtocolVersion = Globals.ProtocolVersion });
 
             Stage = GameStage.Login;
+            Envir.Admission.Handshake();
         }
         private void ClientKeepAlive(C.KeepAlive p)
         {
@@ -1141,6 +1207,13 @@ namespace Server.MirNetwork
         private void StartGame(C.StartGame p)
         {
             if (Stage != GameStage.Select) return;
+
+            if (!Envir.HasAuthenticatedCapacity(this))
+            {
+                Envir.Admission.Reject();
+                SendDisconnect(0);
+                return;
+            }
 
             if (!Settings.AllowStartGame && (Account == null || (Account != null && !Account.AdminAccount)))
             {

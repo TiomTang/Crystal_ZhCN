@@ -85,6 +85,16 @@ namespace Server
 
         public static int IPBlockSeconds = 5;
 
+        // Admission limits are separate from authenticated player capacity.
+        public static int MaxUnauthenticated = 50;
+        public static int HandshakeTimeout = 10000;
+        public static int AuthenticationTimeout = 300000;
+        public static int NewConnectionWindow = 10000;
+        public static int MaxNewConnections = 100;
+        public static int MaxNewConnectionsPerIP = 20;
+        public static int MaxReceiveBuffer = 131072;
+        public static int MaxReceiveQueue = 1024;
+
         //HTTP
         public static bool StartHTTPService = false;
         public static string HTTPIPAddress = "http://127.0.0.1:5679/";
@@ -413,6 +423,14 @@ namespace Server
             MaxUser = Reader.ReadUInt16("Network", "MaxUser", MaxUser);
             MaxIP = Reader.ReadUInt16("Network", "MaxIP", MaxIP);
             MaxPacket = Reader.ReadUInt16("Network", "MaxPacket", MaxPacket);
+            MaxUnauthenticated = Math.Max(1, Reader.ReadInt32("Network", "MaxUnauthenticated", MaxUnauthenticated));
+            HandshakeTimeout = Math.Max(1000, Reader.ReadInt32("Network", "HandshakeTimeout", HandshakeTimeout));
+            AuthenticationTimeout = Math.Max(1000, Reader.ReadInt32("Network", "AuthenticationTimeout", AuthenticationTimeout));
+            NewConnectionWindow = Math.Max(1000, Reader.ReadInt32("Network", "NewConnectionWindow", NewConnectionWindow));
+            MaxNewConnections = Math.Max(1, Reader.ReadInt32("Network", "MaxNewConnections", MaxNewConnections));
+            MaxNewConnectionsPerIP = Math.Max(1, Reader.ReadInt32("Network", "MaxNewConnectionsPerIP", MaxNewConnectionsPerIP));
+            MaxReceiveBuffer = Math.Max(65535, Reader.ReadInt32("Network", "MaxReceiveBuffer", MaxReceiveBuffer));
+            MaxReceiveQueue = Math.Max(1, Reader.ReadInt32("Network", "MaxReceiveQueue", MaxReceiveQueue));
 
             //HTTP
             StartHTTPService = Reader.ReadBoolean("Network", "StartHTTPService", StartHTTPService);

@@ -77,6 +77,26 @@ namespace Server.MirEnvir
 
         public static ConcurrentDictionary<string, DateTime> IPBlocks = new ConcurrentDictionary<string, DateTime>();
 
+        internal readonly ConnectionAdmission Admission = new ConnectionAdmission();
+
+        // Connection admission hardening, modified 2026-11-08.
+        internal bool HasAuthenticatedCapacity(MirConnection candidate, MirConnection replacing = null)
+        {
+            lock (Connections)
+                return Connections.Count(c => c != candidate && c != replacing && c.Connected && c.IsAuthenticated) < Settings.MaxUser;
+        }
+
+        private void ReportAdmission()
+        {
+            lock (Connections)
+            {
+                int authenticated = Connections.Count(c => c.Connected && c.IsAuthenticated);
+                int pending = Connections.Count(c => c.Connected && !c.IsAuthenticated);
+                string report = Admission.Report(Time, pending, authenticated);
+                if (report != null) MessageQueue.Enqueue(report);
+            }
+        }
+
         public static ConcurrentDictionary<string, MirConnectionLog> ConnectionLogs = new ConcurrentDictionary<string, MirConnectionLog>();
 
         public DateTime Now =>
@@ -2077,6 +2097,8 @@ namespace Server.MirEnvir
                                 }
                             }
 
+                            ReportAdmission();
+
                             lock (StatusConnections)
                             {
                                 for (var i = StatusConnections.Count - 1; i >= 0; i--)
@@ -3535,6 +3557,7 @@ namespace Server.MirEnvir
                 }
 
                 _acceptingConnections = true;
+                Admission.Reset(Time);
                 BeginNetworkAccept(_listener, Connection);
                 if (_StatusPort != null)
                     BeginNetworkAccept(_StatusPort, StatusConnection);
@@ -3732,8 +3755,9 @@ namespace Server.MirEnvir
                     tempTcpClient = listener.EndAcceptTcpClient(result);
                     if (!_acceptingConnections || !Running || listener != _listener) return;
 
-                    var ipAddress = NetUtil.ClientIP(tempTcpClient);
                     var ipKey = NetUtil.AccessKey(tempTcpClient);
+
+                    if (!Admission.TryAccept(ipKey, Time)) return;
 
                     if (!IPBlocks.TryGetValue(ipKey, out DateTime banDate) || banDate < Now)
                     {
@@ -3754,21 +3778,28 @@ namespace Server.MirEnvir
 
                         if (count >= Settings.MaxIP)
                         {
-                            UpdateIPBlock(ipKey, TimeSpan.FromSeconds(Settings.IPBlockSeconds));
-
-                            MessageQueue.Enqueue(GameLanguage.Get("{0} Disconnected, Too many connections.", ipAddress));
+                            Admission.Reject();
                         }
                         else
                         {
-                            var tempConnection = new MirConnection(++_sessionID, tempTcpClient);
-                            if (tempConnection.Connected)
+                            lock (Connections)
                             {
-                                lock (Connections)
+                                if (Connections.Count(c => c.Connected && !c.IsAuthenticated) >= Settings.MaxUnauthenticated)
+                                {
+                                    Admission.Reject();
+                                    return;
+                                }
+                                var tempConnection = new MirConnection(++_sessionID, tempTcpClient);
+                                if (tempConnection.Connected)
+                                {
                                     Connections.Add(tempConnection);
-                                tempTcpClient = null; // The connection owns the socket now.
+                                    Admission.Observe(Connections.Count(c => c.Connected && !c.IsAuthenticated));
+                                    tempTcpClient = null; // The connection owns the socket now.
+                                }
                             }
                         }
                     }
+                    else Admission.Reject();
 
                 }
             }
@@ -3841,7 +3872,7 @@ namespace Server.MirEnvir
                         if (status)
                             lock (StatusConnections) full = StatusConnections.Count >= 5;
                         else
-                            lock (Connections) full = Connections.Count >= Settings.MaxUser;
+                            full = false; // Keep accepting so refusal is bounded and explicit.
                         if (!full)
                         {
                             BeginNetworkAccept(listener, status ? (AsyncCallback)StatusConnection : Connection);
@@ -4122,15 +4153,25 @@ namespace Server.MirEnvir
                 return;
             }
 
-            lock (AccountLock)
+            lock (Connections)
             {
-                account.Connection?.SendDisconnect(1);
+                if (!HasAuthenticatedCapacity(c, account.Connection))
+                {
+                    Admission.Reject();
+                    c.SendDisconnect(0);
+                    return;
+                }
 
-                account.Connection = c;
+                lock (AccountLock)
+                {
+                    account.Connection?.SendDisconnect(1);
+
+                    account.Connection = c;
+                }
+
+                c.Account = account;
+                c.Stage = GameStage.Select;
             }
-
-            c.Account = account;
-            c.Stage = GameStage.Select;
 
             account.LastDate = Now;
             account.LastIP = c.IPAddress;
