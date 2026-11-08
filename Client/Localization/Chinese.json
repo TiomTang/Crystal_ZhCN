@@ -1773,7 +1773,7 @@
   },
   "Skills": {
     "Source": "Skills",
-    "Text": "技能 ({0})"
+    "Text": "技能"
   },
   "Mana": {
     "Source": "Mana",
@@ -1785,7 +1785,7 @@
   },
   "Groups": {
     "Source": "Groups",
-    "Text": "队伍 ({0})"
+    "Text": "队伍"
   },
   "Purchasing": {
     "Source": "Purchasing",
@@ -1813,7 +1813,7 @@
   },
   "Quests": {
     "Source": "Quests",
-    "Text": "任务 ({0})"
+    "Text": "任务"
   },
   "Mounts": {
     "Source": "Mounts",
@@ -1821,7 +1821,7 @@
   },
   "Fishing": {
     "Source": "Fishing",
-    "Text": "钓鱼 ({0})"
+    "Text": "钓鱼"
   },
   "Gems and Orbs": {
     "Source": "Gems and Orbs",
@@ -1849,7 +1849,7 @@
   },
   "Log out": {
     "Source": "Log out",
-    "Text": "登出 ({0})"
+    "Text": "登出"
   },
   "Status window (open / close)": {
     "Source": "Status window (open / close)",
@@ -2177,7 +2177,7 @@
   },
   "Trade": {
     "Source": "Trade",
-    "Text": "交易 ({0})"
+    "Text": "交易"
   },
   "Observe": {
     "Source": "Observe",
@@ -4951,10 +4951,6 @@
     "Source": "(Completed)",
     "Text": "（已完成）"
   },
-  "([ItemType] = '{0}' OR '{0}' = -1) AND [ItemName] LIKE '%{1}%'": {
-    "Source": "([ItemType] = '{0}' OR '{0}' = -1) AND [ItemName] LIKE '%{1}%'",
-    "Text": ""
-  },
   "*Burp*": {
     "Source": "*Burp*",
     "Text": "*打嗝*"
@@ -5181,7 +5177,7 @@
   },
   "C               D            X: {0} | Y: {1} | Range: {2}": {
     "Source": "C               D            X: {0} | Y: {1} | Range: {2}",
-    "Text": ""
+    "Text": "C               D            X: {0} | Y: {1} | 范围: {2}"
   },
   "CTRL+F{0}": {
     "Source": "CTRL+F{0}",
@@ -5541,7 +5537,7 @@
   },
   "Damage: {{Random(minstat-maxstat) + [<(random({0}-{1})/4) X (skill level +1)> + random<{2}-{3}>]}}  X  {{{4} + (skill level * {5})}}": {
     "Source": "Damage: {{Random(minstat-maxstat) + [<(random({0}-{1})/4) X (skill level +1)> + random<{2}-{3}>]}}  X  {{{4} + (skill level * {5})}}",
-    "Text": ""
+    "Text": "伤害：{{随机(最小属性-最大属性) + [<(随机({0}-{1})/4) × (技能等级 +1)> + 随机<{2}-{3}>]}}  ×  {{{4} + (技能等级 * {5})}}"
   },
   "Data Exported Successfully.": {
     "Source": "Data Exported Successfully.",
@@ -8079,10 +8075,6 @@
     "Source": "[Hero: {0}] {1}",
     "Text": "[英雄：{0}] {1}"
   },
-  "[MonsterName] LIKE '%{0}%'": {
-    "Source": "[MonsterName] LIKE '%{0}%'",
-    "Text": ""
-  },
   "[inner workloop error. Line {0}]{1}": {
     "Source": "[inner workloop error. Line {0}]{1}",
     "Text": "[内部循环错误，第 {0} 行]{1}"
@@ -8131,17 +8123,9 @@
     "Source": "the randomTextFile:{0} does not exist.",
     "Text": "找不到 randomTextFile：{0}。"
   },
-  "{0}": {
-    "Source": "{0}",
-    "Text": ""
-  },
   "{0} - Importing Progress: {1}% ({2}/{3})": {
     "Source": "{0} - Importing Progress: {1}% ({2}/{3})",
     "Text": "{0} - 导入进度：{1}%（{2}/{3}）"
-  },
-  "{0} / {1}": {
-    "Source": "{0} / {1}",
-    "Text": ""
   },
   "{0} : AWAKE Level {1}, value {2}~{3}.": {
     "Source": "{0} : AWAKE Level {1}, value {2}~{3}.",
@@ -8627,10 +8611,6 @@
     "Source": "{0} x{1} has been created.",
     "Text": "已创建 {0} x{1}。"
   },
-  "{0} {1} {2}{3}": {
-    "Source": "{0} {1} {2}{3}",
-    "Text": ""
-  },
   "{0}'s group already has the maximum number of members.": {
     "Source": "{0}'s group already has the maximum number of members.",
     "Text": "{0} 的队伍人数已满。"
@@ -8662,10 +8642,6 @@
   "{0}, {1}, User logging in.": {
     "Source": "{0}, {1}, User logging in.",
     "Text": "{0}，{1}，用户正在登录。"
-  },
-  "{0}-{1}": {
-    "Source": "{0}-{1}",
-    "Text": ""
   },
   "{0}: SummonedCreature no longer exists?!?. {1}": {
     "Source": "{0}: SummonedCreature no longer exists?!?. {1}",
@@ -8902,5 +8878,21 @@
   "[Load] Skipped orphan QuestProgress (Index={0}) for character: {1}": {
     "Source": "[Load] Skipped orphan QuestProgress (Index={0}) for character: {1}",
     "Text": "[加载] 跳过孤立的任务进度（索引={0}），角色：{1}"
+  },
+  "Host": {
+    "Source": "Host",
+    "Text": "主机"
+  },
+  "Port": {
+    "Source": "Port",
+    "Text": "端口"
+  },
+  "Server": {
+    "Source": "Server",
+    "Text": "服务器"
+  },
+  "Test configuration (-tc)": {
+    "Source": "Test configuration (-tc)",
+    "Text": "测试配置 (-tc)"
   }
 }

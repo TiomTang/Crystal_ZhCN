@@ -2,13 +2,17 @@
 using System.Text;
 
 /// <summary>
-/// Runtime localization for game and server UI text. Source strings are discovered while the
-/// game runs and appended to the language file on first use.
+/// Runtime localization for game and server UI text. Client language packs are published,
+/// read-only resources; server-side discovery retains its existing writable policy.
 /// </summary>
 public static class GameLanguage
 {
     public static readonly LocalizationStore ServerStore = new LocalizationStore();
-    public static readonly LocalizationStore ClientStore = new LocalizationStore();
+    public static readonly LocalizationStore ClientStore = new LocalizationStore(readOnly: true);
+
+#if DEBUG
+    private static LocalizationCapture _clientCapture;
+#endif
 
     private static LocalizationStore Store
     {
@@ -21,13 +25,35 @@ public static class GameLanguage
     /// </summary>
     public const string SourceLanguage = "English";
 
+    /// <summary>
+    /// Loads a published pack without seeding, modifying or saving it. Missing text falls back
+    /// to English. In Debug only, MIR2_LOCALIZATION_COLLECT=1 records missing/untranslated keys
+    /// beside the pack as {language}.Debug.{process}.{unique-session}.json.
+    /// Capture files are developer input for tools/LocalizationScan, not runtime overrides.
+    /// </summary>
     public static void LoadClientLanguage(string languageJsonPath)
     {
-        ClientStore.Load(languageJsonPath, !IsSourceLanguage(languageJsonPath));
-        Seed(ClientStore);
+#if DEBUG
+        LocalizationCapture previous;
+#endif
+        // Publish the pack and its collector together, including concurrent reloads/lookups.
+        lock (ClientStore.SyncRoot)
+        {
+#if DEBUG
+            ClientStore.CaptureMissing = null;
+            previous = _clientCapture;
+#endif
+            ClientStore.Load(languageJsonPath, saveChanges: false);
+#if DEBUG
+            _clientCapture = LocalizationCapture.Create(languageJsonPath);
+            if (_clientCapture != null) ClientStore.CaptureMissing = _clientCapture.Record;
+#endif
+        }
+#if DEBUG
+        // Retiring a collector may flush to disk; never hold the translation lock for that IO.
+        previous?.Dispose();
+#endif
     }
-
-    public static void SaveClientLanguage(string languageJsonPath) => ClientStore.Save(languageJsonPath);
 
     public static void LoadServerLanguage(string languageJsonPath)
     {
@@ -58,7 +84,7 @@ public static class GameLanguage
     /// </summary>
     public static string Get(LocalizationStringHandler text)
     {
-        return Resolve(text.Template, text.Arguments);
+        return Resolve(text.Template, text.Arguments, compositeFormat: true);
     }
 
     /// <summary>
@@ -77,19 +103,19 @@ public static class GameLanguage
         return Resolve(template, args);
     }
 
-    private static string Resolve(string template, object[] args)
+    private static string Resolve(string template, object[] args, bool compositeFormat = false)
     {
         if (string.IsNullOrEmpty(template)) return string.Empty;
 
         var translation = Store.Translate(template, template);
-        var formatted = Format(translation, args);
+        var formatted = Format(translation, args, compositeFormat);
 
-        return formatted ?? Format(template, args) ?? template;
+        return formatted ?? Format(template, args, compositeFormat) ?? template;
     }
 
-    private static string Format(string text, object[] args)
+    private static string Format(string text, object[] args, bool compositeFormat)
     {
-        if (string.IsNullOrEmpty(text) || args == null || args.Length == 0) return text;
+        if (string.IsNullOrEmpty(text) || args == null || (!compositeFormat && args.Length == 0)) return text;
 
         try
         {
@@ -127,7 +153,7 @@ public static class GameLanguage
             _arguments = formattedCount == 0 ? Array.Empty<object>() : new object[formattedCount];
         }
 
-        public void AppendLiteral(string value) => _template.Append(value);
+        public void AppendLiteral(string value) => _template.Append(value.Replace("{", "{{").Replace("}", "}}"));
 
         public void AppendFormatted<T>(T value)
         {

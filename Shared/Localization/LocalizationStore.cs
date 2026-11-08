@@ -14,8 +14,8 @@ public sealed class LocalizationEntry
 
 /// <summary>
 /// Shared translation table. Keys are either the English template, a stable id (dynamic text,
-/// enum values) or a control path prefixed with "ui.". Missing keys are appended on first use
-/// and written back to disk shortly after, so the table maintains itself.
+/// enum values) or a control path prefixed with "ui.". Writable stores collect missing keys;
+/// permanently read-only stores only look up published translations and fall back to source text.
 /// </summary>
 public sealed class LocalizationStore
 {
@@ -32,6 +32,17 @@ public sealed class LocalizationStore
 
     private Timer _saveTimer;
     private volatile bool _dirty;
+    private readonly bool _readOnly;
+
+    public LocalizationStore() { }
+
+    public LocalizationStore(bool readOnly) { _readOnly = readOnly; }
+
+    internal object SyncRoot => _sync;
+
+#if DEBUG
+    internal Action<string, string> CaptureMissing { get; set; }
+#endif
 
     public string FilePath { get; private set; }
     public HashSet<string> Forms { get; } = new HashSet<string>(StringComparer.Ordinal);
@@ -55,12 +66,13 @@ public sealed class LocalizationStore
 
     /// <summary>
     /// Reads the table from disk. A missing or corrupted file leaves an empty table.
-    /// When <paramref name="saveChanges"/> is false the table is read-only: runtime additions stay
-    /// in memory and are never written back.
+    /// When <paramref name="saveChanges"/> is false automatic persistence is disabled.
+    /// A store constructed as read-only also rejects additions and explicit saves, regardless
+    /// of the load flags. Published client packs always use that policy.
     /// </summary>
     public void Load(string path, bool saveChanges = true)
     {
-        FilePath = saveChanges ? path : null;
+        FilePath = !_readOnly && saveChanges ? path : null;
 
         {
             lock (_sync)
@@ -131,7 +143,8 @@ public sealed class LocalizationStore
     {
         lock (_sync)
         {
-            if (_entries.TryGetValue(key, out var entry)) return entry;
+            if (_entries.TryGetValue(key, out var entry))
+                return _readOnly ? new LocalizationEntry { Source = entry.Source, Text = entry.Text } : entry;
 
             if (!string.IsNullOrEmpty(source) && _bySource.TryGetValue(source, out var text))
             {
@@ -151,7 +164,18 @@ public sealed class LocalizationStore
         {
             if (_entries.TryGetValue(key, out var existing))
             {
+#if DEBUG
+                if (_readOnly && string.IsNullOrEmpty(existing.Text)) CaptureMissing?.Invoke(key, source);
+#endif
                 return string.IsNullOrEmpty(existing.Text) ? source : existing.Text;
+            }
+
+            if (_readOnly)
+            {
+#if DEBUG
+                CaptureMissing?.Invoke(key, source);
+#endif
+                return source;
             }
 
             _entries[key] = new LocalizationEntry { Source = source ?? string.Empty, Text = string.Empty };
@@ -176,6 +200,14 @@ public sealed class LocalizationStore
         {
             if (_entries.ContainsKey(key)) return false;
 
+            if (_readOnly)
+            {
+#if DEBUG
+                CaptureMissing?.Invoke(key, source);
+#endif
+                return false;
+            }
+
             _entries[key] = new LocalizationEntry { Source = source ?? string.Empty, Text = string.Empty };
             _order.Add(key);
 
@@ -189,12 +221,13 @@ public sealed class LocalizationStore
 
     public void MarkCovered(string formName)
     {
-        if (string.IsNullOrEmpty(formName)) return;
+        if (_readOnly || string.IsNullOrEmpty(formName)) return;
         if (Forms.Add(formName)) _dirty = true;
     }
 
     private void ScheduleSave()
     {
+        if (_readOnly) return;
         if (_saveTimer == null)
         {
             _saveTimer = new Timer(_ => SaveIfDirty(), null, Timeout.Infinite, Timeout.Infinite);
@@ -210,7 +243,7 @@ public sealed class LocalizationStore
     /// </summary>
     public bool SaveIfDirty()
     {
-        if (!_dirty || string.IsNullOrEmpty(FilePath)) return false;
+        if (_readOnly || !_dirty || string.IsNullOrEmpty(FilePath)) return false;
 
         try
         {
@@ -297,6 +330,7 @@ public sealed class LocalizationStore
     /// </summary>
     public void Save(string path)
     {
+        if (_readOnly) throw new InvalidOperationException("Published language packs cannot be saved at runtime. Use tools/LocalizationScan to maintain them.");
         FilePath = path;
         _dirty = true;
         SaveIfDirty();

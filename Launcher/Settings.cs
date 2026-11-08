@@ -54,8 +54,8 @@ internal static class Settings
         FPSCap = reader.ReadBoolean("Graphics", "FPSCap", migrate ? game.ReadBoolean("Graphics", "FPSCap", true, false) : true, false);
         TopMost = reader.ReadBoolean("Graphics", "AlwaysOnTop", migrate && game.ReadBoolean("Graphics", "AlwaysOnTop", false, false), false);
         Language = reader.ReadString("Game", "Language", game.ReadString("Game", "Language", "English", false), false);
-        // Published language packs must not be rewritten by runtime template discovery.
-        if (File.Exists(Path.Combine("Localization", Language + ".json"))) GameLanguage.ClientStore.Load(Path.Combine("Localization", Language + ".json"), saveChanges: false);
+        // Use the same immutable pack and optional developer capture policy as the game.
+        GameLanguage.LoadClientLanguage(Path.Combine("Localization", Language + ".json"));
         Options.Arguments();
         UserReader = new InIReader(Path.GetFullPath("Launcher.User.ini"));
         if (migrate) Save();
