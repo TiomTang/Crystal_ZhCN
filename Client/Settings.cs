@@ -202,18 +202,24 @@ namespace Client
             FilterGuildChat = false;
 
 
-        //AutoPatcher
-        public static bool P_Patcher = true;
-        public static string P_Host = @"http://mirfiles.com/mir2/cmir/patch/";
-        public static string P_PatchFileName = @"PList.gz";
-        public static bool P_NeedLogin = false;
-        public static string P_Login = string.Empty;
-        public static string P_Password = string.Empty;
-        public static string P_ServerName = string.Empty;
-        public static string P_BrowserAddress = "https://www.lomcn.org/mir2-patchsite/";
-        public static string P_Client = Application.StartupPath + "\\";
-        public static bool P_AutoStart = false;
-        public static int P_Concurrency = 1;
+        public static void ApplyLaunchOptions(Client.Bootstrap.LaunchOptions options)
+        {
+            if (options.Host != null) IPAddress = options.Host;
+            if (options.Port.HasValue) Port = options.Port.Value;
+            if (options.Resolution != null)
+            {
+                string[] dimensions = options.Resolution.Split('x');
+                Resolution = int.Parse(dimensions[0]); ResolutionHeight = int.Parse(dimensions[1]);
+            }
+            if (options.DisplayMode != null) Mode = options.DisplayMode switch
+            {
+                "fullscreen" => DisplayMode.FullScreen,
+                "maximized" => DisplayMode.Maximized,
+                _ => DisplayMode.Windowed
+            };
+            if (options.FpsCap.HasValue) FPSCap = options.FpsCap.Value;
+            if (options.Topmost.HasValue) TopMost = options.Topmost.Value;
+        }
 
         public static void Load()
         {
@@ -316,32 +322,6 @@ namespace Client
             FilterGroupChat = Reader.ReadBoolean("Filter", "FilterGroupChat", FilterGroupChat);
             FilterGuildChat = Reader.ReadBoolean("Filter", "FilterGuildChat", FilterGuildChat);
 
-            //AutoPatcher
-            P_Patcher = Reader.ReadBoolean("Launcher", "Enabled", P_Patcher);
-            P_Host = Reader.ReadString("Launcher", "Host", P_Host);
-            P_PatchFileName = Reader.ReadString("Launcher", "PatchFile", P_PatchFileName);
-            P_NeedLogin = Reader.ReadBoolean("Launcher", "NeedLogin", P_NeedLogin);
-            P_Login = Reader.ReadString("Launcher", "Login", P_Login);
-            P_Password = Reader.ReadString("Launcher", "Password", P_Password);
-            P_AutoStart = Reader.ReadBoolean("Launcher", "AutoStart", P_AutoStart);
-            P_ServerName = Reader.ReadString("Launcher", "ServerName", P_ServerName);
-            P_BrowserAddress = Reader.ReadString("Launcher", "Browser", P_BrowserAddress);
-            P_Concurrency = Reader.ReadInt32("Launcher", "ConcurrentDownloads", P_Concurrency);
-
-
-            if (!P_Host.EndsWith("/")) P_Host += "/";
-            if (P_Host.StartsWith("www.", StringComparison.OrdinalIgnoreCase)) P_Host = P_Host.Insert(0, "http://");
-            if (P_BrowserAddress.StartsWith("www.", StringComparison.OrdinalIgnoreCase)) P_BrowserAddress = P_BrowserAddress.Insert(0, "http://");
-
-            //Temp check to update everyones address
-            if (P_Host.ToLower() == "http://mirfiles.co.uk/mir2/cmir/patch/")
-            {
-                P_Host = "http://mirfiles.com/mir2/cmir/patch/";
-            }
-
-            if (P_Concurrency < 1) P_Concurrency = 1;
-            if (P_Concurrency > 100) P_Concurrency = 100;
-
             try
             {
                 string languageDirectory = @".\Localization\";
@@ -429,17 +409,7 @@ namespace Client
             Reader.Write("Filter", "FilterGroupChat", FilterGroupChat);
             Reader.Write("Filter", "FilterGuildChat", FilterGuildChat);
 
-            //AutoPatcher
-            Reader.Write("Launcher", "Enabled", P_Patcher);
-            Reader.Write("Launcher", "Host", P_Host);
-            Reader.Write("Launcher", "PatchFile", P_PatchFileName);
-            Reader.Write("Launcher", "NeedLogin", P_NeedLogin);
-            Reader.Write("Launcher", "Login", P_Login);
-            Reader.Write("Launcher", "Password", P_Password);
-            Reader.Write("Launcher", "ServerName", P_ServerName);
-            Reader.Write("Launcher", "Browser", P_BrowserAddress);
-            Reader.Write("Launcher", "AutoStart", P_AutoStart);
-            Reader.Write("Launcher", "ConcurrentDownloads", P_Concurrency);
+
         }
 
         public static void LoadTrackedQuests(string charName)

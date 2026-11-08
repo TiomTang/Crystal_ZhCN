@@ -1,0 +1,25 @@
+namespace Launcher.Resources;
+internal static class Images { private static readonly System.Resources.ResourceManager Manager = new("Launcher.Resources.Images", typeof(Images).Assembly);
+        public static System.Drawing.Bitmap Blue_Progress => (System.Drawing.Bitmap)Manager.GetObject("Blue_Progress")!;
+        public static System.Drawing.Bitmap CheckF_Base2 => (System.Drawing.Bitmap)Manager.GetObject("CheckF_Base2")!;
+        public static System.Drawing.Bitmap CheckF_Hover => (System.Drawing.Bitmap)Manager.GetObject("CheckF_Hover")!;
+        public static System.Drawing.Bitmap CheckF_Pressed => (System.Drawing.Bitmap)Manager.GetObject("CheckF_Pressed")!;
+        public static System.Drawing.Bitmap Config_Base => (System.Drawing.Bitmap)Manager.GetObject("Config_Base")!;
+        public static System.Drawing.Bitmap Config_Base1 => (System.Drawing.Bitmap)Manager.GetObject("Config_Base1")!;
+        public static System.Drawing.Bitmap Config_Check_Off1 => (System.Drawing.Bitmap)Manager.GetObject("Config_Check_Off1")!;
+        public static System.Drawing.Bitmap Config_Check_On => (System.Drawing.Bitmap)Manager.GetObject("Config_Check_On")!;
+        public static System.Drawing.Bitmap Config_Hover => (System.Drawing.Bitmap)Manager.GetObject("Config_Hover")!;
+        public static System.Drawing.Bitmap Config_Pressed => (System.Drawing.Bitmap)Manager.GetObject("Config_Pressed")!;
+        public static System.Drawing.Bitmap Cross_Base => (System.Drawing.Bitmap)Manager.GetObject("Cross_Base")!;
+        public static System.Drawing.Bitmap Cross_Hover => (System.Drawing.Bitmap)Manager.GetObject("Cross_Hover")!;
+        public static System.Drawing.Bitmap Cross_Pressed => (System.Drawing.Bitmap)Manager.GetObject("Cross_Pressed")!;
+        public static System.Drawing.Bitmap Green_Progress => (System.Drawing.Bitmap)Manager.GetObject("Green_Progress")!;
+        public static System.Drawing.Bitmap Launch_Base1 => (System.Drawing.Bitmap)Manager.GetObject("Launch_Base1")!;
+        public static System.Drawing.Bitmap Launch_Hover => (System.Drawing.Bitmap)Manager.GetObject("Launch_Hover")!;
+        public static System.Drawing.Bitmap Launch_Pressed => (System.Drawing.Bitmap)Manager.GetObject("Launch_Pressed")!;
+        public static System.Drawing.Bitmap NEW_Progress_End__Blue_ => (System.Drawing.Bitmap)Manager.GetObject("NEW_Progress_End__Blue_")!;
+        public static System.Drawing.Bitmap NEW_Progress_End__Green_ => (System.Drawing.Bitmap)Manager.GetObject("NEW_Progress_End__Green_")!;
+        public static System.Drawing.Bitmap pfffft => (System.Drawing.Bitmap)Manager.GetObject("pfffft")!;
+        public static System.Drawing.Bitmap server_base => (System.Drawing.Bitmap)Manager.GetObject("server_base")!;
+        public static System.Drawing.Bitmap textboxes => (System.Drawing.Bitmap)Manager.GetObject("textboxes")!;
+}

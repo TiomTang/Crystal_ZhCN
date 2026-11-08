@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net8.0-windows7.0</TargetFramework><UseWindowsForms>true</UseWindowsForms><ImplicitUsings>enable</ImplicitUsings><Nullable>disable</Nullable><AssemblyName>Launcher</AssemblyName><RootNamespace>Launcher</RootNamespace><PlatformTarget>x64</PlatformTarget><BaseOutputPath>../Build/Client/</BaseOutputPath><AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath><ApplicationIcon>../Client/MIR2.ICO</ApplicationIcon></PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <OutputPath>../Build/Client/Debug\</OutputPath>
+</PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+  <OutputPath>../Build/Client/Release\</OutputPath>
+</PropertyGroup>
+<ItemGroup><ProjectReference Include="../Shared/Shared.csproj"/><ProjectReference Include="../Client.Bootstrap/Client.Bootstrap.csproj"/><PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40"/></ItemGroup>
+<ItemGroup><None Include="../Client/Localization/*.json" Link="Localization/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
+</Project>

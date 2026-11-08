@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Launcher;
+using Client.Bootstrap;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using Client.Resolution;
@@ -9,48 +9,38 @@ namespace Client
     internal static class Program
     {
         public static CMain Form;
-        public static AMain PForm;
 
         public static bool Restart;
-        public static bool Launch;
 
         [STAThread]
         private static void Main(string[] args)
         {
-            if (args.Length > 0)
-            {
-                foreach (var arg in args)
-                {
-                    if (arg.ToLower() == "-tc") Settings.UseTestConfig = true;
-                }
-            }
-
-            #if DEBUG
-                Settings.UseTestConfig = true;
-            #endif
-
+            Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+            LaunchOptions options;
+            try { options = LaunchOptions.Parse(args); }
+            catch (ArgumentException ex) { MessageBox.Show(ex.Message, "Invalid launch arguments"); Environment.ExitCode = 2; return; }
             try
             {
-                if (UpdatePatcher()) return;
+                using var installation = new InstallationLease(AppContext.BaseDirectory, game: true);
+
+            Settings.UseTestConfig = options.TestConfig;
+#if DEBUG
+            Settings.UseTestConfig = true;
+#endif
+
 
                 if (RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully == true) { }
 
                 Packet.IsServer = false;
                 Settings.Load();
+                Settings.ApplyLaunchOptions(options);
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 CheckResolutionSetting();
 
-                Launch = false;
-                if (Settings.P_Patcher)
-                    Application.Run(PForm = new AMain());
-                else
-                    Launch = true;
-
-                if (Launch)
-                    Application.Run(Form = new CMain());
+                Application.Run(Form = new CMain());
 
                 Settings.Save();
 
@@ -62,56 +52,6 @@ namespace Client
             catch (Exception ex)
             {
                 CMain.SaveError(ex.ToString());
-            }
-        }
-
-        private static bool UpdatePatcher()
-        {
-            try
-            {
-                const string fromName = @".\AutoPatcher.gz", toName = @".\AutoPatcher.exe";
-                if (!File.Exists(fromName)) return false;
-
-                Process[] processes = Process.GetProcessesByName("AutoPatcher");
-
-                if (processes.Length > 0)
-                {
-                    string patcherPath = Application.StartupPath + @"\AutoPatcher.exe";
-
-                    for (int i = 0; i < processes.Length; i++)
-                        if (processes[i].MainModule.FileName == patcherPath)
-                            processes[i].Kill();
-
-                    Stopwatch stopwatch = Stopwatch.StartNew();
-                    bool wait = true;
-                    processes = Process.GetProcessesByName("AutoPatcher");
-
-                    while (wait)
-                    {
-                        wait = false;
-                        for (int i = 0; i < processes.Length; i++)
-                            if (processes[i].MainModule.FileName == patcherPath)
-                            {
-                                wait = true;
-                            }
-
-                        if (stopwatch.ElapsedMilliseconds <= 3000) continue;
-                        MessageBox.Show(GameLanguage.Get("Failed to close AutoPatcher during update."));
-                        return true;
-                    }
-                }
-
-                if (File.Exists(toName)) File.Delete(toName);
-                File.Move(fromName, toName);
-                Process.Start(toName, "Auto");
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                CMain.SaveError(ex.ToString());
-                
-                throw;
             }
         }
 

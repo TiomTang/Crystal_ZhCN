@@ -800,7 +800,7 @@ namespace Client
         public void CreateScreenShot()
         {
             string text = string.Format("[{0} Server {1}] {2} {3:hh\\:mm\\:ss}",
-                Settings.P_ServerName.Length > 0 ? Settings.P_ServerName : "Crystal",
+                "Crystal",
                 MapControl.User != null ? MapControl.User.Name : "",
                 Now.ToShortDateString(),
                 Now.TimeOfDay);

@@ -1,0 +1,15 @@
+; Operator-owned publishing configuration. Example only: not copied to output.
+; Replace placeholders before publishing a real Launcher.ini at installation root.
+; Launcher reads this file without adding keys, migrating or saving it.
+[Launcher]
+Host=https://updates.example.invalid/mir2/
+PatchFile=PList.gz
+ServerName=Example server
+Browser=
+NeedLogin=False
+Login=
+Password=
+
+[Network]
+IPAddress=game.example.invalid
+Port=7000

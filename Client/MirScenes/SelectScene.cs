@@ -468,7 +468,7 @@ namespace Client.MirScenes
                 case 4:
 
                     // 服务端下发的是允许的最大宽度，超过就退到不超过上限的最大档位
-                    ResolutionOptions.Option resolution = ResolutionOptions.Resolve(Settings.Resolution, Settings.ResolutionHeight, p.Resolution);
+                    Client.Bootstrap.ResolutionOptions.Option resolution = ResolutionOptions.Resolve(Settings.Resolution, Settings.ResolutionHeight, p.Resolution);
 
                     Settings.Resolution = resolution.Width;
                     Settings.ResolutionHeight = resolution.Height;
