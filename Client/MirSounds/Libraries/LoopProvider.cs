@@ -22,32 +22,39 @@ namespace Client.MirSounds.Libraries
 
         public static LoopProvider TryCreate(int index, string fileName, int volume, bool loop)
         {
-            fileName = Path.Combine(Settings.SoundPath, fileName);
-            string fileType = Path.GetExtension(fileName);
-
-            // attempt to find file
-            if (String.IsNullOrEmpty(fileType))
+            lock (SoundManager.AudioLock)
             {
-                foreach (String ext in SoundManager.SupportedFileTypes)
-                {
-                    if (File.Exists($"{fileName}{ext}"))
-                    {
-                        fileName = $"{fileName}{ext}";
-                        fileType = ext;
+                if (!SoundManager.CanPlay) return null;
+                fileName = Path.Combine(Settings.SoundPath, fileName);
+                string fileType = Path.GetExtension(fileName);
 
-                        break;
+                // attempt to find file
+                if (String.IsNullOrEmpty(fileType))
+                {
+                    foreach (String ext in SoundManager.SupportedFileTypes)
+                    {
+                        if (File.Exists($"{fileName}{ext}"))
+                        {
+                            fileName = $"{fileName}{ext}";
+                            fileType = ext;
+
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (SoundManager.SupportedFileTypes.Contains(fileType) &&
-                File.Exists(fileName))
-            {
-                return new LoopProvider(index, fileName, volume, loop);
-            }
-            else
-            {
-                return null;
+                if (SoundManager.SupportedFileTypes.Contains(fileType) &&
+                    File.Exists(fileName))
+                {
+                    var sound = new LoopProvider(index, fileName, volume, loop);
+                    if (SoundManager.CanPlay) return sound;
+                    sound.Dispose();
+                    return null;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -57,56 +64,72 @@ namespace Client.MirSounds.Libraries
             _loop = loop;
             _fileName = fileName;
 
-            Play(volume);
+            try { Play(volume); }
+            catch
+            {
+                Dispose();
+                throw;
+            }
+            if (!SoundManager.CanPlay) Dispose();
         }
 
         public bool IsPlaying()
         {
-            return outputDevice.PlaybackState == PlaybackState.Playing;
+            lock (SoundManager.AudioLock)
+                return SoundManager.CanPlay && !_isDisposing && outputDevice?.PlaybackState == PlaybackState.Playing;
         }
 
         public void Play(int volume)
         {
-            if (outputDevice?.PlaybackState == PlaybackState.Playing)
+            SoundManager.WithAudio(() =>
             {
-                return;
-            }
-
-            ExpireTime = CMain.Time + Settings.SoundCleanMinutes * 60 * 1000;
-
-            if (outputDevice == null)
-            {
-                outputDevice = new WaveOutEvent();
-                outputDevice.PlaybackStopped += (_,_) => OutputDevice_PlaybackStopped();
-            }
-
-            if (audioFile == null)
-            {
-                audioFile = new AudioFileReader(_fileName);
-                outputDevice.Init(audioFile);
-            }
-
-            // loop or sound already cached
-            if (outputDevice?.PlaybackState == PlaybackState.Stopped)
-            {
+                if (_isDisposing) return;
                 try
                 {
-                    audioFile.Seek(0, SeekOrigin.Begin);
+                    if (outputDevice?.PlaybackState == PlaybackState.Playing)
+                    {
+                        return;
+                    }
+
+                    ExpireTime = CMain.Time + Settings.SoundCleanMinutes * 60 * 1000;
+
+                    if (outputDevice == null)
+                    {
+                        outputDevice = new WaveOutEvent();
+                        outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
+                    }
+
+                    if (audioFile == null)
+                    {
+                        audioFile = new AudioFileReader(_fileName);
+                        outputDevice.Init(audioFile);
+                    }
+
+                    // loop or sound already cached
+                    if (outputDevice?.PlaybackState == PlaybackState.Stopped)
+                    {
+                        audioFile.Seek(0, SeekOrigin.Begin);
+                    }
+
+                    outputDevice.Volume = ScaleVolume(volume);
+                    outputDevice.Play();
                 }
                 catch
                 {
-                    audioFile = new AudioFileReader(_fileName);
-                    outputDevice.Init(audioFile);
+                    // This instance may not yet belong to SoundManager during construction.
+                    Dispose();
+                    throw;
                 }
-            }
-
-            outputDevice.Volume = ScaleVolume(volume);
-            outputDevice.Play();
+            });
+            if (!SoundManager.CanPlay) Dispose();
         }
 
         public void SetVolume(int vol)
         {
-            outputDevice.Volume = ScaleVolume(vol);
+            SoundManager.WithAudio(() =>
+            {
+                if (!_isDisposing && outputDevice != null) outputDevice.Volume = ScaleVolume(vol);
+            });
         }
 
         public void Stop()
@@ -114,21 +137,38 @@ namespace Client.MirSounds.Libraries
             Dispose();
         }
 
-        private void OutputDevice_PlaybackStopped()
+        private void OutputDevice_PlaybackStopped(object sender, StoppedEventArgs e)
         {
-            if (_loop &&
-                !_isDisposing)
+            lock (SoundManager.AudioLock)
             {
-                    Play(_unscaledVolume);
+                if (_isDisposing || !SoundManager.CanPlay || !ReferenceEquals(sender, outputDevice)) return;
+                if (e.Exception != null)
+                {
+                    if (SoundManager.IsDeviceException(e.Exception)) SoundManager.DisableAudio(e.Exception);
+                    else System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e.Exception).Throw();
+                    return;
+                }
+                if (_loop) Play(_unscaledVolume);
             }
         }
 
         public void Dispose()
         {
-            _isDisposing = true;
-
-            outputDevice?.Dispose();
-            audioFile?.Dispose();
+            lock (SoundManager.AudioLock)
+            {
+                if (_isDisposing) return;
+                _isDisposing = true;
+                var device = outputDevice;
+                var file = audioFile;
+                outputDevice = null;
+                audioFile = null;
+                if (device != null) device.PlaybackStopped -= OutputDevice_PlaybackStopped;
+                try
+                {
+                    SoundManager.DisposeOutput(device);
+                }
+                finally { file?.Dispose(); }
+            }
         }
 
         private float ScaleVolume(int volume)

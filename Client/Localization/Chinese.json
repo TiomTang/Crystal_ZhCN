@@ -3,6 +3,122 @@
     "version": 2,
     "forms": []
   },
+  "The DirectX check could not be started.": {
+    "Source": "The DirectX check could not be started.",
+    "Text": "无法启动 DirectX 检测进程。"
+  },
+  "The runtime extractor could not be started.": {
+    "Source": "The runtime extractor could not be started.",
+    "Text": "无法启动运行库解压程序。"
+  },
+  "The runtime installer could not be started.": {
+    "Source": "The runtime installer could not be started.",
+    "Text": "无法启动运行库安装程序。"
+  },
+  "Missing game runtime": {
+    "Source": "Missing game runtime",
+    "Text": "缺少游戏运行组件"
+  },
+  "The DirectX 9 extension runtime (D3DX9) is missing. DirectX 11/12 alone does not include it. Repair will download Microsoft's official runtime and open its setup wizard. Please confirm the installation and administrator prompt. The runtime cannot be uninstalled.": {
+    "Source": "The DirectX 9 extension runtime (D3DX9) is missing. DirectX 11/12 alone does not include it. Repair will download Microsoft's official runtime and open its setup wizard. Please confirm the installation and administrator prompt. The runtime cannot be uninstalled.",
+    "Text": "缺少 DirectX 9 扩展运行库（D3DX9），仅安装 DirectX 11/12 不包含此组件。\n\n点击修复将下载微软官方运行库并打开安装向导，请确认安装界面和管理员授权。安装完成后会自动重新检测。此运行库安装后无法卸载。"
+  },
+  "Repair and recheck": {
+    "Source": "Repair and recheck",
+    "Text": "修复并重新检测"
+  },
+  "Official download": {
+    "Source": "Official download",
+    "Text": "官方下载"
+  },
+  "Downloading the official DirectX runtime. You can cancel by closing this window.": {
+    "Source": "Downloading the official DirectX runtime. You can cancel by closing this window.",
+    "Text": "正在下载微软官方 DirectX 运行库，关闭窗口可取消下载。"
+  },
+  "Verifying and extracting the Microsoft runtime...": {
+    "Source": "Verifying and extracting the Microsoft runtime...",
+    "Text": "正在校验并解压微软运行库……"
+  },
+  "Please complete the Microsoft DirectX setup wizard and administrator prompt. This window will recheck the runtime when setup exits.": {
+    "Source": "Please complete the Microsoft DirectX setup wizard and administrator prompt. This window will recheck the runtime when setup exits.",
+    "Text": "请完成微软 DirectX 安装向导和管理员授权。安装程序退出后会自动重新检测，请勿关闭此窗口。"
+  },
+  "Checking DirectX in a separate process...": {
+    "Source": "Checking DirectX in a separate process...",
+    "Text": "正在独立进程中重新检测 DirectX……"
+  },
+  "DirectX is available. The client will now restart.": {
+    "Source": "DirectX is available. The client will now restart.",
+    "Text": "DirectX 检测通过，即将重新启动客户端。"
+  },
+  "Runtime download was cancelled or timed out. No installation was started.": {
+    "Source": "Runtime download was cancelled or timed out. No installation was started.",
+    "Text": "下载已取消或超时，未执行安装。"
+  },
+  "Repair did not complete. Use the official download button to install DirectX manually, then restart the client. See Error.txt for details.": {
+    "Source": "Repair did not complete. Use the official download button to install DirectX manually, then restart the client. See Error.txt for details.",
+    "Text": "修复未完成。可点击“官方下载”手动安装 DirectX，再重新启动客户端。详细信息见 Error.txt。"
+  },
+  "The runtime download was redirected to an untrusted location.": {
+    "Source": "The runtime download was redirected to an untrusted location.",
+    "Text": "运行库下载被重定向到非受信任地址，已停止下载。"
+  },
+  "The runtime download is larger than expected.": {
+    "Source": "The runtime download is larger than expected.",
+    "Text": "运行库下载大小异常，已停止下载。"
+  },
+  "The downloaded runtime failed its integrity check. It will not be executed.": {
+    "Source": "The downloaded runtime failed its integrity check. It will not be executed.",
+    "Text": "下载的运行库完整性校验失败，不会执行安装程序。"
+  },
+  "The Microsoft runtime signature could not be verified. The installer will not be executed.": {
+    "Source": "The Microsoft runtime signature could not be verified. The installer will not be executed.",
+    "Text": "无法验证微软运行库的数字签名，不会执行安装程序。"
+  },
+  "The runtime installer is not signed by Microsoft Corporation.": {
+    "Source": "The runtime installer is not signed by Microsoft Corporation.",
+    "Text": "运行库安装程序并非由 Microsoft Corporation 签名，已阻止执行。"
+  },
+  "Runtime extraction timed out.": {
+    "Source": "Runtime extraction timed out.",
+    "Text": "运行库解压超时。"
+  },
+  "Runtime extraction failed with exit code {0}.": {
+    "Source": "Runtime extraction failed with exit code {0}.",
+    "Text": "运行库解压失败，退出码：{0}。"
+  },
+  "DirectX setup did not complete successfully (exit code {0}).": {
+    "Source": "DirectX setup did not complete successfully (exit code {0}).",
+    "Text": "DirectX 安装未成功完成，退出码：{0}。"
+  },
+  "The DirectX check timed out. Please restart the client manually.": {
+    "Source": "The DirectX check timed out. Please restart the client manually.",
+    "Text": "DirectX 检测超时，请手动重新启动客户端。"
+  },
+  "DirectX is still unavailable after setup. Please restart Windows or install the runtime manually.": {
+    "Source": "DirectX is still unavailable after setup. Please restart Windows or install the runtime manually.",
+    "Text": "安装后仍无法使用 DirectX，请重启 Windows 或手动安装运行库。"
+  },
+  "The game could not start. Please check the error below and the Error.txt log.": {
+    "Source": "The game could not start. Please check the error below and the Error.txt log.",
+    "Text": "游戏无法启动，请检查以下错误和 Error.txt 日志。"
+  },
+  "Unable to start game": {
+    "Source": "Unable to start game",
+    "Text": "游戏启动失败"
+  },
+  "Could not open link": {
+    "Source": "Could not open link",
+    "Text": "无法打开链接"
+  },
+  "The audio device is unavailable. Music and sound effects are disabled for this session; you can continue playing. Saved volume settings are unchanged. Open Windows sound settings?": {
+    "Source": "The audio device is unavailable. Music and sound effects are disabled for this session; you can continue playing. Saved volume settings are unchanged. Open Windows sound settings?",
+    "Text": "声音设备不可用，本次运行已关闭音乐和音效，可以继续游戏。已保存的音量设置不会改变。\n\n是否打开 Windows 声音设置，检查默认播放设备和声卡驱动？"
+  },
+  "Continuing without sound": {
+    "Source": "Continuing without sound",
+    "Text": "已切换为静音模式"
+  },
   "You are not a high enough level.": {
     "Source": "You are not a high enough level.",
     "Text": "你的等级不足。"

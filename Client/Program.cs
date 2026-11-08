@@ -15,6 +15,17 @@ namespace Client
         [STAThread]
         private static void Main(string[] args)
         {
+            if (args.Length == 1 && args[0] == StartupRecovery.ProbeArgument)
+            {
+                try { StartupRecovery.CheckDirectX(); }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex);
+                    Environment.ExitCode = 1;
+                }
+                return;
+            }
+
             Directory.SetCurrentDirectory(AppContext.BaseDirectory);
             LaunchOptions options;
             try { options = LaunchOptions.Parse(args); }
@@ -40,6 +51,7 @@ namespace Client
 
                 CheckResolutionSetting();
 
+                if (!StartupRecovery.EnsureDirectX()) return;
                 Application.Run(Form = new CMain());
 
                 Settings.Save();
@@ -51,7 +63,7 @@ namespace Client
             }
             catch (Exception ex)
             {
-                CMain.SaveError(ex.ToString());
+                StartupRecovery.ShowFatal(ex);
             }
         }
 

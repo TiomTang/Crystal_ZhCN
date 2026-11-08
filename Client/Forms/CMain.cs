@@ -27,6 +27,7 @@ namespace Client
         private static bool _outputSizeChanged;
         private static bool _pointerInViewport;
         private static MouseButtons _pressedMouseButtons;
+        private bool _startupFailed;
 
         public readonly static Stopwatch Timer = Stopwatch.StartNew();
         public readonly static DateTime StartTime = DateTime.UtcNow;
@@ -55,23 +56,6 @@ namespace Client
         {
             InitializeComponent();
 
-            Application.Idle += Application_Idle;
-
-            MouseClick += CMain_MouseClick;
-            MouseDown += CMain_MouseDown;
-            MouseUp += CMain_MouseUp;
-            MouseMove += CMain_MouseMove;
-            MouseDoubleClick += CMain_MouseDoubleClick;
-            KeyPress += CMain_KeyPress;
-            KeyDown += CMain_KeyDown;
-            KeyUp += CMain_KeyUp;
-            Deactivate += CMain_Deactivate;
-            MouseWheel += CMain_MouseWheel;
-            ClientSizeChanged += CMain_ClientSizeChanged;
-            MouseLeave += CMain_MouseLeave;
-            MouseCaptureChanged += CMain_MouseCaptureChanged;
-
-
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Selectable, true);
             FormBorderStyle = Settings.Mode == DisplayMode.Windowed && !Settings.Borderless ? FormBorderStyle.FixedDialog : FormBorderStyle.None;
 
@@ -97,12 +81,49 @@ namespace Client
                 SlimDX.Configuration.EnableObjectTracking = true;
 
                 DXManager.Create();
+                SoundManager.AudioUnavailable += OnAudioUnavailable;
                 SoundManager.Create();
+                // Fail here, rather than repeatedly failing from idle and input callbacks.
+                _ = MirScene.ActiveScene;
+                Application.Idle += Application_Idle;
+                MouseClick += CMain_MouseClick;
+                MouseDown += CMain_MouseDown;
+                MouseUp += CMain_MouseUp;
+                MouseMove += CMain_MouseMove;
+                MouseDoubleClick += CMain_MouseDoubleClick;
+                KeyPress += CMain_KeyPress;
+                KeyDown += CMain_KeyDown;
+                KeyUp += CMain_KeyUp;
+                Deactivate += CMain_Deactivate;
+                MouseWheel += CMain_MouseWheel;
+                ClientSizeChanged += CMain_ClientSizeChanged;
+                MouseLeave += CMain_MouseLeave;
+                MouseCaptureChanged += CMain_MouseCaptureChanged;
             }
             catch (Exception ex)
             {
-                SaveError(ex.ToString());
+                _startupFailed = true;
+                StartupRecovery.ShowFatal(ex, this);
+                BeginInvoke(new Action(Close));
             }
+        }
+
+        private void OnAudioUnavailable(Exception exception)
+        {
+            StartupRecovery.Log(exception);
+            if (IsDisposed || Disposing || !IsHandleCreated) return;
+            try
+            {
+                BeginInvoke(new Action(() =>
+                {
+                    if (IsDisposed || Disposing || _startupFailed) return;
+                    if (MessageBox.Show(this,
+                        GameLanguage.Get("The audio device is unavailable. Music and sound effects are disabled for this session; you can continue playing. Saved volume settings are unchanged. Open Windows sound settings?"),
+                        GameLanguage.Get("Continuing without sound"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                        StartupRecovery.Open("ms-settings:sound", this);
+                }));
+            }
+            catch (InvalidOperationException) { }
         }
 
         private static void Application_Idle(object sender, EventArgs e)
@@ -913,6 +934,17 @@ namespace Client
 
         private void CMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (_startupFailed)
+            {
+                Application.Idle -= Application_Idle;
+                SoundManager.AudioUnavailable -= OnAudioUnavailable;
+                try { SoundManager.Dispose(); }
+                catch (Exception ex) { StartupRecovery.Log(ex); }
+                try { DXManager.Dispose(); }
+                catch (Exception ex) { StartupRecovery.Log(ex); }
+                return;
+            }
+
             if (CMain.Time < GameScene.LogTime && !Settings.UseTestConfig && !GameScene.Observing)
             {
                 GameScene.Scene.ChatDialog.ReceiveChat(GameLanguage.Get("Cannot leave game for {0} seconds", (GameScene.LogTime - CMain.Time) / 1000), ChatType.System);
@@ -920,6 +952,8 @@ namespace Client
             }
             else
             {
+                Application.Idle -= Application_Idle;
+                SoundManager.AudioUnavailable -= OnAudioUnavailable;
                 Settings.Save();
 
                 DXManager.Dispose();
