@@ -25,6 +25,7 @@ namespace AutoPatcherAdmin
         IReadOnlyList<string> EnumerateFiles(string remoteDirectory, CancellationToken cancellationToken = default);
         IReadOnlyList<string> EnumerateDirectories(string remoteDirectory, CancellationToken cancellationToken = default);
         long GetFileLength(string remotePath);
+        long? GetExistingFileLength(string remotePath);
         byte[] DownloadFile(string remotePath);
         void DownloadFiles(IEnumerable<string> remotePaths, string localRoot, CancellationToken cancellationToken = default);
         void UploadDirectory(string localRoot, string remoteRoot, IReadOnlyList<string> relativePaths, string action, CancellationToken cancellationToken = default);
@@ -70,6 +71,7 @@ namespace AutoPatcherAdmin
         public abstract IReadOnlyList<string> EnumerateFiles(string remoteDirectory, CancellationToken cancellationToken = default);
         public virtual IReadOnlyList<string> EnumerateDirectories(string remoteDirectory, CancellationToken cancellationToken = default) => Array.Empty<string>();
         public abstract long GetFileLength(string remotePath);
+        public abstract long? GetExistingFileLength(string remotePath);
         public abstract byte[] DownloadFile(string remotePath);
         public abstract void EnsureDirectory(string remoteDirectory);
         public abstract void MoveFile(string sourcePath, string destinationPath);
@@ -204,6 +206,12 @@ namespace AutoPatcherAdmin
         public override long GetFileLength(string remotePath)
         {
             return _client.GetAttributes(NormalizeRemotePath(remotePath)).Size;
+        }
+
+        public override long? GetExistingFileLength(string remotePath)
+        {
+            try { return GetFileLength(remotePath); }
+            catch (Renci.SshNet.Common.SftpPathNotFoundException) { return null; }
         }
 
         public override byte[] DownloadFile(string remotePath)
@@ -378,6 +386,24 @@ namespace AutoPatcherAdmin
             var request = CreateRequest(remotePath, WebRequestMethods.Ftp.GetFileSize);
             using var response = (FtpWebResponse)request.GetResponse();
             return response.ContentLength;
+        }
+
+        public override long? GetExistingFileLength(string remotePath)
+        {
+            try { return GetFileLength(remotePath); }
+            catch (WebException ex) when ((ex.Response as FtpWebResponse)?.StatusCode == FtpStatusCode.ActionNotTakenFileUnavailable)
+            {
+                // FTP 550 also means permission denied. Confirm absence via readable
+                // ancestor listings rather than treating every failed SIZE as missing.
+                string parent = "/";
+                foreach (string part in NormalizeRemotePath(remotePath).Split('/', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    if (!ListDirectoryNames(parent).Any(name =>
+                        string.Equals(name.TrimEnd('/').Split('/').Last(), part, StringComparison.Ordinal))) return null;
+                    parent = CombineRemotePath(parent, part);
+                }
+                throw;
+            }
         }
 
         public override byte[] DownloadFile(string remotePath)
@@ -641,7 +667,16 @@ namespace AutoPatcherAdmin
         {
             using var response = _client.Send(new HttpRequestMessage(HttpMethod.Head, BuildUri(remotePath)));
             response.EnsureSuccessStatusCode();
-            return response.Content.Headers.ContentLength ?? 0;
+            return response.Content.Headers.ContentLength ?? throw new IOException("Remote server did not provide Content-Length.");
+        }
+
+        public override long? GetExistingFileLength(string remotePath)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Head, BuildUri(remotePath));
+            using var response = _client.Send(request);
+            if (response.StatusCode == HttpStatusCode.NotFound) return null;
+            response.EnsureSuccessStatusCode();
+            return response.Content.Headers.ContentLength ?? throw new IOException("Remote server did not provide Content-Length.");
         }
 
         public override byte[] DownloadFile(string remotePath)

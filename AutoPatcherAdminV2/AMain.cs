@@ -524,6 +524,46 @@ namespace AutoPatcherAdmin
             return result;
         }
 
+        private void CheckExistingRemoteFiles(PatchCompareResult result)
+        {
+            var candidates = result.Unchanged.ToDictionary(x => x.Path, StringComparer.OrdinalIgnoreCase);
+            var oldByName = OldList.ToDictionary(x => x.FileName.Replace(Path.DirectorySeparatorChar, '/'), StringComparer.OrdinalIgnoreCase);
+            var repairs = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            int checkedCount = 0;
+            SetActionText($"Checking {candidates.Count} existing remote files...");
+            RunParallelWithTransport(candidates.Keys.ToList(), 4, (transport, path) =>
+            {
+                CheckCancelled();
+                var old = oldByName[path];
+                string? reason;
+                try
+                {
+                    reason = RemoteFileCheck.Check(old.FileName, old.Length, old.Compressed, name =>
+                    {
+                        string remotePath = CombineRemotePath(new Uri(Settings.Host).AbsolutePath, name);
+                        return transport.GetExistingFileLength(remotePath);
+                    });
+                }
+                catch (OperationCanceledException) { throw; }
+                catch (Exception ex)
+                {
+                    throw new IOException($"Remote check failed for {path}; compare is incomplete. {ex.Message}", ex);
+                }
+                if (reason != null) repairs[path] = reason;
+                int done = Interlocked.Increment(ref checkedCount);
+                PostUi(() => ActionLabel.Text = $"Checking remote files: {done} / {candidates.Count}");
+            });
+            CheckCancelled();
+            foreach (var file in result.Unchanged.ToList())
+            {
+                if (!repairs.TryGetValue(file.Path, out string? reason)) continue;
+                file.RepairReason = reason;
+                result.Unchanged.Remove(file);
+                result.Changed.Add(file);
+            }
+            Log($"Remote check complete: {checkedCount} checked, {repairs.Count} files require repair.");
+        }
+
         private void UpdateSummaryLabels(PatchCompareResult? result)
         {
             int added = result?.Added.Count ?? 0;
@@ -745,10 +785,17 @@ namespace AutoPatcherAdmin
         {
             string filter = PreviewActionFilterDropDown.SelectedItem as string ?? "All";
             PreviewGrid.Rows.Clear();
+            var repairs = _compareResult?.Changed.Where(x => x.RepairReason != null)
+                .ToDictionary(x => x.Path, x => x.RepairReason!, StringComparer.OrdinalIgnoreCase);
 
             foreach (var row in _previewRows.Where(x => filter == "All" || x.Action == filter))
             {
                 int rowIndex = PreviewGrid.Rows.Add(row.Action, row.Path, FormatBytes(row.Size));
+                if (repairs != null && repairs.TryGetValue(row.Path, out string? repair))
+                {
+                    PreviewGrid.Rows[rowIndex].Cells[0].Value = "Remote damaged";
+                    foreach (DataGridViewCell cell in PreviewGrid.Rows[rowIndex].Cells) cell.ToolTipText = repair;
+                }
                 ApplyPreviewRowStyle(PreviewGrid.Rows[rowIndex], row.Action);
             }
         }
@@ -832,7 +879,9 @@ namespace AutoPatcherAdmin
             GetNewFileList();
             CheckCancelled();
 
-            _compareResult = BuildPListCompareResult();
+            var comparison = BuildPListCompareResult();
+            CheckExistingRemoteFiles(comparison);
+            _compareResult = comparison;
 
             UpdateSummaryLabels(_compareResult);
             PopulatePreviewGrid(_compareResult);
@@ -868,7 +917,7 @@ namespace AutoPatcherAdmin
                 ProcessButton.Enabled = _publishPreviewReady;
                 ActionLabel.Text = _publishPreviewReady
                     ? $"Ready: {_compareResult.UploadCount} files to upload, {_compareResult.Deleted.Count} files to remove."
-                    : "Up to date — all files match remote.";
+                    : "Up to date — local metadata and remote file sizes match the manifest.";
             });
             return true;
         }

@@ -4,6 +4,7 @@ namespace AutoPatcherAdmin
     {
         public string Path { get; set; } = string.Empty;
         public int Length { get; set; }
+        public string? RepairReason { get; set; }
     }
 
     public sealed class PatchCompareResult
