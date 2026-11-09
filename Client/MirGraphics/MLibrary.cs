@@ -883,7 +883,7 @@ namespace Client.MirGraphics
         public long CleanTime;
         public Size TrueSize;
 
-        public unsafe byte* Data;
+        public byte[] Data;
 
         public MImage(BinaryReader reader)
         {
@@ -920,32 +920,33 @@ namespace Client.MirGraphics
 
         private unsafe void CreateTextureCore(BinaryReader reader)
         {
-            int w = Width;// + (4 - Width % 4) % 4;
-            int h = Height;// + (4 - Height % 4) % 4;
-
-            Image = new Texture(DXManager.Device, w, h, 1, Usage.None, Format.A8R8G8B8, Pool.Managed);
-            DataRectangle stream = Image.LockRectangle(0, LockFlags.Discard);
-            Data = (byte*)stream.Data.DataPointer;
-
-            DecompressImage(ReadImageBytes(reader, Length), stream.Data);
-
-            stream.Data.Dispose();
-            Image.UnlockRectangle(0);
-
-            if (HasMask)
+            byte[] pixels;
+            using (var decoded = new MemoryStream())
             {
-                reader.ReadBytes(12);
-                w = Width;// + (4 - Width % 4) % 4;
-                h = Height;// + (4 - Height % 4) % 4;
-
-                MaskImage = new Texture(DXManager.Device, w, h, 1, Usage.None, Format.A8R8G8B8, Pool.Managed);
-                stream = MaskImage.LockRectangle(0, LockFlags.Discard);
-
-                DecompressImage(ReadImageBytes(reader, Length), stream.Data);
-
-                stream.Data.Dispose();
-                MaskImage.UnlockRectangle(0);
+                DecompressImage(ReadImageBytes(reader, Length), decoded);
+                pixels = decoded.ToArray();
             }
+            Texture image = null, mask = null;
+            try
+            {
+                image = TextureUpload.FromBytes(Width, Height, pixels);
+                if (HasMask)
+                {
+                    // Mask header follows the main compressed payload, with its own dimensions/length.
+                    short mw = reader.ReadInt16(), mh = reader.ReadInt16();
+                    short mx = reader.ReadInt16(), my = reader.ReadInt16();
+                    int ml = reader.ReadInt32();
+                    if (mw != MaskWidth || mh != MaskHeight || ml != MaskLength)
+                        throw new InvalidDataException("Inconsistent mask header.");
+                    using var decoded = new MemoryStream();
+                    DecompressImage(ReadImageBytes(reader, ml), decoded);
+                    mask = TextureUpload.FromBytes(mw, mh, decoded.ToArray());
+                }
+                Image = image;
+                MaskImage = mask;
+                Data = pixels;
+            }
+            catch { image?.Dispose(); mask?.Dispose(); throw; }
 
             DXManager.TextureList.Add(this);
             TextureValid = true;

@@ -20,6 +20,15 @@ namespace Client.MirGraphics
         private static int _blendBatchDepth;
         private static bool _opacityOverride = true;
 
+        // Windowed presentation defaults to FlipEx; exclusive fullscreen remains D3D9.
+        public static bool FlipExRequested => Environment.GetEnvironmentVariable("MIR2_FLIP_EX") != "0"
+            && Settings.Mode != DisplayMode.FullScreen && !_flipExUnavailable;
+        private static bool _flipExUnavailable;
+        private static Direct3D _direct3D;
+        private static int _recreationFailures;
+        private static bool _recoveryFailed;
+        private static bool _changingDisplayModeFallback;
+        public static bool IsFlipEx => Device is DeviceEx;
         public static Device Device;
         public static Sprite Sprite;
         public static Line Line;
@@ -78,52 +87,88 @@ namespace Client.MirGraphics
             };
 
 
-            Direct3D d3d = new Direct3D();
-            ConfigurePresentation();
-
-            Capabilities devCaps = d3d.GetDeviceCaps(0, DeviceType.Hardware);
-            DeviceType devType = DeviceType.Reference;
-            CreateFlags devFlags = CreateFlags.HardwareVertexProcessing;
-
-            if (devCaps.VertexShaderVersion.Major >= 2 && devCaps.PixelShaderVersion.Major >= 2)
-                devType = DeviceType.Hardware;
-
-            if ((devCaps.DeviceCaps & DeviceCaps.HWTransformAndLight) != 0)
-                devFlags = CreateFlags.HardwareVertexProcessing;
-
-
-            if ((devCaps.DeviceCaps & DeviceCaps.PureDevice) != 0)
-                devFlags |= CreateFlags.PureDevice;
-
-
             try
             {
-                Device = new Device(d3d, d3d.Adapters.DefaultAdapter.Adapter, devType, Program.Form.Handle, devFlags, Parameters);
+                try
+                {
+                    CreateDeviceResources();
+                }
+                catch (Exception ex) when (FlipExRequested)
+                {
+                    DisableFlipEx("Initialization", ex.ToString());
+                    ReleaseDeviceResources();
+                    CreateDeviceResources();
+                }
+            }
+            catch
+            {
+                ReleaseDeviceResources();
+                DeviceLost = true;
+                NeedsReset = true;
+                throw;
+            }
+            NeedsReset = false;
+            DeviceLost = false;
+            LogPresentationState("Create");
+        }
+
+        private static void CreateDeviceResources()
+        {
+            bool flipEx = FlipExRequested;
+            _direct3D = flipEx ? new Direct3DEx() : new Direct3D();
+            ConfigurePresentation();
+            Capabilities caps = _direct3D.GetDeviceCaps(0, DeviceType.Hardware);
+            DeviceType type = caps.VertexShaderVersion.Major >= 2 && caps.PixelShaderVersion.Major >= 2
+                ? DeviceType.Hardware : DeviceType.Reference;
+            CreateFlags flags = CreateFlags.HardwareVertexProcessing;
+            if ((caps.DeviceCaps & DeviceCaps.PureDevice) != 0) flags |= CreateFlags.PureDevice;
+            try
+            {
+                Device = flipEx
+                    ? new DeviceEx((Direct3DEx)_direct3D, _direct3D.Adapters.DefaultAdapter.Adapter,
+                        type, Program.Form.Handle, flags, Parameters)
+                    : new Device(_direct3D, _direct3D.Adapters.DefaultAdapter.Adapter,
+                        type, Program.Form.Handle, flags, Parameters);
             }
             catch (Direct3D9Exception ex)
             {
-                if (!TryWindowedFallback("Create", ex)) throw;
-                ConfigurePresentation();
-                Device = new Device(d3d, d3d.Adapters.DefaultAdapter.Adapter, devType, Program.Form.Handle, devFlags, Parameters);
+                if (flipEx || !TryWindowedFallback("Create", ex)) throw;
+                // Changing out of exclusive mode may select a different device family.
+                // Never create a legacy device with the new FlipEx parameters or old resources.
+                ReleaseDeviceResources();
+                CreateDeviceResources();
+                return;
             }
-
-            Device.SetDialogBoxMode(true);
-
-            // Shaders survive Reset and must also exist if the first canvas allocation needs a retry.
+            if (!IsFlipEx) Device.SetDialogBoxMode(true);
+            VerifyFrameLatency();
             LoadPixelsShaders();
-            try
-            {
-                LoadTextures();
-            }
-            catch (Exception ex)
-            {
-                CleanUp();
-                DeviceLost = true;
-                NeedsReset = true;
-                LogGraphicsDiagnostics("Initial display resources could not be created: " + ex);
-                throw;
-            }
-            LogPresentationState("Create");
+            LoadTextures();
+        }
+
+        private static void DisableFlipEx(string operation, string reason)
+        {
+            _flipExUnavailable = true;
+            LogGraphicsDiagnostics(operation + ": disabling FlipEx for this process; recreating legacy D3D9. " + reason);
+        }
+
+        private static void ReleaseDeviceResources()
+        {
+            SafeEndScene();
+            CleanUp();
+            NormalPixelShader?.Dispose(); NormalPixelShader = null;
+            GrayScalePixelShader?.Dispose(); GrayScalePixelShader = null;
+            MagicPixelShader?.Dispose(); MagicPixelShader = null;
+            Device?.Dispose(); Device = null;
+            _direct3D?.Dispose(); _direct3D = null;
+        }
+
+        private static void VerifyFrameLatency()
+        {
+            if (Device is not DeviceEx exDevice) return;
+            exDevice.MaximumFrameLatency = 1;
+            int actual = exDevice.MaximumFrameLatency;
+            if (actual != 1) throw new InvalidOperationException("Frame latency readback mismatch.");
+            LogGraphicsDiagnostics("FlipEx MaximumFrameLatency=" + actual);
         }
 
         public static bool TryGetDesktopBounds(out Rectangle bounds)
@@ -157,6 +202,9 @@ namespace Client.MirGraphics
 
         private static void ConfigurePresentation()
         {
+            Parameters.SwapEffect = FlipExRequested ? SwapEffect.FlipEx : SwapEffect.Discard;
+            Parameters.PresentFlags = FlipExRequested ? PresentFlags.None : PresentFlags.LockableBackBuffer;
+            Parameters.BackBufferCount = FlipExRequested ? 2 : 1;
             Size outputSize = Program.Form == null ? Size.Empty : Program.Form.ClientSize;
             if (Settings.Mode == DisplayMode.FullScreen)
                 outputSize = new Size(_desktopMode.Width, _desktopMode.Height);
@@ -173,12 +221,16 @@ namespace Client.MirGraphics
 
         private static bool TryWindowedFallback(string operation, Direct3D9Exception ex)
         {
-            if (Settings.Mode == DisplayMode.Windowed || ex.ResultCode.Code == ResultCode.DeviceLost.Code ||
+            if (FlipExRequested || Settings.Mode == DisplayMode.Windowed || ex.ResultCode.Code == ResultCode.DeviceLost.Code ||
                 ex.ResultCode.Code == ResultCode.DeviceNotReset.Code)
                 return false;
 
             LogGraphicsDiagnostics(operation + " failed; falling back to windowed mode: " + ex);
-            CMain.SetDisplayMode(DisplayMode.Windowed);
+            // Apply window geometry now, but defer device work to this recovery operation.
+            // SetDisplayMode normally calls ResetDevice and must not re-enter this stack.
+            _changingDisplayModeFallback = true;
+            try { CMain.SetDisplayMode(DisplayMode.Windowed); }
+            finally { _changingDisplayModeFallback = false; }
             return true;
         }
 
@@ -235,12 +287,24 @@ namespace Client.MirGraphics
                 }
 
                 long presentStarted = GraphicsDiagnostics.Timestamp();
-                try { Device.Present(); }
+                try
+                {
+                    if (Device is DeviceEx exDevice)
+                    {
+                        if (!AcceptExPresentResult(exDevice.PresentEx(Present.None))) return false;
+                    }
+                    else Device.Present();
+                }
                 finally { GraphicsDiagnostics.Record(GraphicsMetric.DevicePresent, presentStarted); }
                 return true;
             }
             catch (Direct3D9Exception ex)
             {
+                if (Device is DeviceEx)
+                {
+                    AcceptExPresentResult(ex.ResultCode);
+                    return false;
+                }
                 if (!TryWindowedFallback("Present", ex)) throw;
                 return false;
             }
@@ -248,6 +312,31 @@ namespace Client.MirGraphics
             {
                 GraphicsDiagnostics.Record(GraphicsMetric.Present, started);
             }
+        }
+
+        internal static bool AcceptExPresentResult(Result result)
+        {
+            if (result.Code == ResultCode.PresentOccluded.Code)
+            {
+                // Occlusion is a successful status, not a displayed frame or a lost device.
+                Thread.Sleep(10);
+                return false;
+            }
+            if (result.Code == ResultCode.PresentModeChanged.Code)
+            {
+                DeviceLost = true;
+                return false;
+            }
+            if (result.IsFailure)
+            {
+                LogGraphicsDiagnostics("PresentEx failed: " + result);
+                // Removed/hung devices must be destroyed, never reset in an endless retry loop.
+                if (result.Code != ResultCode.DeviceLost.Code && result.Code != ResultCode.DeviceNotReset.Code)
+                    DisableFlipEx("PresentEx", result.ToString());
+                DeviceLost = true;
+                return false;
+            }
+            return true;
         }
 
         private static unsafe void LoadPixelsShaders()
@@ -291,23 +380,19 @@ namespace Client.MirGraphics
 
             if (RadarTexture == null || RadarTexture.Disposed)
             {
-                RadarTexture = new Texture(Device, 2, 2, 1, Usage.None, Format.A8R8G8B8, Pool.Managed);
-
-                DataRectangle stream = RadarTexture.LockRectangle(0, LockFlags.Discard);
-                using (Bitmap image = new Bitmap(2, 2, 8, PixelFormat.Format32bppArgb, stream.Data.DataPointer))
-                using (Graphics graphics = Graphics.FromImage(image))
+                RadarTexture = TextureUpload.Paint(2, 2, image =>
+                {
+                    using var graphics = Graphics.FromImage(image);
                     graphics.Clear(Color.White);
-                RadarTexture.UnlockRectangle(0);
+                });
             }
             if (PoisonDotBackground == null || PoisonDotBackground.Disposed)
             {
-                PoisonDotBackground = new Texture(Device, 5, 5, 1, Usage.None, Format.A8R8G8B8, Pool.Managed);
-
-                DataRectangle stream = PoisonDotBackground.LockRectangle(0, LockFlags.Discard);
-                using (Bitmap image = new Bitmap(5, 5, 20, PixelFormat.Format32bppArgb, stream.Data.DataPointer))
-                using (Graphics graphics = Graphics.FromImage(image))
+                PoisonDotBackground = TextureUpload.Paint(5, 5, image =>
+                {
+                    using var graphics = Graphics.FromImage(image);
                     graphics.Clear(Color.White);
-                PoisonDotBackground.UnlockRectangle(0);
+                });
             }
             CreateLights();
         }
@@ -327,10 +412,7 @@ namespace Client.MirGraphics
                 int width = LightSizes[i].X;
                 int height = LightSizes[i].Y;
 
-                Texture light = new Texture(Device, width, height, 1, Usage.None, Format.A8R8G8B8, Pool.Managed);
-
-                DataRectangle stream = light.LockRectangle(0, LockFlags.Discard);
-                using (Bitmap image = new Bitmap(width, height, width * 4, PixelFormat.Format32bppArgb, stream.Data.DataPointer))
+                Texture light = TextureUpload.Paint(width, height, image =>
                 {
                     using (Graphics graphics = Graphics.FromImage(image))
                     {
@@ -371,9 +453,7 @@ namespace Client.MirGraphics
                             }
                         }
                     }
-                }
-
-                light.UnlockRectangle(0);
+                });
                 //light.Disposing += (o, e) => Lights.Remove(light);
                 Lights.Add(light);
             }
@@ -450,6 +530,25 @@ namespace Client.MirGraphics
         {
             try
             {
+                if (_recoveryFailed) return;
+                if (Device == null || IsFlipEx != FlipExRequested)
+                {
+                    if (!NeedsReset) TearDown();
+                    else TryReset();
+                    return;
+                }
+                if (Device is DeviceEx exDevice)
+                {
+                    DeviceState state = exDevice.CheckDeviceState(Program.Form.Handle);
+                    if (state == DeviceState.PresentOccluded) return;
+                    if (state == DeviceState.DeviceLost) return;
+                    if (state == DeviceState.DeviceHung || state == DeviceState.DeviceRemoved ||
+                        state == DeviceState.OutOfVideoMemory)
+                        DisableFlipEx("CheckDeviceState", state.ToString());
+                    if (!NeedsReset) TearDown();
+                    else TryReset();
+                    return;
+                }
                 Result result = DXManager.Device.TestCooperativeLevel();
 
                 if (!NeedsReset)
@@ -473,14 +572,18 @@ namespace Client.MirGraphics
 
                 TryReset();
             }
-            catch
+            catch (Exception ex)
             {
+                LogGraphicsDiagnostics("Device recovery failed: " + ex);
+                if (IsFlipEx) DisableFlipEx("Recovery", ex.ToString());
+                DeviceLost = true;
             }
         }
 
         public static void ResetDevice()
         {
-            if (DXManager.Device == null || DXManager.Parameters == null) return;
+            if (_recoveryFailed || _changingDisplayModeFallback || DXManager.Parameters == null ||
+                (Device == null && !NeedsReset)) return;
 
             TearDown();
         }
@@ -554,7 +657,7 @@ namespace Client.MirGraphics
 
         private static bool TryReset()
         {
-            if (!NeedsReset) return false;
+            if (!NeedsReset || _recoveryFailed) return false;
 
             if (Settings.ScreenWidth <= 0 || Settings.ScreenHeight <= 0) return false;
 
@@ -566,10 +669,34 @@ namespace Client.MirGraphics
                 clientHeight = Program.Form.ClientSize.Height;
             }
 
+            bool recreating = Device == null || IsFlipEx != FlipExRequested;
             try
             {
+                if (recreating)
+                {
+                    ReleaseDeviceResources();
+                    try
+                    {
+                        CreateDeviceResources();
+                    }
+                    catch (Exception ex) when (FlipExRequested)
+                    {
+                        DisableFlipEx("Device recreation", ex.ToString());
+                        ReleaseDeviceResources();
+                        CreateDeviceResources();
+                    }
+                    _recreationFailures = 0;
+                    CompleteReset();
+                    return true;
+                }
                 ConfigurePresentation();
-                DXManager.Device.Reset(DXManager.Parameters);
+                if (Device is DeviceEx exDevice)
+                {
+                    Result result = exDevice.ResetEx(new[] { Parameters });
+                    if (result.IsFailure) throw new Direct3D9Exception(result);
+                }
+                else DXManager.Device.Reset(DXManager.Parameters);
+                VerifyFrameLatency();
             }
             catch (Exception ex)
             {
@@ -580,6 +707,20 @@ namespace Client.MirGraphics
                     Settings.Mode, DXManager.Parameters.Windowed,
                     DXManager.Parameters.BackBufferWidth, DXManager.Parameters.BackBufferHeight,
                     clientWidth, clientHeight, ex.GetType().Name, ex.Message));
+                if (recreating)
+                {
+                    ReleaseDeviceResources();
+                    if (++_recreationFailures >= 3)
+                    {
+                        _recoveryFailed = true;
+                        string failure = "Device recreation failed three times; rendering stopped. Restart the client. " + ex;
+                        LogGraphicsDiagnostics(failure);
+                        CMain.SaveError(failure);
+                    }
+                }
+                if (IsFlipEx && ex is Direct3D9Exception fatal &&
+                    (fatal.ResultCode.Code == ResultCode.DeviceHung.Code || fatal.ResultCode.Code == ResultCode.DeviceRemoved.Code))
+                    DisableFlipEx("ResetEx", fatal.ToString());
                 if (ex is Direct3D9Exception d3dException && TryWindowedFallback("Reset", d3dException))
                     return !NeedsReset;
                 return false;
@@ -588,7 +729,7 @@ namespace Client.MirGraphics
             // Keep the Create order. Discarding back-buffer contents is not object disposal.
             try
             {
-                DXManager.Device.SetDialogBoxMode(true);
+                if (!IsFlipEx) DXManager.Device.SetDialogBoxMode(true);
             }
             catch
             {
@@ -607,6 +748,12 @@ namespace Client.MirGraphics
                 return false;
             }
 
+            CompleteReset();
+            return true;
+        }
+
+        private static void CompleteReset()
+        {
             NeedsReset = false;
             DXManager.DeviceLost = false;
 
@@ -615,8 +762,6 @@ namespace Client.MirGraphics
             SafeEndScene();
             _resetCount++;
             LogPresentationState("Reset OK");
-
-            return true;
         }
 
         private static string _lastPresentationState;
@@ -632,6 +777,8 @@ namespace Client.MirGraphics
                     Settings.Mode, Parameters.Windowed, Layout.LogicalSize.Width, Layout.LogicalSize.Height,
                     clientSize.Width, clientSize.Height, Layout.OutputSize.Width, Layout.OutputSize.Height,
                     Layout.Viewport, displayMode.Width, displayMode.Height, displayMode.RefreshRate);
+                state = "device=" + Device.GetType().Name + " swap=" + Parameters.SwapEffect
+                    + " buffers=" + Parameters.BackBufferCount + " flags=" + Parameters.PresentFlags + " " + state;
                 if (state == _lastPresentationState && _resetCount > 3 && _resetCount % 100 != 0) return;
                 _lastPresentationState = state;
                 LogGraphicsDiagnostics(operation + " #" + _resetCount + " " + state);
@@ -994,14 +1141,7 @@ namespace Client.MirGraphics
         {
             try
             {
-                CleanUp();
-
-                Device?.Direct3D?.Dispose();
-                Device?.Dispose();
-
-                NormalPixelShader?.Dispose();
-                GrayScalePixelShader?.Dispose();
-                MagicPixelShader?.Dispose();
+                ReleaseDeviceResources();
             }
             finally
             {

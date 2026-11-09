@@ -310,21 +310,9 @@ namespace Client.MirControls
             if (Size.IsEmpty)
                 return;
 
-            if (TextureSize != Size)
-                DisposeTexture();
-
-            if (ControlTexture == null || ControlTexture.Disposed)
-            {
-                DXManager.ControlList.Add(this);
-
-                ControlTexture = new Texture(DXManager.Device, Size.Width, Size.Height, 1, Usage.None, Format.A8R8G8B8, Pool.Managed);
-                TextureSize = Size;
-            }
-
+            DXManager.Sprite.Flush();
             Point caret = GetCaretPosition();
-
-            DataRectangle stream = ControlTexture.LockRectangle(0, LockFlags.Discard);
-            using (Bitmap bm = new Bitmap(Size.Width, Size.Height, Size.Width * 4, PixelFormat.Format32bppArgb, stream.Data.DataPointer))
+            Texture replacement = TextureUpload.Paint(Size.Width, Size.Height, bm =>
             {
                 TextBox.DrawToBitmap(bm, new Rectangle(0, 0, Size.Width, Size.Height));
                 using (Graphics graphics = Graphics.FromImage(bm))
@@ -333,10 +321,11 @@ namespace Client.MirControls
                     if (TextBox.Focused)
                         graphics.DrawLine(CaretPen, new Point(caret.X, caret.Y), new Point(caret.X, caret.Y + TextBox.Font.Height));
                 }
-
-            }
-            ControlTexture.UnlockRectangle(0);
-            DXManager.Sprite.Flush();
+            });
+            DisposeTexture();
+            ControlTexture = replacement;
+            TextureSize = Size;
+            DXManager.ControlList.Add(this);
             TextureValid = true;
         }
 

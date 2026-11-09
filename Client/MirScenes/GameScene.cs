@@ -1191,7 +1191,7 @@ namespace Client.MirScenes
 
             if (CMain.Time >= MoveTime)
             {
-                MoveTime = CMain.Time + 100; //Move Speed
+                MoveTime = MovementClock.NextDeadline(CMain.Time, MoveTime);
                 CanMove = true;
                 MapControl.AnimationCount++;
                 MapControl.TextureValid = false;
