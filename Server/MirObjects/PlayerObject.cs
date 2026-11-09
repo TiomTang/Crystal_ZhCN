@@ -11719,26 +11719,42 @@ namespace Server.MirObjects
 
         public bool CheckNeedQuestItem(UserItem item, bool gainItem = true)
         {
-            foreach (QuestProgressInfo quest in CurrentQuests.
-                Where(e => e.ItemTaskCount.Count > 0).
-                Where(e => e.NeedItem(item.Info)).
-                Where(e => CanGainQuestItem(item)))
+            var quests = CurrentQuests.Where(quest =>
+                quest.ItemTaskCount.Any(task => task.Info.Item == item.Info)).ToList();
+
+            int remaining = 0;
+            foreach (QuestProgressInfo quest in quests)
             {
-                if (gainItem)
+                quest.ProcessItem(Info.QuestInventory);
+
+                foreach (var task in quest.ItemTaskCount)
                 {
-                    GainQuestItem(item);
-                    quest.ProcessItem(Info.QuestInventory);
+                    if (task.Info.Item != item.Info) continue;
 
-                    Enqueue(new S.SendOutputMessage { Message = GameLanguage.Get("You found {0}.", item.FriendlyName), Type = OutputMessageType.Quest });
-
-                    SendUpdateQuest(quest, QuestState.Update);
-
-                    Report.ItemChanged(item, item.Count, 2, "CheckNeedQuestItem (WinQuestItem)");
+                    remaining = Math.Max(remaining, task.Info.Count - task.Count);
                 }
-                return true;
             }
 
-            return false;
+            if (remaining <= 0 || item.Count == 0) return false;
+
+            UserItem questItem = item.Clone();
+            questItem.Count = (ushort)Math.Min(item.Count, remaining);
+            if (!CanGainQuestItem(questItem)) return false;
+            if (!gainItem) return true;
+
+            ushort gainedCount = questItem.Count;
+            string friendlyName = questItem.FriendlyName;
+            GainQuestItem(questItem);
+
+            foreach (QuestProgressInfo quest in quests)
+            {
+                quest.ProcessItem(Info.QuestInventory);
+                SendUpdateQuest(quest, QuestState.Update);
+            }
+
+            Enqueue(new S.SendOutputMessage { Message = GameLanguage.Get("You found {0}.", friendlyName), Type = OutputMessageType.Quest });
+            Report.ItemChanged(questItem, gainedCount, 2, "CheckNeedQuestItem (WinQuestItem)");
+            return true;
         }
         public bool CheckNeedQuestFlag(int flagNumber)
         {
