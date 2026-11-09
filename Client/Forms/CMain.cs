@@ -133,13 +133,15 @@ namespace Client
                 while (AppStillIdle)
                 {
                     UpdateTime();
-                    UpdateEnviroment();
 
                     if (IsDrawTime())
                     {
+                        UpdateEnviroment();
                         RenderEnvironment();
                         UpdateFrameTime();
                     }
+                    else
+                        WaitForNextDraw();
                 }
 
             }
@@ -147,6 +149,21 @@ namespace Client
             {
                 SaveError(ex.ToString());
             }
+        }
+
+        /// <summary>
+        /// Yields the CPU until the next draw is due. Only reached when Present returns
+        /// immediately, as some windowed-mode drivers do: spinning for the remainder of
+        /// the frame burns a whole core without producing any extra frames. Environment
+        /// updates run once per drawn frame, which matches the pacing of the vsync path.
+        /// </summary>
+        private static void WaitForNextDraw()
+        {
+            long remaining = _drawTime - Time;
+            if (remaining <= 0)
+                return;
+
+            System.Threading.Thread.Sleep((int)Math.Min(remaining, 16));
         }
 
         private static void CMain_Deactivate(object sender, EventArgs e)
@@ -455,8 +472,17 @@ namespace Client
                     if (MirScene.ActiveScene != null)
                         MirScene.ActiveScene.Draw();
 
-                    DXManager.Sprite.End();
-                    DXManager.Device.EndScene();
+                    long submitStarted = GraphicsDiagnostics.Timestamp();
+                    try
+                    {
+                        DXManager.Sprite.End();
+                        DXManager.Device.EndScene();
+                    }
+                    finally
+                    {
+                        // Separate final submission from the UI rebuild; neither is GPU timing.
+                        GraphicsDiagnostics.Record(GraphicsMetric.SceneSubmit, submitStarted);
+                    }
                 }
                 finally
                 {

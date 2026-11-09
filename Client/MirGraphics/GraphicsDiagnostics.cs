@@ -10,8 +10,13 @@ namespace Client.MirGraphics
 {
     internal enum GraphicsMetric
     {
-        Scene, Present, TextureRead, TextureDecode, TextureUpload, Cleanup, Render
+        Scene, Present, TextureRead, TextureDecode, TextureUpload, Cleanup, Render,
+        Floor, Background, Objects, Particles, Lights, Names, Composite,
+        UiRebuild, SceneSubmit, OutputCopy, DevicePresent
     }
+
+    internal enum GraphicsStage { Other, Map, Ui, Present }
+    internal enum GraphicsStateChange { Other, Blend, Opacity, Shader, Surface }
 
     /// <summary>
     /// Opt-in CPU wall-clock diagnostics, not GPU timings. Set MIR2_GRAPHICS_TRACE=1
@@ -20,7 +25,10 @@ namespace Client.MirGraphics
     /// </summary>
     internal static class GraphicsDiagnostics
     {
-        private const int MetricCount = 7;
+        private const int MetricCount = (int)GraphicsMetric.DevicePresent + 1;
+        private const int StageCount = (int)GraphicsStage.Present + 1;
+        private const int StateChangeCount = (int)GraphicsStateChange.Surface + 1;
+        [ThreadStatic] private static GraphicsStage _stage;
         private const int QueueCapacity = 2;
         private static readonly object Gate = new object();
         private static readonly long WindowTicks = Stopwatch.Frequency * 5L;
@@ -124,9 +132,25 @@ namespace Client.MirGraphics
 
         public static void RecordDraw() { if (_enabled) AddCounter(0); }
         public static void RecordFlush() { if (_enabled) AddCounter(1); }
-        public static void RecordStateChange() { if (_enabled) AddCounter(2); }
+        public static void RecordStateChange(GraphicsStateChange reason = GraphicsStateChange.Other)
+        {
+            if (_enabled) AddCounter(2, reason);
+        }
 
-        private static void AddCounter(int counter)
+        public static StageScope BeginStage(GraphicsStage stage) => _enabled ? new StageScope(stage) : default;
+
+        internal readonly struct StageScope : IDisposable
+        {
+            private readonly GraphicsStage _previous;
+            public StageScope(GraphicsStage stage)
+            {
+                _previous = _stage;
+                _stage = (uint)stage < StageCount ? stage : GraphicsStage.Other;
+            }
+            public void Dispose() => _stage = _previous;
+        }
+
+        private static void AddCounter(int counter, GraphicsStateChange reason = GraphicsStateChange.Other)
         {
             lock (Gate)
             {
@@ -134,6 +158,9 @@ namespace Client.MirGraphics
                 if (counter == 0) _window.Draws++;
                 else if (counter == 1) _window.Flushes++;
                 else _window.StateChanges++;
+                _window.StageCounters[(int)_stage * 3 + counter]++;
+                if (counter == 2)
+                    _window.StateChangeReasons[(uint)reason < StateChangeCount ? (int)reason : 0]++;
             }
         }
 
@@ -205,6 +232,8 @@ namespace Client.MirGraphics
             public readonly long[] Sum = new long[MetricCount];
             public readonly long[] Max = new long[MetricCount];
             public readonly long[] Histogram = new long[16];
+            public readonly long[] StageCounters = new long[StageCount * 3];
+            public readonly long[] StateChangeReasons = new long[StateChangeCount];
             public Window(long start) { Start = start; }
         }
 
@@ -217,6 +246,11 @@ namespace Client.MirGraphics
                     var header = new StringBuilder("record_type,window_seconds,frames,frame_intervals,frame_sum_ms,frame_max_ms,frame_p50_upper_ms_approx,frame_p95_upper_ms_approx,frame_p99_upper_ms_approx,draws,flushes,state_changes,textures,controls,estimated_texture_bytes,dropped_windows_total,timing_semantics,frame_over_33_334ms,frame_over_50ms,frame_over_100ms");
                     foreach (GraphicsMetric metric in Enum.GetValues<GraphicsMetric>())
                         header.Append(',').Append(metric).Append("_count,").Append(metric).Append("_sum_ms,").Append(metric).Append("_max_ms");
+                    foreach (GraphicsStage stage in Enum.GetValues<GraphicsStage>())
+                        header.Append(",stage_").Append(stage).Append("_draws,stage_").Append(stage)
+                            .Append("_flushes,stage_").Append(stage).Append("_state_changes");
+                    foreach (GraphicsStateChange reason in Enum.GetValues<GraphicsStateChange>())
+                        header.Append(",state_").Append(reason);
                     stream.WriteLine(header);
                     stream.Flush();
                     foreach (Window window in _queue.GetConsumingEnumerable())
@@ -252,6 +286,8 @@ namespace Client.MirGraphics
                 Append(row, window.Count[i]); Append(row, window.Sum[i] * TickMilliseconds);
                 Append(row, window.Max[i] * TickMilliseconds);
             }
+            foreach (long count in window.StageCounters) Append(row, count);
+            foreach (long count in window.StateChangeReasons) Append(row, count);
             stream.WriteLine(row);
         }
 

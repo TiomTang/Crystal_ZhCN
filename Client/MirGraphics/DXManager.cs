@@ -210,19 +210,33 @@ namespace Client.MirGraphics
         public static bool PresentFrame()
         {
             // Sprite.End and EndScene have already run; the copy does not use scene shaders.
+            using var stage = GraphicsDiagnostics.BeginStage(GraphicsStage.Present);
             long started = GraphicsDiagnostics.Timestamp();
             try
             {
                 if (MainSurface != OutputSurface)
                 {
-                    Device.SetRenderTarget(0, OutputSurface);
-                    CurrentSurface = OutputSurface;
-                    Device.Clear(ClearFlags.Target, Color.Black, 0, 0);
-                    Device.StretchRectangle(MainSurface, new Rectangle(Point.Empty, Layout.LogicalSize),
-                        OutputSurface, Layout.Viewport, TextureFilter.None);
+                    long copyStarted = GraphicsDiagnostics.Timestamp();
+                    try
+                    {
+                        Device.SetRenderTarget(0, OutputSurface);
+                        CurrentSurface = OutputSurface;
+
+                        // The stretch covers every output pixel when the viewport fills the
+                        // surface; only letterboxed layouts need the bars cleared first.
+                        if (Layout.Viewport.Width != Layout.OutputSize.Width ||
+                            Layout.Viewport.Height != Layout.OutputSize.Height)
+                            Device.Clear(ClearFlags.Target, Color.Black, 0, 0);
+
+                        Device.StretchRectangle(MainSurface, new Rectangle(Point.Empty, Layout.LogicalSize),
+                            OutputSurface, Layout.Viewport, TextureFilter.None);
+                    }
+                    finally { GraphicsDiagnostics.Record(GraphicsMetric.OutputCopy, copyStarted); }
                 }
 
-                Device.Present();
+                long presentStarted = GraphicsDiagnostics.Timestamp();
+                try { Device.Present(); }
+                finally { GraphicsDiagnostics.Record(GraphicsMetric.DevicePresent, presentStarted); }
                 return true;
             }
             catch (Direct3D9Exception ex)
@@ -389,7 +403,7 @@ namespace Client.MirGraphics
             // old value keeps the cache in sync with the device; updating it first makes every later
             // call skip SetRenderTarget because the target looks unchanged.
             CurrentSurface = surface;
-            GraphicsDiagnostics.RecordStateChange();
+            GraphicsDiagnostics.RecordStateChange(GraphicsStateChange.Surface);
         }
         public static void SetGrayscale(bool value)
         {
@@ -400,14 +414,14 @@ namespace Client.MirGraphics
                 if (Device.PixelShader == GrayScalePixelShader) return;
                 Flush();
                 Device.PixelShader = GrayScalePixelShader;
-                GraphicsDiagnostics.RecordStateChange();
+                GraphicsDiagnostics.RecordStateChange(GraphicsStateChange.Shader);
             }
             else
             {
                 if (Device.PixelShader == null) return;
                 Flush();
                 Device.PixelShader = null;
-                GraphicsDiagnostics.RecordStateChange();
+                GraphicsDiagnostics.RecordStateChange(GraphicsStateChange.Shader);
             }
         }
 
@@ -652,7 +666,7 @@ namespace Client.MirGraphics
             ApplyOpacity(opacity);
             Opacity = opacity;
             _opacityOverride = true;
-            GraphicsDiagnostics.RecordStateChange();
+            GraphicsDiagnostics.RecordStateChange(GraphicsStateChange.Opacity);
             Flush();
         }
 
@@ -710,12 +724,15 @@ namespace Client.MirGraphics
                 ApplyOpacity(Opacity);
             }
 
-            Device.SetRenderTarget(0, CurrentSurface);
+            // Route through SetSurface: an unchanged target then costs nothing. Calling the
+            // device directly forced a render-target flush on every blend toggle, which
+            // dominates frame time on integrated GPUs (84 toggles per frame in busy scenes).
+            SetSurface(CurrentSurface);
             Blending = value;
             BlendingRate = rate;
             BlendingMode = mode;
             _opacityOverride = !value;
-            GraphicsDiagnostics.RecordStateChange();
+            GraphicsDiagnostics.RecordStateChange(GraphicsStateChange.Blend);
         }
 
         internal readonly struct BlendState
@@ -782,7 +799,7 @@ namespace Client.MirGraphics
             Device.PixelShader = NormalPixelShader;
             Device.SetPixelShaderConstant(0, new Vector4[] { new Vector4(1.0F, 1.0F, 1.0F, blend) });
             Device.SetPixelShaderConstant(1, new Vector4[] { new Vector4(tintcolor.R / 255, tintcolor.G / 255, tintcolor.B / 255, 1.0F) });
-            GraphicsDiagnostics.RecordStateChange();
+            GraphicsDiagnostics.RecordStateChange(GraphicsStateChange.Shader);
             Flush();
         }
 
@@ -795,7 +812,7 @@ namespace Client.MirGraphics
             Device.PixelShader = GrayScalePixelShader;
             Device.SetPixelShaderConstant(0, new Vector4[] { new Vector4(1.0F, 1.0F, 1.0F, blend) });
             Device.SetPixelShaderConstant(1, new Vector4[] { new Vector4(tintcolor.R / 255, tintcolor.G / 255, tintcolor.B / 255, 1.0F) });
-            GraphicsDiagnostics.RecordStateChange();
+            GraphicsDiagnostics.RecordStateChange(GraphicsStateChange.Shader);
             Flush();
         }
 
@@ -808,7 +825,7 @@ namespace Client.MirGraphics
             Device.PixelShader = MagicPixelShader;
             Device.SetPixelShaderConstant(0, new Vector4[] { new Vector4(1.0F, 1.0F, 1.0F, blend) });
             Device.SetPixelShaderConstant(1, new Vector4[] { new Vector4(tintcolor.R / 255, tintcolor.G / 255, tintcolor.B / 255, 1.0F) });
-            GraphicsDiagnostics.RecordStateChange();
+            GraphicsDiagnostics.RecordStateChange(GraphicsStateChange.Shader);
             Flush();
         }
 

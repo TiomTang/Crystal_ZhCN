@@ -167,6 +167,54 @@ namespace Client.MirControls
         {
             TextureValid = false;
         }
+
+        /// <summary>
+        /// Minimum milliseconds between full control-tree rebuilds. Zero rebuilds immediately.
+        /// The scene texture holds the whole UI tree, so a dirty label used to force a rebuild
+        /// of every control on that frame; on integrated GPUs one rebuild costs tens of
+        /// milliseconds. Coalescing keeps the previous texture for a bounded delay instead.
+        /// </summary>
+        protected virtual long UiRebuildIntervalMilliseconds => 0;
+
+        private long _nextUiRebuild;
+
+        protected internal override void DrawControl()
+        {
+            using var stage = GraphicsDiagnostics.BeginStage(GraphicsStage.Ui);
+            if (!DrawControlTexture)
+                return;
+
+            if (!TextureValid)
+            {
+                bool canRebuild = ControlTexture == null || ControlTexture.Disposed ||
+                                  CMain.Time >= _nextUiRebuild;
+                if (canRebuild)
+                {
+                    _nextUiRebuild = CMain.Time + UiRebuildIntervalMilliseconds;
+                    long rebuildStarted = GraphicsDiagnostics.Timestamp();
+                    try
+                    {
+                        CreateTexture();
+                    }
+                    finally
+                    {
+                        // CPU wall time includes texture creation, child drawing and driver waits.
+                        GraphicsDiagnostics.Record(GraphicsMetric.UiRebuild, rebuildStarted);
+                    }
+                }
+                // When the rebuild is deferred, TextureValid deliberately stays false so the
+                // update is not lost; the previous texture is drawn until the next allowance.
+            }
+
+            if (ControlTexture == null || ControlTexture.Disposed)
+                return;
+
+            DXManager.DrawOpaque(ControlTexture, new System.Drawing.Rectangle(0, 0, Size.Width, Size.Height),
+                new SlimDX.Vector3?(new SlimDX.Vector3((float)(DisplayLocation.X), (float)(DisplayLocation.Y), 0.0f)),
+                System.Drawing.Color.White, Opacity);
+
+            CleanTime = CMain.Time + Settings.CleanDelay;
+        }
         
         public virtual void ProcessPacket(Packet p)
         {

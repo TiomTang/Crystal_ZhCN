@@ -17,6 +17,10 @@ namespace Client.MirScenes
 {
     public sealed class GameScene : MirScene
     {
+        // The in-game UI tree is large; rebuilding it on every dirty frame dominates frame time
+        // on low-end GPUs. 100 ms bounds UI update latency to a tenth of a second.
+        protected override long UiRebuildIntervalMilliseconds => 100;
+
         public static GameScene Scene;
         public static bool Observing;
         public static bool AllowObserve;
@@ -1157,7 +1161,8 @@ namespace Client.MirScenes
         protected internal override void DrawControl()
         {
             if (MapControl != null && !MapControl.IsDisposed)
-                MapControl.DrawControl();
+                using (GraphicsDiagnostics.BeginStage(GraphicsStage.Map))
+                    MapControl.DrawControl();
             base.DrawControl();
 
 
@@ -10570,8 +10575,10 @@ namespace Client.MirScenes
         {
             if (User == null) return;
 
+            long stamp = GraphicsDiagnostics.Timestamp();
             if (!FloorValid)
                 DrawFloor();
+            GraphicsDiagnostics.Record(GraphicsMetric.Floor, stamp);
 
 
             if (Size != TextureSize)
@@ -10587,6 +10594,8 @@ namespace Client.MirScenes
             Surface oldSurface = DXManager.CurrentSurface;
             Surface surface = ControlTexture.GetSurfaceLevel(0);
             DXManager.SetSurface(surface);
+
+            stamp = GraphicsDiagnostics.Timestamp();
             DXManager.Device.Clear(ClearFlags.Target, BackColour, 0, 0);
 
             DrawBackground();
@@ -10595,14 +10604,19 @@ namespace Client.MirScenes
             {
                 DXManager.Draw(DXManager.FloorTexture, new Rectangle(0, 0, Settings.ScreenWidth, Settings.ScreenHeight), Vector3.Zero, Color.White);
             }
+            GraphicsDiagnostics.Record(GraphicsMetric.Background, stamp);
 
+            stamp = GraphicsDiagnostics.Timestamp();
             DrawObjects();
+            GraphicsDiagnostics.Record(GraphicsMetric.Objects, stamp);
 
             //render weather
+            stamp = GraphicsDiagnostics.Timestamp();
             foreach (ParticleEngine engine in GameScene.Scene.ParticleEngines)
             {
                 engine.Draw();
             }
+            GraphicsDiagnostics.Record(GraphicsMetric.Particles, stamp);
 
             //Render Death, 
 
@@ -10610,9 +10624,12 @@ namespace Client.MirScenes
 
             if (setting != LightSetting.Day || GameScene.User.Poison.HasFlag(PoisonType.Blindness))
             {
+                stamp = GraphicsDiagnostics.Timestamp();
                 DrawLights(setting);
+                GraphicsDiagnostics.Record(GraphicsMetric.Lights, stamp);
             }
 
+            stamp = GraphicsDiagnostics.Timestamp();
             if (Settings.DropView || GameScene.DropViewTime > CMain.Time)
             {
                 foreach (var ob in Objects.Values.OfType<ItemObject>())
@@ -10647,6 +10664,7 @@ namespace Client.MirScenes
 
             if (MapObject.User.MouseOver(MouseLocation))
                 MapObject.User.DrawName();
+            GraphicsDiagnostics.Record(GraphicsMetric.Names, stamp);
 
             DXManager.SetSurface(oldSurface);
             surface.Dispose();
@@ -10668,7 +10686,9 @@ namespace Client.MirScenes
 
             if (MapObject.User.Dead) DXManager.SetGrayscale(true);
 
+            long stamp = GraphicsDiagnostics.Timestamp();
             DXManager.DrawOpaque(ControlTexture, new Rectangle(0, 0, Settings.ScreenWidth, Settings.ScreenHeight), Vector3.Zero, Color.White, Opacity);
+            GraphicsDiagnostics.Record(GraphicsMetric.Composite, stamp);
 
             if (MapObject.User.Dead) DXManager.SetGrayscale(false);
 
@@ -10833,6 +10853,9 @@ namespace Client.MirScenes
                 if (y >= Height) break;
                 int drawY = (y - User.Movement.Y + OffSetY + 1) * CellHeight + User.OffSetMove.Y;
 
+                // Keep tile order, but retain additive state across adjacent blended tiles.
+                // The scope must end before drawing this row's objects.
+                using (var tileBatch = DXManager.BeginBlendBatch())
                 for (int x = User.Movement.X - ViewRangeX; x <= User.Movement.X + ViewRangeX; x++)
                 {
                     if (x < 0) continue;
@@ -10850,6 +10873,7 @@ namespace Client.MirScenes
                         index--;
                         int animationoffset = M2CellInfo[x, y].TileAnimationOffset ^ 0x2000;
                         index += animationoffset * (AnimationCount % animation);
+                        tileBatch.Restore();
                         Libraries.MapLibs[190].DrawUp(index, drawX, drawY);
                     }
 
@@ -10881,6 +10905,7 @@ namespace Client.MirScenes
                                     }
                                     else
                                     {
+                                        tileBatch.Restore();
                                         Libraries.MapLibs[M2CellInfo[x, y].MiddleIndex].DrawUp(index, drawX, drawY);
                                     }
                                 }
@@ -10888,6 +10913,7 @@ namespace Client.MirScenes
                             s = Libraries.MapLibs[M2CellInfo[x, y].MiddleIndex].GetSize(index);
                             if ((s.Width != CellWidth || s.Height != CellHeight) && (s.Width != (CellWidth * 2) || s.Height != (CellHeight * 2)) && !blend)
                             {
+                                tileBatch.Restore();
                                 Libraries.MapLibs[M2CellInfo[x, y].MiddleIndex].DrawUp(index, drawX, drawY);
                             }
                         }
@@ -10949,6 +10975,7 @@ namespace Client.MirScenes
                     }
                     else
                     {
+                        tileBatch.Restore();
                         if (fileIndex == 28 && Libraries.MapLibs[fileIndex].GetOffSet(index) != Point.Empty)
                             Libraries.MapLibs[fileIndex].Draw(index, new Point(drawX, drawY - CellHeight), Color.White, true);
                         else

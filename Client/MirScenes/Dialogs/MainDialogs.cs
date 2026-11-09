@@ -1885,14 +1885,14 @@ namespace Client.MirScenes.Dialogs
 
         private void MiniMap_BeforeDraw(object sender, EventArgs e)
         {
-
-            foreach (var icon in QuestIcons)
-                icon.Dispose();
-
-            QuestIcons.Clear();
+            int questIconCount = 0;
 
             MapControl map = GameScene.Scene.MapControl;
-            if (map == null) return;
+            if (map == null)
+            {
+                TrimQuestIcons(0);
+                return;
+            }
 
             if (map.MiniMap == 0 && Index != 2091)
             {
@@ -1905,6 +1905,7 @@ namespace Client.MirScenes.Dialogs
 
             if (map.MiniMap <= 0 || Index != 2090 || Libraries.MiniMap == null)
             {
+                TrimQuestIcons(0);
                 return;
             }
 
@@ -1998,24 +1999,71 @@ namespace Client.MirScenes.Dialogs
                             break;
                     }
 
-                    QuestIcons.Add(new MirLabel
-                    {
-                        AutoSize = true,
-                        Parent = GameScene.Scene.MiniMapDialog,
-                        Font = new Font(Settings.FontName, 9f, FontStyle.Bold),
-                        DrawFormat = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter,
-                        Text = text,
-                        ForeColour = color,
-                        Location = new Point((int)(x - Settings.ScreenWidth + GameScene.Scene.MiniMapDialog.Size.Width) - 6, (int)(y) - 10),
-                        NotControl = true,
-                        Visible = true,
-                        Modal = true
-                    });
+                    UpdateQuestIcon(questIconCount++, text, color,
+                        new Point((int)(x - Settings.ScreenWidth + GameScene.Scene.MiniMapDialog.Size.Width) - 6, (int)(y) - 10));
                 }
 
                 #endregion
 
             }
+            TrimQuestIcons(questIconCount);
+        }
+
+        private void UpdateQuestIcon(int index, string text, Color colour, Point location)
+        {
+            // Slots follow the original NPC traversal order. Keep unchanged glyph textures
+            // instead of disposing and rasterizing every quest marker on each UI rebuild.
+            MirLabel icon;
+            if (index < QuestIcons.Count && !QuestIcons[index].IsDisposed)
+            {
+                icon = QuestIcons[index];
+            }
+            else
+            {
+                icon = new MirLabel
+                {
+                    AutoSize = true,
+                    Parent = this,
+                    Font = new Font(Settings.FontName, 9f, FontStyle.Bold),
+                    DrawFormat = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter,
+                    NotControl = true,
+                    Visible = true,
+                    Modal = true
+                };
+                if (index < QuestIcons.Count)
+                    QuestIcons[index] = icon;
+                else
+                    QuestIcons.Add(icon);
+            }
+
+            icon.Text = text;
+            icon.ForeColour = colour;
+            icon.Location = location;
+        }
+
+        private void TrimQuestIcons(int count)
+        {
+            for (int i = QuestIcons.Count - 1; i >= count; i--)
+            {
+                QuestIcons[i].Dispose();
+                QuestIcons.RemoveAt(i);
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                if (ReferenceEquals(Controls[Controls.Count - count + i], QuestIcons[i])) continue;
+
+                foreach (MirLabel icon in QuestIcons)
+                    icon.BringToFront();
+                break;
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                TrimQuestIcons(0);
+            base.Dispose(disposing);
         }
 
         public void Toggle()
