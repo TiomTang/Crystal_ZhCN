@@ -697,6 +697,10 @@ namespace Server.MirObjects
                     if (item.Count > 1)
                     {
                         var percent = Envir.RandomomRange(10, 4);
+
+                        if (percent == 0)
+                            continue;
+
                         var count = (ushort)Math.Ceiling(item.Count / 10F * percent);
 
                         if (count > item.Count)
@@ -7653,6 +7657,15 @@ namespace Server.MirObjects
 
                 if (item.Item != null)
                 {
+                    // A zero count stack is invalid; destroy it instead of letting it enter a bag.
+                    if (item.Item.Count < 1)
+                    {
+                        CurrentMap.RemoveObject(ob);
+                        ob.Despawn();
+                        i--;
+                        continue;
+                    }
+
                     if (!CanGainItem(item.Item)) continue;
 
                     if (item.Item.Info.ShowGroupPickup && IsGroupMember(this))

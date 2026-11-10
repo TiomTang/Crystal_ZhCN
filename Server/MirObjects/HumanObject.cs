@@ -1491,6 +1491,10 @@ namespace Server.MirObjects
                     if (item.Count > 1)
                     {
                         var percent = Envir.RandomomRange(10, 8);
+
+                        if (percent == 0)
+                            continue;
+
                         var count = (ushort)Math.Ceiling(item.Count / 10F * percent);
 
                         if (count > item.Count)

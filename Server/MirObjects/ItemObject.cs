@@ -128,6 +128,14 @@ namespace Server.MirObjects
          
         public override void Process()
         {
+            // Zero count stacks are invalid; sweep leftovers created by older builds.
+            if (Item != null && Item.Count < 1)
+            {
+                CurrentMap.RemoveObject(this);
+                Despawn();
+                return;
+            }
+
             if (Envir.Time > ExpireTime)
             {
                 CurrentMap.RemoveObject(this);
