@@ -9880,7 +9880,7 @@
   },
   "Fishing": {
     "Source": "Fishing",
-    "Text": "钓鱼 ({0})"
+    "Text": "钓鱼"
   },
   "Fishing ({0})": {
     "Source": "Fishing ({0})",
@@ -10060,7 +10060,7 @@
   },
   "Groups": {
     "Source": "Groups",
-    "Text": "队伍 ({0})"
+    "Text": "队伍"
   },
   "Groups ({0})": {
     "Source": "Groups ({0})",
@@ -10592,7 +10592,7 @@
   },
   "Log out": {
     "Source": "Log out",
-    "Text": "登出 ({0})"
+    "Text": "登出"
   },
   "Logging in is currently disabled.": {
     "Source": "Logging in is currently disabled.",
@@ -11500,7 +11500,7 @@
   },
   "Quests": {
     "Source": "Quests",
-    "Text": "任务 ({0})"
+    "Text": "任务"
   },
   "Quests ({0})": {
     "Source": "Quests ({0})",
@@ -12100,7 +12100,7 @@
   },
   "Skills": {
     "Source": "Skills",
-    "Text": "技能 ({0})"
+    "Text": "技能"
   },
   "Skills ({0})": {
     "Source": "Skills ({0})",
@@ -12488,7 +12488,7 @@
   },
   "Trade": {
     "Source": "Trade",
-    "Text": "交易 ({0})"
+    "Text": "交易"
   },
   "Trade ({0})": {
     "Source": "Trade ({0})",
