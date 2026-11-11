@@ -486,6 +486,12 @@ namespace Client.MirGraphics
         private int _count;
         private bool _initialized;
 
+        private readonly Dictionary<long, AnimationMask> _animationMasks = new Dictionary<long, AnimationMask>();
+        private readonly Queue<long> _animationMaskOrder = new Queue<long>();
+
+        private const int AnimationMaskLimit = 128;
+        private const int AnimationMaskMaxPixels = 512 * 512;
+
         private BinaryReader _reader;
         private FileStream _fStream;
 
@@ -846,6 +852,9 @@ namespace Client.MirGraphics
             mi.CleanTime = CMain.Time + Settings.CleanDelay;
         }
 
+        // Single-frame pixel test. It only describes the frame that is currently drawn, so
+        // object hover must use VisiblePixelRange instead; this overload stays for cases
+        // that really do mean one specific image.
         public bool VisiblePixel(int index, Point point, bool accuate)
         {
             if (!CheckImage(index))
@@ -862,6 +871,158 @@ namespace Client.MirGraphics
                         return true;
 
             return false;
+        }
+
+        // Hit test against the union silhouette of a whole animation. Small sprites move
+        // and reshape between frames, so testing only the current frame drops the cursor
+        // while the animation plays; the union keeps the whole motion range clickable.
+        // Falls back to the frame that is on screen when the animation is too large to
+        // union. The point is relative to the object's DrawLocation.
+        public bool VisiblePixelRange(int start, int count, int current, Point point)
+        {
+            AnimationMask mask = GetAnimationMask(start, count) ?? GetAnimationMask(current, 1);
+
+            if (mask == null)
+                return false;
+
+            int px = point.X - mask.OffsetX;
+            int py = point.Y - mask.OffsetY;
+            const int accuracy = 2;
+
+            for (int x = -accuracy; x <= accuracy; x++)
+            {
+                int sx = px + x;
+                if (sx < 0 || sx >= mask.Width) continue;
+
+                for (int y = -accuracy; y <= accuracy; y++)
+                {
+                    int sy = py + y;
+                    if (sy < 0 || sy >= mask.Height) continue;
+
+                    if (mask.Pixels[(sy * mask.Width) + sx] != 0)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        private AnimationMask GetAnimationMask(int start, int count)
+        {
+            if (!_initialized)
+                Initialize();
+
+            if (_images == null || count <= 0)
+                return null;
+
+            long key = ((long)start << 32) | (uint)count;
+
+            if (_animationMasks.TryGetValue(key, out AnimationMask mask))
+                return mask;
+
+            mask = BuildAnimationMask(start, count);
+
+            // Cache the failure as well, otherwise an animation that cannot be unioned
+            // would decode every frame again on every hover test.
+            while (_animationMaskOrder.Count >= AnimationMaskLimit)
+                _animationMasks.Remove(_animationMaskOrder.Dequeue());
+
+            _animationMasks[key] = mask;
+            _animationMaskOrder.Enqueue(key);
+
+            return mask;
+        }
+
+        private AnimationMask BuildAnimationMask(int start, int count)
+        {
+            if (start < 0 || start > _images.Length - count)
+                return null;
+
+            int left = int.MaxValue, top = int.MaxValue, right = int.MinValue, bottom = int.MinValue;
+
+            for (int i = 0; i < count; i++)
+            {
+                MImage mi = LoadImage(start + i);
+
+                if (mi == null || mi.Width <= 0 || mi.Height <= 0) continue;
+
+                left = Math.Min(left, mi.X);
+                top = Math.Min(top, mi.Y);
+                right = Math.Max(right, mi.X + mi.Width);
+                bottom = Math.Max(bottom, mi.Y + mi.Height);
+            }
+
+            if (left == int.MaxValue)
+                return null;
+
+            int width = right - left, height = bottom - top;
+
+            if (width <= 0 || height <= 0 || width * height > AnimationMaskMaxPixels)
+                return null;
+
+            var mask = new AnimationMask
+            {
+                OffsetX = left,
+                OffsetY = top,
+                Width = width,
+                Height = height,
+                Pixels = new byte[width * height]
+            };
+
+            byte[] buffer = null;
+
+            for (int i = 0; i < count; i++)
+            {
+                int index = start + i;
+                MImage mi = _images[index];
+
+                if (mi == null || mi.Width <= 0 || mi.Height <= 0) continue;
+
+                int length = mi.Width * mi.Height * 4;
+                byte[] pixels = mi.TextureValid && mi.Data != null ? mi.Data : null;
+
+                if (pixels == null)
+                {
+                    if (buffer == null || buffer.Length < length) buffer = new byte[length];
+
+                    _fStream.Seek(_indexList[index] + 17, SeekOrigin.Begin);
+
+                    if (MImage.ReadPixels(_reader, mi.Length, buffer) < length) continue;
+
+                    pixels = buffer;
+                }
+
+                int originX = mi.X - left, originY = mi.Y - top;
+
+                for (int y = 0; y < mi.Height; y++)
+                {
+                    int srcRow = y * mi.Width;
+                    int dstRow = ((originY + y) * width) + originX;
+
+                    for (int x = 0; x < mi.Width; x++)
+                        if (pixels[((srcRow + x) * 4) + 3] != 0)
+                            mask.Pixels[dstRow + x] = 1;
+                }
+            }
+
+            return mask;
+        }
+
+        private MImage LoadImage(int index)
+        {
+            if (_images[index] != null)
+                return _images[index];
+
+            _fStream.Position = _indexList[index];
+            _images[index] = new MImage(_reader);
+
+            return _images[index];
+        }
+
+        private sealed class AnimationMask
+        {
+            public int OffsetX, OffsetY, Width, Height;
+            public byte[] Pixels;
         }
     }
 
@@ -1074,6 +1235,27 @@ namespace Client.MirGraphics
             TrueSize = Rectangle.FromLTRB(l, t, r, b).Size;
 
             return TrueSize;
+        }
+
+        // Read and decompress one image payload into a reusable buffer, so a cursor
+        // hit area can include frames that are not on screen yet without uploading
+        // a texture or allocating a frame-sized array per frame.
+        public static int ReadPixels(BinaryReader reader, int length, byte[] buffer)
+        {
+            int total = 0;
+
+            using (var stream = new GZipStream(new MemoryStream(ReadImageBytes(reader, length)), CompressionMode.Decompress))
+            {
+                while (total < buffer.Length)
+                {
+                    int read = stream.Read(buffer, total, buffer.Length - total);
+                    if (read <= 0) break;
+
+                    total += read;
+                }
+            }
+
+            return total;
         }
 
         private static byte[] DecompressImage(byte[] image)

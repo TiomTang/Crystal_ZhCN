@@ -308,7 +308,14 @@ namespace Client.MirObjects
 
         public override bool MouseOver(Point p)
         {
-            return MapControl.MapLocation == CurrentLocation || BodyLibrary != null && BodyLibrary.VisiblePixel(DrawFrame, p.Subtract(FinalDrawLocation), false);
+            if (MapControl.MapLocation == CurrentLocation) return true;
+            if (BodyLibrary == null) return false;
+            if (Frame == null || Frame.Count <= 0) return BodyLibrary.VisiblePixel(DrawFrame, p.Subtract(FinalDrawLocation), false);
+
+            // Test the whole animation rather than the frame that happens to be showing.
+            // A thin silhouette reshapes between frames, so a cursor sitting on it keeps
+            // falling on transparent pixels and the hover drops while it animates.
+            return BodyLibrary.VisiblePixelRange(Frame.Start + (Frame.OffSet * (byte)Direction), Frame.Count, DrawFrame, p.Subtract(DrawLocation));
         }
 
         public override void DrawBehindEffects(bool effectsEnabled)

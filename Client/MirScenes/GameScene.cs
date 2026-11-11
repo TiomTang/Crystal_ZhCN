@@ -10354,8 +10354,8 @@ namespace Client.MirScenes
         public static int ViewRangeX;
         public static int ViewRangeY;
 
-        private MonsterObject _hoveredPet;
-        private Point _petHoverMouseLocation, _petHoverOffset;
+        private MonsterObject _hoverMonster;
+        private Point _hoverMouseLocation, _hoverOffset;
 
         private bool _autoPath;
         public bool AutoPath
@@ -10471,7 +10471,7 @@ namespace Client.MirScenes
 
         public void ResetMap()
         {
-            _hoveredPet = null;
+            _hoverMonster = null;
             GameScene.Scene.NPCDialog.Hide();
 
             MapObject.MouseObjectID = 0;
@@ -10554,17 +10554,19 @@ namespace Client.MirScenes
 
         private void UpdateMouseObject()
         {
-            if (_hoveredPet != null && ReferenceEquals(MapObject.MouseObject, _hoveredPet) &&
-                IsHoverablePet(_hoveredPet) && CMain.MPoint == _petHoverMouseLocation)
+            if (_hoverMonster != null && ReferenceEquals(MapObject.MouseObject, _hoverMonster) &&
+                IsHoverable(_hoverMonster) && CMain.MPoint == _hoverMouseLocation)
             {
-                // Keep the original hit relative to the world anchor, not the animated image offset.
-                Point offset = CMain.MPoint.Subtract(_hoveredPet.DrawLocation);
-                if (Math.Abs(offset.X - _petHoverOffset.X) <= CellWidth / 4 &&
-                    Math.Abs(offset.Y - _petHoverOffset.Y) <= CellHeight / 4)
+                // Keep the original hit relative to the world anchor, not the animated image
+                // offset, so a stationary cursor stays on the same monster for its whole
+                // animation and across action changes.
+                Point offset = CMain.MPoint.Subtract(_hoverMonster.DrawLocation);
+                if (Math.Abs(offset.X - _hoverOffset.X) <= CellWidth / 4 &&
+                    Math.Abs(offset.Y - _hoverOffset.Y) <= CellHeight / 4)
                     return;
             }
 
-            _hoveredPet = null;
+            _hoverMonster = null;
             MapObject bestmouseobject = null;
             for (int y = MapLocation.Y + 2; y >= MapLocation.Y - 2; y--)
             {
@@ -10598,11 +10600,11 @@ namespace Client.MirScenes
                             MapObject.MouseObjectID = bestmouseobject.ObjectID;
                             Redraw();
                         }
-                        if (ob is MonsterObject pet && IsHoverablePet(pet))
+                        if (ob is MonsterObject monster && IsHoverable(monster))
                         {
-                            _hoveredPet = pet;
-                            _petHoverMouseLocation = CMain.MPoint;
-                            _petHoverOffset = CMain.MPoint.Subtract(pet.DrawLocation);
+                            _hoverMonster = monster;
+                            _hoverMouseLocation = CMain.MPoint;
+                            _hoverOffset = CMain.MPoint.Subtract(monster.DrawLocation);
                         }
                         return;
                     }
@@ -10616,10 +10618,10 @@ namespace Client.MirScenes
             }
         }
 
-        private bool IsHoverablePet(MonsterObject pet)
+        private bool IsHoverable(MonsterObject monster)
         {
-            return User != null && !pet.Dead && pet.MasterObjectId == User.ObjectID && pet.BodyLibrary != null &&
-                Objects.TryGetValue(pet.ObjectID, out MapObject registered) && ReferenceEquals(registered, pet);
+            return User != null && !monster.Dead && monster.BodyLibrary != null &&
+                Objects.TryGetValue(monster.ObjectID, out MapObject registered) && ReferenceEquals(registered, monster);
         }
 
         public static MapObject GetObject(uint targetID)
