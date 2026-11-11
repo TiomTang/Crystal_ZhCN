@@ -389,6 +389,7 @@ namespace Server.MirDatabase
                         ";Stone",
                     };
 
+                    Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
                     File.WriteAllLines(path, contents);
                 }
 

@@ -142,6 +142,7 @@ namespace Server.MirForms.DropBuilder
 
             var bytes = (_dirty || _originalBytes == null) ? Encode(Render()) : _originalBytes;
 
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(path)));
             File.WriteAllBytes(path, bytes);
 
             Path = path;

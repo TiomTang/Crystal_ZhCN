@@ -215,7 +215,8 @@ namespace Server.MirForms.DropBuilder
             }
 
             tabControlSeperateItems_SelectedIndexChanged(tabControlSeperateItems, null);
-            listBoxMonsters.SelectedIndex = 0;
+            SetEditMode(false);
+            if (listBoxMonsters.Items.Count > 0) listBoxMonsters.SelectedIndex = 0;
             labelMonsterList.Text = $"Monster Count: {Envir.MonsterInfoList.Count}";
         }
 
@@ -480,17 +481,24 @@ namespace Server.MirForms.DropBuilder
 
             LoadDropFile(false);
             UpdateDropFile();
+            SetEditMode(false);
 
             textBoxMinLevel.Text = string.Empty;
             textBoxMaxLevel.Text = string.Empty;
             checkBoxCap.Checked = false;
+
+            if (listBoxMonsters.SelectedItem is not MonsterDropInfo selectedItem)
+            {
+                labelMobLevel.Text = string.Empty;
+                return;
+            }
 
             string hidden = _hiddenSections > 0
                 ? $"  ({_hiddenSections} section(s) not shown here, kept as-is)"
                 : string.Empty;
 
             labelMobLevel.Text =
-                $"Currently Editing: {((MonsterDropInfo)listBoxMonsters.SelectedItem).Name} - Level: {Envir.MonsterInfoList[listBoxMonsters.SelectedIndices[0]].Level}" + hidden;
+                $"Currently Editing: {selectedItem.Name} - Level: {Envir.MonsterInfoList[listBoxMonsters.SelectedIndex].Level}" + hidden;
         }
 
         public string GetPathOfSelectedItem()
@@ -579,42 +587,36 @@ namespace Server.MirForms.DropBuilder
                 buttonUpdateGold.Enabled = false;
         }
 
-        //Switch to Edit mode
+        private void SetEditMode(bool edit)
+        {
+            bool hasSelection = listBoxMonsters.SelectedItem != null;
+            textBoxDropList.ReadOnly = !edit;
+            textBoxDropList.BackColor = edit ? System.Drawing.Color.Honeydew : System.Drawing.Color.Cornsilk;
+            buttonEdit.Text = edit ? GameLanguage.Get("Accept") : GameLanguage.Get("Edit Drop File");
+            buttonEdit.Enabled = hasSelection;
+            buttonAdd.Enabled = hasSelection && !edit;
+            listBoxMonsters.Enabled = !edit;
+            textBoxSearch.Enabled = !edit;
+            tabControlSeperateItems.Enabled = hasSelection && !edit;
+            groupBoxGold.Enabled = hasSelection && !edit;
+            groupBoxItem.Enabled = hasSelection && !edit;
+        }
+
+        // Switch between viewing and editing without relying on localized button text.
         private void buttonEdit_Click(object sender, EventArgs e)
         {
-            if (buttonEdit.Text == "Accept")
+            if (listBoxMonsters.SelectedItem == null) return;
+
+            if (!textBoxDropList.ReadOnly)
             {
-                textBoxDropList.ReadOnly = true;
-                textBoxDropList.BackColor = System.Drawing.Color.Cornsilk;
-                buttonEdit.Text = GameLanguage.Get("Edit Drop File");
-                //buttonEdit.Image = Properties.Resources.edit;
-
-                // Empty List<DropItem>'s
-                foreach (var item in ItemLists)
-                    item.Clear();
-
                 LoadDropFile(true);
                 SaveDropFile();
                 UpdateDropFile();
-
-                buttonAdd.Enabled = true;
-                listBoxMonsters.Enabled = true;
-                tabControlSeperateItems.Enabled = true;
-                groupBoxGold.Enabled = true;
-                groupBoxItem.Enabled = true;
+                SetEditMode(false);
             }
             else
             {
-                textBoxDropList.ReadOnly = false;
-                textBoxDropList.BackColor = System.Drawing.Color.Honeydew;
-                buttonEdit.Text = GameLanguage.Get("Accept");
-                //buttonEdit.Image = Properties.Resources.accept;
-
-                buttonAdd.Enabled = false;
-                listBoxMonsters.Enabled = false;
-                tabControlSeperateItems.Enabled = false;
-                groupBoxGold.Enabled = false;
-                groupBoxItem.Enabled = false;
+                SetEditMode(true);
             }
         }
 
