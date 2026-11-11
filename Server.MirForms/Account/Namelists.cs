@@ -22,6 +22,8 @@ namespace Server.Account
         #region Update Name List
         private void UpdateNamelists()
         {
+            NamelistViewBox.Items.Clear();
+
             // Define the directory path for the Namelists folder
             string namelistsPath = Path.Combine("Envir", "Namelists");
 
@@ -54,7 +56,7 @@ namespace Server.Account
                 relativePath = Path.ChangeExtension(relativePath, null);
 
                 // Add the relative path to the NamelistView
-                NamelistView.Items.Add(relativePath);
+                NamelistView.Items.Add(new ListViewItem(relativePath) { Tag = filePath });
 
                 // Increment the namelist count
                 namelistCount++;
@@ -76,19 +78,29 @@ namespace Server.Account
             TotalUniquePlayerLabel.Text = GameLanguage.Get($"Total Unique Players: {uniquePlayers.Count} (In all Namelists)");
         }
 
+        private bool TryGetSelectedNamelist(out string fullPath)
+        {
+            fullPath = null;
+            if (NamelistView.SelectedItems.Count == 0 ||
+                NamelistView.SelectedItems[0].Tag is not string path)
+                return false;
+
+            if (!File.Exists(path))
+            {
+                UpdateNamelists();
+                return false;
+            }
+
+            fullPath = path;
+            return true;
+        }
+
         private void NamelistView_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Clear the contents of the NamelistViewBox before updating
             NamelistViewBox.Items.Clear();
 
-            // Check if any item is selected
-            if (NamelistView.SelectedItems.Count == 0) return;
-
-            // Get the selected item's text, which is the relative path without the .txt extension
-            string relativePath = NamelistView.SelectedItems[0].Text;
-
-            // Construct the full path to the .txt file
-            string fullPath = Path.Combine("Envir", "Namelists", relativePath + ".txt");
+            if (!TryGetSelectedNamelist(out string fullPath)) return;
 
             // Check if the file exists
             if (File.Exists(fullPath))
@@ -105,7 +117,7 @@ namespace Server.Account
                 {
                     foreach (string line in lines)
                     {
-                        NamelistViewBox.Items.Add(line);
+                        NamelistViewBox.Items.Add(new ListViewItem(line) { Tag = line });
                     }
                 }
             }
@@ -120,14 +132,15 @@ namespace Server.Account
         #region Refresh Button
         private void RefreshButton_Click(object sender, EventArgs e)
         {
+            NamelistViewBox.Items.Clear();
+
             // Define the directory path for the Namelists folder
             string namelistsPath = Path.Combine("Envir", "Namelists");
 
             // Ensure the directory exists
             if (!Directory.Exists(namelistsPath))
             {
-                NamelistView.Items.Clear();
-                NamelistView.Items.Add("Namelists directory not found.");
+                UpdateNamelists();
                 NamelistCountLabel.Text = GameLanguage.Get("Found in: 0 Namelists");
                 return;
             }
@@ -165,7 +178,7 @@ namespace Server.Account
                     relativePath = Path.ChangeExtension(relativePath, null);
 
                     // Add the relative path to the NamelistView
-                    NamelistView.Items.Add(relativePath);
+                    NamelistView.Items.Add(new ListViewItem(relativePath) { Tag = filePath });
 
                     // Increment the count of namelists containing the player's name
                     count++;
@@ -187,17 +200,10 @@ namespace Server.Account
         private void DeletePlayerButton_Click(object sender, EventArgs e)
         {
             // Ensure an item is selected in NamelistViewBox
-            if (NamelistViewBox.SelectedItems.Count == 0) return;
+            if (NamelistViewBox.SelectedItems.Count == 0 ||
+                NamelistViewBox.SelectedItems[0].Tag is not string playerToDelete) return;
 
-            // Get the selected player's name
-            string playerToDelete = NamelistViewBox.SelectedItems[0].Text;
-
-            // Ensure an item is selected in NamelistView to get the relevant file
-            if (NamelistView.SelectedItems.Count == 0) return;
-
-            // Get the file associated with the selected namelist
-            string relativePath = NamelistView.SelectedItems[0].Text;
-            string fullPath = Path.Combine("Envir", "Namelists", relativePath + ".txt");
+            if (!TryGetSelectedNamelist(out string fullPath)) return;
 
             // Read all lines from the file and remove the selected player's name
             var lines = File.ReadAllLines(fullPath).ToList();
@@ -224,7 +230,7 @@ namespace Server.Account
         private void AddPlayerButton_Click(object sender, EventArgs e)
         {
             // Ensure a namelist is selected in NamelistView
-            if (NamelistView.SelectedItems.Count == 0)
+            if (!TryGetSelectedNamelist(out string fullPath))
             {
                 MessageBox.Show(GameLanguage.Get("Please select a namelist to add the player to."));
                 return;
@@ -240,9 +246,11 @@ namespace Server.Account
                 return;
             }
 
-            // Get the file associated with the selected namelist
-            string relativePath = NamelistView.SelectedItems[0].Text;
-            string fullPath = Path.Combine("Envir", "Namelists", relativePath + ".txt");
+            if (!File.Exists(fullPath))
+            {
+                UpdateNamelists();
+                return;
+            }
 
             // Read all lines from the file to check if the player is already listed
             var lines = File.ReadAllLines(fullPath).ToList();
@@ -257,11 +265,11 @@ namespace Server.Account
             File.WriteAllLines(fullPath, lines);
 
             // Refresh NamelistViewBox to display the new player if the current namelist is selected
-            if (NamelistViewBox.Items.Contains(new ListViewItem("Empty")))
+            if (NamelistViewBox.Items.Count == 1 && NamelistViewBox.Items[0].Tag == null)
             {
                 NamelistViewBox.Items.Clear();
             }
-            NamelistViewBox.Items.Add(playerName);
+            NamelistViewBox.Items.Add(new ListViewItem(playerName) { Tag = playerName });
         }
         #endregion
 
@@ -290,6 +298,7 @@ namespace Server.Account
             }
 
             // Create the new namelist file
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(fullPath)));
             File.Create(fullPath).Dispose();
 
             // Update the NamelistView to include the new namelist
@@ -301,7 +310,7 @@ namespace Server.Account
         private void DeleteNamelistButton_Click(object sender, EventArgs e)
         {
             // Ensure a namelist is selected in NamelistView
-            if (NamelistView.SelectedItems.Count == 0)
+            if (!TryGetSelectedNamelist(out string fullPath))
             {
                 MessageBox.Show(GameLanguage.Get("Please select a namelist to delete."));
                 return;
@@ -309,7 +318,6 @@ namespace Server.Account
 
             // Get the selected namelist's relative path
             string relativePath = NamelistView.SelectedItems[0].Text;
-            string fullPath = Path.Combine("Envir", "Namelists", relativePath + ".txt");
 
             // Confirm deletion
             var confirmResult = MessageBox.Show(GameLanguage.Get($"Are you sure you want to delete the namelist '{relativePath}'?"),

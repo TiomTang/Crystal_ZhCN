@@ -984,17 +984,18 @@ namespace Server.Database
                 if (mouseOverRow >= 0 &&
                     mouseOverCol >= 0)
                 {
-                    var colName = itemInfoGridView.Rows[mouseOverRow].Cells[mouseOverCol].OwningColumn.HeaderText;
+                    var column = itemInfoGridView.Rows[mouseOverRow].Cells[mouseOverCol].OwningColumn;
 
-                    if (colName == "Modified" ||
-                        colName == "Index" ||
-                        colName == "Name" ||
+                    if (column.Name == nameof(Modified) ||
+                        column.Name == nameof(ItemIndex) ||
+                        column.Name == nameof(ItemName) ||
                         itemInfoGridView.Rows[mouseOverRow].Cells[mouseOverCol] is DataGridViewComboBoxCell
                         )
                     {
                         return;
                     }
 
+                    var colName = column.HeaderText;
                     String promptText = $"Enter new value for column [{colName}]:";
                     if (itemInfoGridView.Rows[mouseOverRow].Cells[mouseOverCol] is DataGridViewCheckBoxCell)
                     {

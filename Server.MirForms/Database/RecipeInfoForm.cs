@@ -16,14 +16,33 @@ namespace Server.Database
             UiText.Apply(this);
             this.Load += RecipeInfoForm_Load;
             SaveButton.Click += SaveButton_Click;
+            TrackRecipeChanges(Controls);
+        }
+
+        private void TrackRecipeChanges(Control.ControlCollection controls)
+        {
+            foreach (Control control in controls)
+            {
+                if (control is TextBox)
+                    control.TextChanged += RecipeDataChanged;
+                else if (control is ComboBox comboBox && comboBox != ItemComboBox)
+                    comboBox.SelectedIndexChanged += RecipeDataChanged;
+
+                TrackRecipeChanges(control.Controls);
+            }
+        }
+
+        private void RecipeDataChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreItemSelectionEvent && !string.IsNullOrEmpty(currentFilePath))
+                isModified = true;
         }
 
         #region Form Load
         private void RecipeInfoForm_Load(object sender, EventArgs e)
         {
             // Define the directory path where the recipes are stored
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string directoryPath = Path.Combine(currentDirectory, "Envir", "Recipe");
+            string directoryPath = Path.GetFullPath(Settings.RecipePath);
 
             // Clear the selected item in the ItemComboBox on load
             ItemComboBox.SelectedIndex = -1;  // No item selected initially
@@ -45,10 +64,6 @@ namespace Server.Database
                     RecipeList.Items.Add(fileNameWithoutExtension);
                 }
             }
-            else
-            {
-                MessageBox.Show(GameLanguage.Get("The recipe directory does not exist."), GameLanguage.Get("Directory Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
 
             LoadItemsIntoComboBox();
             UpdateRecipeCount();
@@ -59,8 +74,7 @@ namespace Server.Database
         private void UpdateRecipeCount()
         {
             // Define the directory path where the recipes are stored
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string directoryPath = Path.Combine(currentDirectory, "Envir", "Recipe");
+            string directoryPath = Path.GetFullPath(Settings.RecipePath);
 
             int recipeCount = 0;
 
@@ -80,8 +94,13 @@ namespace Server.Database
         #region Recipe List Index Changed
         private void RecipeList_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_ignoreItemSelectionEvent) return;
+
             if (RecipeList.SelectedIndex == -1)
+            {
+                ClearRecipeForm();
                 return;
+            }
 
             // Get the selected recipe file name
             string selectedRecipeName = RecipeList.SelectedItem.ToString();
@@ -92,6 +111,13 @@ namespace Server.Database
         #region Clear Recipe 
         private void ClearRecipeForm()
         {
+            currentFilePath = null;
+            isModified = false;
+            ItemComboBox.SelectedIndex = -1;
+            Tool1ComboBox.SelectedIndex = -1;
+            Tool2ComboBox.SelectedIndex = -1;
+            Tool3ComboBox.SelectedIndex = -1;
+
             // Clear Craft Amount, Chance, and Gold fields
             CraftAmountTextBox.Text = string.Empty;
             ChanceTextBox.Text = string.Empty;
@@ -125,8 +151,7 @@ namespace Server.Database
         #region Load Recipes
         private void LoadRecipe(string recipeName)
         {
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string directoryPath = Path.Combine(currentDirectory, "Envir", "Recipe");
+            string directoryPath = Path.GetFullPath(Settings.RecipePath);
             string filePath = Path.Combine(directoryPath, recipeName + ".txt");
 
             // Check if the file exists
@@ -134,12 +159,12 @@ namespace Server.Database
             {
                 // Read the lines from the recipe file and parse as needed
                 string[] fileLines = File.ReadAllLines(filePath);
-                ParseAndDisplayRecipe(fileLines);
 
                 // Temporarily ignore the combo box event while we select the item
                 _ignoreItemSelectionEvent = true;
                 try
                 {
+                    ParseAndDisplayRecipe(fileLines);
                     SetItemComboBoxSelection(recipeName);
                 }
                 finally
@@ -147,12 +172,12 @@ namespace Server.Database
                     _ignoreItemSelectionEvent = false;
                 }
 
-                // Set isModified to true since the recipe was loaded and might be changed
-                isModified = true;
+                isModified = false;
                 currentFilePath = filePath; // Store the current file path for later rename operations
             }
             else
             {
+                ClearRecipeForm();
                 MessageBox.Show(GameLanguage.Get("The selected recipe file does not exist."), GameLanguage.Get("File Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -161,6 +186,8 @@ namespace Server.Database
         #region Item Combo Box
         private void SetItemComboBoxSelection(string recipeName)
         {
+            ItemComboBox.SelectedIndex = -1;
+
             // Look for an item name matching the recipe
             foreach (var item in SMain.EditEnvir.ItemInfoList)
             {
@@ -408,6 +435,7 @@ namespace Server.Database
 
             try
             {
+                Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(currentFilePath)));
                 using (StreamWriter writer = new StreamWriter(currentFilePath))
                 {
                     // Write [Recipe] section
@@ -420,11 +448,11 @@ namespace Server.Database
                     writer.WriteLine("[Tools]");
 
                     // Write tools, skipping None
-                    if (Tool1ComboBox.SelectedItem.ToString() != "None")
+                    if (Tool1ComboBox.SelectedIndex > 0)
                         writer.WriteLine(Tool1ComboBox.SelectedItem.ToString());
-                    if (Tool2ComboBox.SelectedItem.ToString() != "None")
+                    if (Tool2ComboBox.SelectedIndex > 0)
                         writer.WriteLine(Tool2ComboBox.SelectedItem.ToString());
-                    if (Tool3ComboBox.SelectedItem.ToString() != "None")
+                    if (Tool3ComboBox.SelectedIndex > 0)
                         writer.WriteLine(Tool3ComboBox.SelectedItem.ToString());
 
                     writer.WriteLine();
@@ -449,7 +477,7 @@ namespace Server.Database
         }
         private void WriteIngredient(StreamWriter writer, ComboBox nameComboBox, TextBox amountTextBox, TextBox duraTextBox)
         {
-            if (nameComboBox.SelectedItem.ToString() == "None") return; // Skip if None is selected
+            if (nameComboBox.SelectedIndex <= 0) return; // Skip empty selection or None.
 
             string name = nameComboBox.SelectedItem.ToString();
             string amount = string.IsNullOrWhiteSpace(amountTextBox.Text) ? "" : amountTextBox.Text;
@@ -476,15 +504,7 @@ namespace Server.Database
         private void NewRecipeButton_Click(object sender, EventArgs e)
         {
             // Define the directory path where the recipes are stored
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string directoryPath = Path.Combine(currentDirectory, "Envir", "Recipe");
-
-            // Ensure the directory exists
-            if (!Directory.Exists(directoryPath))
-            {
-                MessageBox.Show(GameLanguage.Get("The recipe directory does not exist."), GameLanguage.Get("Directory Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            string directoryPath = Path.GetFullPath(Settings.RecipePath);
 
             // Generate a unique file name for the new recipe
             string newRecipeName = "NewRecipe";
@@ -502,6 +522,7 @@ namespace Server.Database
             // Create a blank recipe file with the specified layout
             try
             {
+                Directory.CreateDirectory(directoryPath);
                 using (StreamWriter writer = new StreamWriter(newRecipePath))
                 {
                     writer.WriteLine("[Recipe]");
@@ -525,7 +546,7 @@ namespace Server.Database
             RecipeList.SelectedItem = newRecipeName; // Automatically select the new recipe
 
             // Reset all combo boxes and text boxes to their default values
-            ItemComboBox.SelectedIndex = 0; // "None"
+            ItemComboBox.SelectedIndex = -1;
             CraftAmountTextBox.Text = string.Empty;
             ChanceTextBox.Text = string.Empty;
             GoldTextBox.Text = string.Empty;
@@ -588,12 +609,23 @@ namespace Server.Database
             }
 
             // Otherwise rename
-            UpdateRecipeFileName(selectedItemName);
-
-            // Update the list item if something was actually renamed
-            if (RecipeList.SelectedIndex >= 0)
+            bool renamed = UpdateRecipeFileName(selectedItemName);
+            _ignoreItemSelectionEvent = true;
+            try
             {
-                RecipeList.Items[RecipeList.SelectedIndex] = selectedItemName;
+                if (!renamed)
+                {
+                    SetItemComboBoxSelection(oldRecipeName);
+                    return;
+                }
+
+                // Refresh the name without reloading and discarding the current draft.
+                if (RecipeList.SelectedIndex >= 0)
+                    RecipeList.Items[RecipeList.SelectedIndex] = selectedItemName;
+            }
+            finally
+            {
+                _ignoreItemSelectionEvent = false;
             }
 
             isModified = true;
@@ -601,14 +633,14 @@ namespace Server.Database
         #endregion
 
         #region Update Recipe File Name
-        private void UpdateRecipeFileName(string newItemName)
+        private bool UpdateRecipeFileName(string newItemName)
         {
-            string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Envir", "Recipe");
+            string directoryPath = Path.GetFullPath(Settings.RecipePath);
             string newFilePath = Path.Combine(directoryPath, newItemName + ".txt");
 
             // If both paths match (ignoring case), skip the rename
             if (currentFilePath.Equals(newFilePath, StringComparison.OrdinalIgnoreCase))
-                return;
+                return true;
 
             // If a different file with that new name already exists, warn and skip
             if (File.Exists(newFilePath))
@@ -619,7 +651,7 @@ namespace Server.Database
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning
                 );
-                return;
+                return false;
             }
 
             // Rename the existing file
@@ -629,6 +661,7 @@ namespace Server.Database
                 {
                     File.Move(currentFilePath, newFilePath);
                     currentFilePath = newFilePath;
+                    return true;
                 }
                 catch (Exception ex)
                 {
@@ -636,6 +669,8 @@ namespace Server.Database
                         GameLanguage.Get("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+
+            return false;
         }
         #endregion
 
@@ -651,8 +686,7 @@ namespace Server.Database
 
             // Get the selected recipe file name
             string selectedRecipeName = RecipeList.SelectedItem.ToString();
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string directoryPath = Path.Combine(currentDirectory, "Envir", "Recipe");
+            string directoryPath = Path.GetFullPath(Settings.RecipePath);
             string filePath = Path.Combine(directoryPath, selectedRecipeName + ".txt");
 
             // Check if the recipe file exists
@@ -698,8 +732,7 @@ namespace Server.Database
 
             // Get the selected recipe name
             string selectedRecipeName = RecipeList.SelectedItem.ToString();
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string directoryPath = Path.Combine(currentDirectory, "Envir", "Recipe");
+            string directoryPath = Path.GetFullPath(Settings.RecipePath);
             string filePath = Path.Combine(directoryPath, $"{selectedRecipeName}.txt");
 
             // Confirm deletion
@@ -740,8 +773,10 @@ namespace Server.Database
         // Clears the form fields
         private void ClearForm()
         {
+            currentFilePath = null;
+            isModified = false;
             RecipeList.SelectedIndex = -1; // No recipe selected
-            ItemComboBox.SelectedIndex = 0; // Reset to "None"
+            ItemComboBox.SelectedIndex = -1;
             CraftAmountTextBox.Text = string.Empty;
             ChanceTextBox.Text = string.Empty;
             GoldTextBox.Text = string.Empty;

@@ -3447,6 +3447,7 @@ namespace Server.MirEnvir
             MessageQueue.Enqueue(GameLanguage.Get("{0} Buffs Loaded.", BuffInfoList.Count));
 
             RecipeInfoList.Clear();
+            Directory.CreateDirectory(Settings.RecipePath);
             foreach (var recipe in Directory.GetFiles(Settings.RecipePath, "*.txt")
                          .Select(path => Path.GetFileNameWithoutExtension(path))
                          .ToArray())
@@ -5702,6 +5703,7 @@ namespace Server.MirEnvir
 
             if (!File.Exists(path))
             {
+                Directory.CreateDirectory(Settings.EnvirPath);
                 File.WriteAllText(path, "");
             }
             else

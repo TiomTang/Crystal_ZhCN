@@ -222,26 +222,25 @@ namespace Server.MirForms.VisualMapInfo
             ToolStripButton ToolSender = (ToolStripButton)sender;
             ToolSender.Checked = true;
 
-            switch (ToolSender.Text)
+            if (ToolSender == SelectButton)
             {
-                case "Select Region":
-                    VisualizerGlobal.SelectedTool = VisualizerGlobal.Tool.Select;
-                    VisualizerGlobal.Cursor = Cursors.Arrow;
-                    break;
-                case "Add Region":
-                    VisualizerGlobal.SelectedTool = VisualizerGlobal.Tool.Add;
-                    VisualizerGlobal.Cursor = Cursors.UpArrow;
-                    break;
-                case "Move Region":
-                    VisualizerGlobal.SelectedTool = VisualizerGlobal.Tool.Move;
-                    VisualizerGlobal.Cursor = Cursors.SizeAll;
-                    break;
-                case "Resize Region":
-                    VisualizerGlobal.SelectedTool = VisualizerGlobal.Tool.Resize;
-                    VisualizerGlobal.Cursor = Cursors.SizeWE;
-                    break;
-                default:
-                    break;
+                VisualizerGlobal.SelectedTool = VisualizerGlobal.Tool.Select;
+                VisualizerGlobal.Cursor = Cursors.Arrow;
+            }
+            else if (ToolSender == AddButton)
+            {
+                VisualizerGlobal.SelectedTool = VisualizerGlobal.Tool.Add;
+                VisualizerGlobal.Cursor = Cursors.UpArrow;
+            }
+            else if (ToolSender == MoveButton)
+            {
+                VisualizerGlobal.SelectedTool = VisualizerGlobal.Tool.Move;
+                VisualizerGlobal.Cursor = Cursors.SizeAll;
+            }
+            else if (ToolSender == ResizeButton)
+            {
+                VisualizerGlobal.SelectedTool = VisualizerGlobal.Tool.Resize;
+                VisualizerGlobal.Cursor = Cursors.SizeWE;
             }
         }
         
