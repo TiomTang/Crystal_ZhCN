@@ -8,4 +8,12 @@
 </PropertyGroup>
 <ItemGroup><ProjectReference Include="../Shared/Shared.csproj"/><ProjectReference Include="../Client.Bootstrap/Client.Bootstrap.csproj"/><PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40"/></ItemGroup>
 <ItemGroup><None Include="../Client/Localization/*.json" Link="Localization/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
+<!-- The WebView2 package ships a WPF assembly built for net5.0 WPF that references
+     WindowsBase 5.0.0.0, conflicting with the 4.0.0.0 in net8.0. The launcher only
+     uses the WinForms control, so drop the unused reference. -->
+<Target Name="RemoveWebView2WpfReference" BeforeTargets="ResolveAssemblyReferences">
+  <ItemGroup>
+    <Reference Remove="@(Reference)" Condition="'%(Filename)' == 'Microsoft.Web.WebView2.Wpf'" />
+  </ItemGroup>
+</Target>
 </Project>
