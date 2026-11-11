@@ -9,7 +9,7 @@ using S = ServerPackets;
 
 namespace Server.MirObjects
 {
-    public class MonsterObject : MapObject
+    public partial class MonsterObject : MapObject
     {
         public static MonsterObject GetMonster(MonsterInfo info)
         {
@@ -601,6 +601,16 @@ namespace Server.MirObjects
         }
         public const int RegenDelay = 10000, EXPOwnerDelay = 5000, AloneDelay = 3000, SearchDelay = 3000, RoamDelay = 1000, HealDelay = 600, RevivalDelay = 2000;
         public long ActionTime, MoveTime, AttackTime, RegenTime, DeadTime, AloneTime, SearchTime, RoamTime, HealTime;
+        // A pet chase that cannot get any closer is abandoned after this long: MoveTo has no path
+        // finding, so a blocked or squeezed target used to be held forever while the pet stood still.
+        private const int ChaseAbandonDelay = 1000;
+        // Radius (in cells) the pet may wander around its chase anchor and still count as stuck. A
+        // chase that keeps travelling stays valid even when the target keeps the same distance.
+        private const int ChaseStuckRadius = 2;
+        protected MapObject ChaseReference;
+        protected int ChaseBestDistance = int.MaxValue;
+        protected long ChaseBlockedSince = -1;
+        protected Point ChaseAnchor;
         public long ShockTime, RageTime, HallucinationTime;
         public bool BindingShotCenter, PoisonStopRegen = true;
 
@@ -640,7 +650,7 @@ namespace Server.MirObjects
                     Envir.Time > MoveTime && 
                     Envir.Time > ActionTime && 
                     Envir.Time > ShockTime &&
-                    (Master == null || Master.PMode == PetMode.MoveOnly || Master.PMode == PetMode.Both || Master.PMode == PetMode.FocusMasterTarget) && 
+                    MasterAllowsMove &&
                     !CurrentPoison.HasFlag(PoisonType.Paralysis) && 
                     !CurrentPoison.HasFlag(PoisonType.LRParalysis) &&
                     !CurrentPoison.HasFlag(PoisonType.Frozen) &&
@@ -655,7 +665,7 @@ namespace Server.MirObjects
                     !Dead &&
                     Envir.Time > AttackTime &&
                     Envir.Time > ActionTime &&
-                    (Master == null || Master.PMode == PetMode.AttackOnly || Master.PMode == PetMode.Both || Master.PMode == PetMode.FocusMasterTarget) &&
+                    MasterAllowsAttack &&
                     !CurrentPoison.HasFlag(PoisonType.Paralysis) &&
                     !CurrentPoison.HasFlag(PoisonType.LRParalysis) &&
                     !CurrentPoison.HasFlag(PoisonType.Dazed) &&
@@ -1748,47 +1758,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Master != null && Master.CurrentMap != null)
-            {
-                bool masterAllowsPets = !Master.CurrentMap.Info.NoPets || IgnoresNoPetRestriction;
-                bool needsRecall = CurrentMap != Master.CurrentMap;
-
-                // If frozen AND on different map AND master allows pets — force recall
-                if (Frozen && needsRecall && masterAllowsPets)
-                {
-                    PetRecall();
-                    return;
-                }
-
-                // If frozen but already on correct map — unfreeze
-                if (Frozen && !needsRecall && masterAllowsPets)
-                {
-                    Frozen = false;
-                    PMode = PetMode.Both;
-                }
-            }
-
-            // Still frozen = do nothing
-            if (Frozen) return;
-
-            if (Master != null)
-            {
-                PetMode mode = Master.PMode;
-                Map masterMap = Master.CurrentMap;
-                Point masterLocation = Master.CurrentLocation;
-
-                if ((mode == PetMode.Both || mode == PetMode.MoveOnly || mode == PetMode.FocusMasterTarget)
-                    && masterMap != null)
-                {
-                    if (!Functions.InRange(CurrentLocation, masterLocation, Globals.DataRange) || CurrentMap != masterMap)
-                        PetRecall();
-                }
-
-                if (mode == PetMode.MoveOnly || mode == PetMode.None)
-                {
-                    Target = null;
-                }
-            }
+            if (!ProcessPetStatus()) return;
 
             CheckAlone();
 
@@ -1874,7 +1844,7 @@ namespace Server.MirObjects
         protected virtual void ProcessSearch()
         {
             if (Envir.Time < SearchTime) return;
-            if (Master != null && (Master.PMode == PetMode.MoveOnly || Master.PMode == PetMode.None || Master.PMode == PetMode.FocusMasterTarget)) return;
+            if (!MasterAllowsSearch) return;
 
             SearchTime = Envir.Time + SearchDelay;
 
@@ -1913,8 +1883,17 @@ namespace Server.MirObjects
         {
             if (Target == null || !CanAttack) return;
 
+            if (ChaseReference != Target)
+            {
+                ChaseReference = Target;
+                ChaseBestDistance = int.MaxValue;
+                ChaseBlockedSince = -1;
+            }
+
             if (InAttackRange())
             {
+                ResetChaseTracking();
+
                 Attack();
 
                 if (Target != null && Target.Dead)
@@ -1928,15 +1907,84 @@ namespace Server.MirObjects
             if (Envir.Time < ShockTime)
             {
                 Target = null;
+                ResetChaseTracking();
                 return;
             }
 
             if (Settings.MonsterRecallEnabled && Info.CanRecall && TryRecallToTarget())
             {
+                ResetChaseTracking();
                 return;
             }
 
+            if (!CanMove)
+            {
+                // Attack-only mode (or paralysis): an out-of-reach target used to keep the pet idle,
+                // ignoring enemies already standing next to it.
+                if (IsPet)
+                {
+                    MapObject adjacent = FindAdjacentTarget();
+                    if (adjacent != null) Target = adjacent;
+                }
+
+                return;
+            }
+
+            // Wild monsters keep their original chase: they pursue until the target leaves the map
+            // or data range. Only owner-bound objects get the stuck handling below.
+            if (!IsPet)
+            {
+                MoveTo(Target.CurrentLocation);
+                return;
+            }
+
+            int dx = Math.Abs(CurrentLocation.X - Target.CurrentLocation.X);
+            int dy = Math.Abs(CurrentLocation.Y - Target.CurrentLocation.Y);
+            int distance = dx > dy ? dx : dy;
+
+            if (distance < ChaseBestDistance)
+            {
+                ChaseBestDistance = distance;
+                ChaseBlockedSince = -1;
+                ChaseAnchor = CurrentLocation;
+            }
+            else if (ChaseBlockedSince < 0)
+            {
+                ChaseBlockedSince = Envir.Time;
+                ChaseAnchor = CurrentLocation;
+            }
+
             MoveTo(Target.CurrentLocation);
+
+            // Blocked or squeezed chases cycle without ever closing the distance, which left pets
+            // standing still while holding an unreachable target. Give up after the grace period and
+            // let the next search pick a reachable target, but keep chasing when the pet is still
+            // travelling (a target that runs at the same speed never closes the gap either).
+            if (ChaseBlockedSince >= 0 && Envir.Time - ChaseBlockedSince >= ChaseAbandonDelay)
+            {
+                int anchorX = Math.Abs(CurrentLocation.X - ChaseAnchor.X);
+                int anchorY = Math.Abs(CurrentLocation.Y - ChaseAnchor.Y);
+
+                if (anchorX <= ChaseStuckRadius && anchorY <= ChaseStuckRadius)
+                {
+                    ResetChaseTracking();
+                    Target = null;
+                    SearchTime = 0;
+                }
+                else
+                {
+                    ChaseBlockedSince = -1;
+                    ChaseBestDistance = distance;
+                    ChaseAnchor = CurrentLocation;
+                }
+            }
+        }
+
+        protected void ResetChaseTracking()
+        {
+            ChaseReference = null;
+            ChaseBestDistance = int.MaxValue;
+            ChaseBlockedSince = -1;
         }
 
         protected virtual bool TryRecallToTarget()
@@ -1983,6 +2031,55 @@ namespace Server.MirObjects
             if (Target.CurrentMap != CurrentMap) return false;
 
             return Target.CurrentLocation != CurrentLocation && Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
+        }
+
+        /// <summary>
+        /// Being hit must not pull a pet off the target it is already fighting: only switch to the
+        /// attacker when there is no target yet or the attacker is closer than the current target.
+        /// </summary>
+        protected bool CanFocusAttacker(MapObject attacker)
+        {
+            // Wild monsters keep the original retarget-on-hit behaviour.
+            if (!IsPet) return true;
+
+            if (Target == null) return true;
+
+            // Never drop a target the pet is already hitting: surrounded pets used to swap to
+            // whichever neighbour landed the last hit and never finished anything.
+            if (InAttackRange()) return false;
+
+            return Functions.MaxDistance(CurrentLocation, attacker.CurrentLocation)
+                < Functions.MaxDistance(CurrentLocation, Target.CurrentLocation);
+        }
+
+        /// <summary>
+        /// Nearest attackable object standing directly next to this object, used when movement is
+        /// unavailable and the current target is out of reach.
+        /// </summary>
+        protected virtual MapObject FindAdjacentTarget()
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                Point location = Functions.PointMove(CurrentLocation, (MirDirection)i, 1);
+                if (!CurrentMap.ValidPoint(location)) continue;
+
+                Cell cell = CurrentMap.GetCell(location);
+                if (cell.Objects == null) continue;
+
+                for (int j = 0; j < cell.Objects.Count; j++)
+                {
+                    MapObject ob = cell.Objects[j];
+
+                    if (ob == null || ob == this || ob.Dead) continue;
+                    if (ob.Race != ObjectType.Monster && ob.Race != ObjectType.Player && ob.Race != ObjectType.Hero) continue;
+                    if (ob.Hidden && (!CoolEye || Level < ob.Level)) continue;
+                    if (!ob.IsAttackTarget(this)) continue;
+
+                    return ob;
+                }
+            }
+
+            return null;
         }
 
         protected virtual void FindTarget()
@@ -2675,7 +2772,7 @@ namespace Server.MirObjects
                     if (Functions.MaxDistance(CurrentLocation, attacker.CurrentLocation) < (8 - attacker.Info.MentalStateLvl))
                         Target = attacker;
                 }
-                else
+                else if (CanFocusAttacker(attacker))
                     Target = attacker;
             }
 
@@ -2772,7 +2869,7 @@ namespace Server.MirObjects
                 return 0;
             }
 
-            if (Target != this && attacker.IsAttackTarget(this))
+            if (Target != this && attacker.IsAttackTarget(this) && CanFocusAttacker(attacker))
                 Target = attacker;
 
             if (BindingShotCenter) ReleaseBindingShot();
