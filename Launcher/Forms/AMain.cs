@@ -9,7 +9,15 @@ namespace Launcher
 {
     public partial class AMain : Form
     {
-        private int _fileCount, _currentCount;
+        private enum UpdatePhase { Checking, Downloading, Applying }
+
+        private int _fileCount;
+        private volatile string _currentFileName = "";
+        private volatile UpdatePhase _phase = UpdatePhase.Checking;
+        // Written by the download thread, read by the UI timer; every counter is
+        // published with Volatile so the bars cannot tear on 32-bit reads.
+        private long _fileDone, _fileTotal, _doneBytes, _totalBytes;
+        private int _filesDone, _filesTotal, _applyDone, _applyTotal;
 
         public volatile bool Completed, Checked, CleanFiles, LabelSwitch, ErrorFound;
 
@@ -27,11 +35,19 @@ namespace Launcher
         private CancellationTokenSource cancellation = new();
         private bool forceRepair;
         private volatile string updateStatus = "Checking files...";
-        private readonly Button repairButton = new() { Name = "RepairButton", Text = "Repair files", Size = new Size(105, 19), Location = new Point(200, 525) };
-        private readonly Button cancelButton = new() { Name = "CancelButton", Text = "Cancel download", Size = new Size(135, 19), Location = new Point(310, 525) };
+        private readonly Button repairButton = new() { Name = "RepairButton", Size = new Size(105, 21), Location = new Point(200, 524) };
+        private readonly Button cancelButton = new() { Name = "CancelButton", Size = new Size(135, 21), Location = new Point(310, 524) };
 
 
         private int SkinPixels(int value) => (int)Math.Round(value * ClientSize.Width / 800f);
+        // The informational version appends "+<commit>"; the label holds one short line.
+        private static string BuildVersion()
+        {
+            string version = Application.ProductVersion;
+            int commit = version.IndexOf('+');
+            return commit < 0 ? version : version[..commit];
+        }
+        private int BarWidth(long done, long total) => total <= 0 ? SkinPixels(5) : Math.Max(SkinPixels(5), (int)((long)SkinPixels(550) * Math.Clamp(done, 0, total) / total));
 
         public AMain()
         {
@@ -43,20 +59,32 @@ namespace Launcher
             {
                 button.BackColor = Color.FromArgb(48, 48, 48); button.ForeColor = Color.Gainsboro;
                 button.UseVisualStyleBackColor = false; button.FlatStyle = FlatStyle.Flat;
+                // Inherited form font is too tall for these 21px buttons and clipped the captions.
+                button.Font = new Font("Calibri", 8.25F);
+                button.TextAlign = ContentAlignment.MiddleCenter;
             }
+            repairButton.Text = GameLanguage.Get("Repair files");
+            cancelButton.Text = GameLanguage.Get("Cancel download");
+            // Bottom strip follows the skin: the file field ends near x=422 and the
+            // version line sits below both bars, so both labels must stay inside them.
+            CurrentFile_label.Size = new Size(360, 20);
+            ActionLabel.Location = new Point(424, 470); ActionLabel.Size = new Size(180, 21);
+            Version_label.Size = new Size(200, 15);
+            Version_label.Location = new Point(ClientSize.Width - Version_label.Width - 9, Version_label.Location.Y);
             Controls.Add(repairButton); Controls.Add(cancelButton); repairButton.BringToFront(); cancelButton.BringToFront();
             cancelButton.Click += (_, _) => cancellation.Cancel();
             repairButton.Click += (_, _) =>
             {
                 if (_workThread?.IsAlive == true || DeferredUpdate.Pending(Settings.P_Client)) return;
-                if (MessageBox.Show("Download ALL managed files again? This uses bandwidth. Personal settings and unknown files will not be deleted.", "Repair files", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
-                forceRepair = true; Completed = Checked = ErrorFound = false; _currentCount = 0;
+                if (MessageBox.Show(GameLanguage.Get("Download ALL managed files again? This uses bandwidth. Personal settings and unknown files will not be deleted."), GameLanguage.Get("Repair files"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                forceRepair = true; Completed = Checked = ErrorFound = false; ResetProgress();
                 cancellation.Dispose(); cancellation = new(); Launch_pb.Enabled = false;
                 updateSource = Settings.Snapshot(); InterfaceTimer.Enabled = true;
                 _workThread = new Thread(Start) { IsBackground = true }; _workThread.Start();
             };
             BackColor = Color.FromArgb(1, 0, 0);
             TransparencyKey = Color.FromArgb(1, 0, 0);
+            CurrentFile_label.AutoEllipsis = true;
         }
 
         public static void LocalizeControls(Control root)
@@ -74,22 +102,49 @@ namespace Launcher
                 Program.Trace("check-complete downloads=" + _fileCount);
                 if (plan.Downloads.Count != 0)
                 {
-                    UpdateTransaction.Prepare(updateSource, Settings.P_Client, plan.Downloads, cancellation.Token,
-                        (name, done, total) => { updateStatus = name + " " + done + "/" + total; });
+                    _phase = UpdatePhase.Downloading;
+                    UpdateTransaction.Prepare(updateSource, Settings.P_Client, plan.Downloads, cancellation.Token, OnTransferProgress);
                     if (!DeferredUpdate.RequiresRestart(plan.Downloads))
                     {
+                        _phase = UpdatePhase.Applying;
                         updateStatus = "Applying and verifying resource update...";
                         Program.Trace("resource-apply");
-                        UpdateTransaction.ApplyConfirmed(Settings.P_Client, token => DeferredUpdate.Probe(Settings.P_Client, token));
+                        UpdateTransaction.ApplyConfirmed(Settings.P_Client, token => DeferredUpdate.Probe(Settings.P_Client, token), OnApplyProgress);
                         Program.Trace("resource-committed");
                     }
                 }
-                _currentCount = _fileCount;
                 Checked = true;
             }
             catch (OperationCanceledException) { ErrorFound = true; updateStatus = "Download cancelled; installed files unchanged."; }
             catch (Exception ex) { ErrorFound = true; updateStatus = ex.Message; SaveError(ex.GetType().Name + ": Update failed; installed files unchanged or recovery required."); }
             finally { Completed = true; }
+        }
+
+        private void ResetProgress()
+        {
+            _currentFileName = ""; _phase = UpdatePhase.Checking;
+            Volatile.Write(ref _fileDone, 0); Volatile.Write(ref _fileTotal, 0);
+            Volatile.Write(ref _doneBytes, 0); Volatile.Write(ref _totalBytes, 0);
+            Volatile.Write(ref _filesDone, 0); Volatile.Write(ref _filesTotal, 0);
+            Volatile.Write(ref _applyDone, 0); Volatile.Write(ref _applyTotal, 0);
+        }
+
+        private void OnTransferProgress(TransferProgress p)
+        {
+            _currentFileName = p.Name;
+            Volatile.Write(ref _fileDone, p.FileDone);
+            Volatile.Write(ref _fileTotal, p.FileTotal);
+            Volatile.Write(ref _doneBytes, p.Done);
+            Volatile.Write(ref _totalBytes, p.Total);
+            Volatile.Write(ref _filesDone, p.FilesDone);
+            Volatile.Write(ref _filesTotal, p.FilesTotal);
+        }
+
+        private void OnApplyProgress(int done, int total, string name)
+        {
+            Volatile.Write(ref _applyDone, done);
+            Volatile.Write(ref _applyTotal, total);
+            _currentFileName = name ?? "";
         }
 
         private async void AMain_Load(object sender, EventArgs e)
@@ -101,7 +156,7 @@ namespace Launcher
             Launch_pb.Enabled = false;
             ProgressCurrent_pb.Width = SkinPixels(5);
             TotalProg_pb.Width = SkinPixels(5);
-            Version_label.Text = string.Format("Build: {0}.{1}.{2}", "Crystal", Settings.UseTestConfig ? "Debug" : "Release", Application.ProductVersion);
+            Version_label.Text = string.Format("Build: Crystal {0} {1}", Settings.UseTestConfig ? "Debug" : "Release", BuildVersion());
 
             if (Settings.P_ServerName != String.Empty)
             {
@@ -270,11 +325,33 @@ namespace Launcher
         {
             if (!Completed)
             {
-                repairButton.Enabled = false; cancelButton.Enabled = !cancellation.IsCancellationRequested;
+                repairButton.Enabled = false;
+                cancelButton.Enabled = _phase == UpdatePhase.Downloading && !cancellation.IsCancellationRequested;
                 ActionLabel.Visible = true; CurrentFile_label.Visible = true;
-                ActionLabel.Text = GameLanguage.Get("{0} Files Remaining", Math.Max(0, _fileCount - _currentCount));
-                CurrentFile_label.Text = updateStatus;
-                TotalProg_pb.Width = _fileCount == 0 ? SkinPixels(5) : Math.Max(SkinPixels(5), (int)((long)SkinPixels(550) * _currentCount / _fileCount));
+                switch (_phase)
+                {
+                    case UpdatePhase.Downloading:
+                        long filesDone = Volatile.Read(ref _filesDone), filesTotal = Volatile.Read(ref _filesTotal);
+                        long doneBytes = Volatile.Read(ref _doneBytes), totalBytes = Volatile.Read(ref _totalBytes);
+                        CurrentFile_label.Text = _currentFileName.Length == 0
+                            ? GameLanguage.Get("{0} Files Remaining", Math.Max(0, filesTotal - filesDone))
+                            : _currentFileName;
+                        ActionLabel.Text = Math.Min(filesDone + 1, filesTotal) + "/" + filesTotal + "  " + ToSize(doneBytes) + "/" + ToSize(totalBytes);
+                        TotalProg_pb.Width = BarWidth(doneBytes, totalBytes);
+                        ProgressCurrent_pb.Width = BarWidth(Volatile.Read(ref _fileDone), Volatile.Read(ref _fileTotal));
+                        break;
+                    case UpdatePhase.Applying:
+                        int applyDone = Volatile.Read(ref _applyDone), applyTotal = Volatile.Read(ref _applyTotal);
+                        CurrentFile_label.Text = _currentFileName.Length == 0 ? updateStatus : _currentFileName;
+                        ActionLabel.Text = GameLanguage.Get("Applying update {0}/{1}", applyDone, applyTotal);
+                        TotalProg_pb.Width = SkinPixels(550);
+                        ProgressCurrent_pb.Width = BarWidth(applyDone, applyTotal);
+                        break;
+                    default:
+                        CurrentFile_label.Text = updateStatus; ActionLabel.Text = "";
+                        TotalProg_pb.Width = ProgressCurrent_pb.Width = SkinPixels(5);
+                        break;
+                }
                 return;
             }
             InterfaceTimer.Enabled = false;
@@ -282,7 +359,7 @@ namespace Launcher
             if (!ErrorFound && DeferredUpdate.Pending(Settings.P_Client))
             {
                 CurrentFile_label.Visible = true;
-                CurrentFile_label.Text = "Restarting launcher to apply and verify update...";
+                CurrentFile_label.Text = GameLanguage.Get("Applying update... the launcher will restart automatically.");
                 Program.Trace("self-update-restart-requested");
                 CurrentFile_label.Refresh();
                 // Keep the reason visible before the one required self-update restart.

@@ -21,8 +21,8 @@ internal static class Program
         Trace("start mode=" + (args.Length == 0 ? "normal" : args[0]));
         try
         {
-            if (args.Length == 3 && args[0] == "--apply-transaction") { DeferredUpdate.Apply(args[1], int.Parse(args[2])); return; }
-            if (args.Length == 2 && args[0] == "--recover-update") { DeferredUpdate.Apply(args[1], 0); return; }
+            if (args.Length == 3 && args[0] == "--apply-transaction") { ApplyProgress.Run(args[1], int.Parse(args[2])); return; }
+            if (args.Length == 2 && args[0] == "--recover-update") { ApplyProgress.Run(args[1], 0); return; }
             if (args.Length == 2 && args[0] == "--confirm-update" && Guid.TryParseExact(args[1], "N", out _))
             {
                 Settings.Load(); using var form = new AMain();

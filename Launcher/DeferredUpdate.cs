@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Client.Bootstrap;
 namespace Launcher;
+public enum ApplyPhase { Waiting, Applying, Verifying, Restarting }
 public static class DeferredUpdate
 {
     // Only known resource trees and the operator INI can be replaced while
@@ -42,10 +43,11 @@ public static class DeferredUpdate
         { if ((File.GetAttributes(f) & FileAttributes.ReparsePoint) != 0) throw new IOException("Reparse helper dependency"); File.Copy(f, Path.Combine(target, Path.GetFileName(f))); }
         foreach (string d in Directory.GetDirectories(source)) CopyTree(d, Path.Combine(target, Path.GetFileName(d)));
     }
-    public static void Apply(string root, int parentId, bool restart = true)
+    public static void Apply(string root, int parentId, bool restart = true, Action<ApplyPhase, int, int, string> report = null)
     {
         if (parentId != 0)
         {
+            report?.Invoke(ApplyPhase.Waiting, 0, 0, null);
             try { using var parent = Process.GetProcessById(parentId); if (!parent.WaitForExit(30000)) throw new IOException("Launcher did not exit"); }
             catch (ArgumentException) { }
         }
@@ -54,10 +56,16 @@ public static class DeferredUpdate
             InstallationLease.EnsureLegacyClientStopped(root);
             if (LegacyPending(root)) throw new IOException("Legacy .launcher-update/pending.json requires manual recovery; files preserved");
             if (parentId == 0) UpdateTransaction.Recover(root);
-            else UpdateTransaction.ApplyConfirmed(root, token => Probe(root, token));
+            else UpdateTransaction.ApplyConfirmed(root,
+                token => { report?.Invoke(ApplyPhase.Verifying, 0, 0, null); return Probe(root, token); },
+                (done, total, name) => report?.Invoke(ApplyPhase.Applying, done, total, name));
         }
         HelperCleanup.Schedule();
-        if (restart && Process.Start(new ProcessStartInfo(Path.Combine(Path.GetFullPath(root), "Launcher.exe")) { WorkingDirectory = Path.GetFullPath(root), UseShellExecute = false }) == null) throw new IOException("Committed update but restart failed");
+        if (restart) { report?.Invoke(ApplyPhase.Restarting, 0, 0, null); Restart(root); }
+    }
+    public static void Restart(string root)
+    {
+        if (Process.Start(new ProcessStartInfo(Path.Combine(Path.GetFullPath(root), "Launcher.exe")) { WorkingDirectory = Path.GetFullPath(root), UseShellExecute = false }) == null) throw new IOException("Committed update but restart failed");
     }
     internal static bool Probe(string root, string token)
     {

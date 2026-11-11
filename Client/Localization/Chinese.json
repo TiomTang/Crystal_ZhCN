@@ -4267,6 +4267,34 @@
     "Source": "{0:#,##0}MB Remaining",
     "Text": "剩余 {0:#,##0}MB"
   },
+  "Applying update {0}/{1}": {
+    "Source": "Applying update {0}/{1}",
+    "Text": "应用更新 {0}/{1}"
+  },
+  "Applying update files... ({0}/{1})": {
+    "Source": "Applying update files... ({0}/{1})",
+    "Text": "正在应用更新文件…（{0}/{1}）"
+  },
+  "Applying update... the launcher will restart automatically.": {
+    "Source": "Applying update... the launcher will restart automatically.",
+    "Text": "正在应用更新……启动器将自动重新启动。"
+  },
+  "Verifying update...": {
+    "Source": "Verifying update...",
+    "Text": "正在校验更新…"
+  },
+  "Restarting launcher...": {
+    "Source": "Restarting launcher...",
+    "Text": "正在重新启动启动器…"
+  },
+  "Waiting for the launcher to close...": {
+    "Source": "Waiting for the launcher to close...",
+    "Text": "正在等待启动器关闭…"
+  },
+  "Do not close this window.": {
+    "Source": "Do not close this window.",
+    "Text": "请勿关闭此窗口。"
+  },
   "Up to date.": {
     "Source": "Up to date.",
     "Text": "已是最新版本。"
@@ -4282,6 +4310,18 @@
   "Your files have been cleaned up.": {
     "Source": "Your files have been cleaned up.",
     "Text": "您的文件已清理完成。"
+  },
+  "Repair files": {
+    "Source": "Repair files",
+    "Text": "修复文件"
+  },
+  "Cancel download": {
+    "Source": "Cancel download",
+    "Text": "取消下载"
+  },
+  "Download ALL managed files again? This uses bandwidth. Personal settings and unknown files will not be deleted.": {
+    "Source": "Download ALL managed files again? This uses bandwidth. Personal settings and unknown files will not be deleted.",
+    "Text": "是否重新下载全部受管文件？这会消耗流量。个人设置和未知文件不会被删除。"
   },
   "Clean Files": {
     "Source": "Clean Files",

@@ -6,6 +6,10 @@ using Client.Bootstrap;
 
 namespace Launcher;
 
+// Byte and file counters for a staged download. Name is the manifest-relative path
+// of the file currently being received.
+public sealed record TransferProgress(string Name, long FileDone, long FileTotal, long Done, long Total, int FilesDone, int FilesTotal);
+
 // Hashes identify locally staged/backup bytes only; the legacy server manifest has no hash.
 public static class UpdateTransaction
 {
@@ -128,12 +132,19 @@ public static class UpdateTransaction
         }
 #endif
     }
-    public static void Prepare(PatchSource source, string root, IReadOnlyList<FileInformation> files, CancellationToken cancel, Action<string, long, long> progress = null)
+    public static void Prepare(PatchSource source, string root, IReadOnlyList<FileInformation> files, CancellationToken cancel, Action<TransferProgress> progress = null)
     {
         RecoverCompleted(root);
         if (Exists(root)) throw new IOException("Previous transaction requires recovery");
         if (DeferredUpdate.LegacyPending(root)) throw new IOException("Legacy pending update requires manual recovery; .launcher-update is preserved");
         CheckDiskBudget(root, files);
+        long totalBytes = 0; int filesTotal = 0;
+        foreach (var file in files)
+        {
+            PatchEngine.ValidateManifestName(file.FileName);
+            if (PatchEngine.Protected(file.FileName)) continue;
+            filesTotal++; totalBytes += file.Length;
+        }
         // Publish only a complete initial journal. Unpublished directories never gate game startup.
         var j = new Journal();
         string initializing = ".mir2-initializing-" + j.Id;
@@ -148,6 +159,8 @@ public static class UpdateTransaction
         try
         {
             using var client = source.CreateClient();
+            long doneBytes = 0; int filesDone = 0;
+            progress?.Invoke(new TransferProgress("", 0, 0, 0, totalBytes, 0, filesTotal));
             foreach (var info in files)
             {
                 cancel.ThrowIfCancellationRequested();
@@ -175,7 +188,7 @@ public static class UpdateTransaction
                         cancel.ThrowIfCancellationRequested(); total += n;
                         if (total > info.Length) throw new InvalidDataException("Expanded patch exceeds manifest length");
                         for (int k = 0; k < n; k++) crc = CrcTable[(crc ^ buffer[k]) & 255] ^ (crc >> 8);
-                        output.Write(buffer, 0, n); progress?.Invoke(info.FileName, total, info.Length);
+                        output.Write(buffer, 0, n); progress?.Invoke(new TransferProgress(info.FileName, total, info.Length, doneBytes + total, totalBytes, filesDone, filesTotal));
                     }
                     if (total != info.Length) throw new InvalidDataException("Downloaded length mismatch");
                     if (limited.Count != wireLength || raw.ReadAsync(new byte[1], transferToken).AsTask().GetAwaiter().GetResult() != 0) throw new InvalidDataException("Wire length mismatch");
@@ -186,22 +199,28 @@ public static class UpdateTransaction
                 var e = new Entry { Name = info.FileName, Length = info.Length, Time = info.Creation.ToBinary(), Hash = Hash(slot), Existed = File.Exists(target) };
                 if (e.Existed) { e.OldHash = Hash(target); e.OldTime = File.GetLastWriteTime(target).ToBinary(); }
                 j.Entries.Add(e); Save(root, j);
+                doneBytes += info.Length; filesDone++;
             }
             cancel.ThrowIfCancellationRequested(); j.State = "Prepared"; Save(root, j);
         }
         catch { Cleanup(root, j); throw; }
     }
     public static void Apply(string root, Func<bool> confirm) => ApplyConfirmed(root, _ => confirm());
-    public static void ApplyConfirmed(string root, Func<string, bool> confirm)
+    public static void ApplyConfirmed(string root, Func<string, bool> confirm, Action<int, int, string> progress = null)
     {
         var j = Load(root);
         if (j.State != "Prepared") throw new IOException("Transaction is not prepared");
         j.State = "Applying"; Save(root, j); Boundary("journal-before-backup");
         try
         {
+            // The lease already blocks a client start for the whole update; one check
+            // before the first replace is enough and avoids re-enumerating processes
+            // for every file in a large map update.
+            InstallationLease.EnsureLegacyClientStopped(root);
             for (int i = 0; i < j.Entries.Count; i++)
             {
-                var e = j.Entries[i]; InstallationLease.EnsureLegacyClientStopped(root);
+                var e = j.Entries[i];
+                progress?.Invoke(i, j.Entries.Count, e.Name);
                 string target = PatchEngine.Target(root, e.Name), stage = Slot(root, i), backup = Slot(root, i, true);
                 if (!Matches(stage, e.Hash) || new FileInfo(stage).Length != e.Length) throw new IOException("Staged file integrity failure");
                 if (e.Existed)
@@ -217,6 +236,7 @@ public static class UpdateTransaction
                 if (e.Existed) File.Replace(stage, target, null); else File.Move(stage, target);
                 Boundary("after-replace");
             }
+            progress?.Invoke(j.Entries.Count, j.Entries.Count, null);
             j.State = "AwaitingHealth"; j.HealthToken = Guid.NewGuid().ToString("N"); Save(root, j);
             if (!confirm(j.HealthToken)) throw new IOException("Updated launcher startup confirmation failed");
             Boundary("before-commit"); j.State = "Committed"; Save(root, j);
