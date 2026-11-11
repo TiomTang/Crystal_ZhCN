@@ -1823,7 +1823,25 @@ namespace Server.MirObjects
             AttackSpeed = 1400 - ((Stats[Stat.AttackSpeed] * 60) + Math.Min(370, (Level * 14)));
 
             if (AttackSpeed < 550) AttackSpeed = 550;
+
+            RefreshPetInheritance();
         }
+
+        /// <summary>
+        /// Rebuilds the inherited part of every living servant after the owner's own stats changed.
+        /// </summary>
+        public void RefreshPetInheritance()
+        {
+            for (int i = 0; i < Pets.Count; i++)
+            {
+                MonsterObject pet = Pets[i];
+
+                if (pet == null || pet.Dead || pet.Node == null) continue;
+
+                pet.RefreshAll();
+            }
+        }
+
         public virtual void RefreshGuildBuffs() { }
 
         public virtual void RefreshMaxExperience() { }

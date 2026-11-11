@@ -2469,6 +2469,27 @@ namespace Server.MirEnvir
             }
         }
 
+        private volatile bool _petInheritanceUpdate;
+
+        /// <summary>
+        /// Requests a servant stat refresh. The flag is consumed by Process on the world loop so the
+        /// editor never touches live objects from its own thread.
+        /// </summary>
+        public void RequiresPetInheritanceUpdate()
+        {
+            _petInheritanceUpdate = true;
+        }
+
+        private void ProcessPetInheritanceUpdate()
+        {
+            if (!_petInheritanceUpdate) return;
+
+            _petInheritanceUpdate = false;
+
+            for (var i = 0; i < Players.Count; i++) Players[i].RefreshPetInheritance();
+            for (var i = 0; i < Heroes.Count; i++) Heroes[i].RefreshPetInheritance();
+        }
+
         public void SaveDB()
         {
             bool existed = File.Exists(DatabasePath);

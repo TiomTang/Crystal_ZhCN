@@ -98,6 +98,7 @@ namespace Server
             configToolStripMenuItem1 = new ToolStripMenuItem();
             serverToolStripMenuItem = new ToolStripMenuItem();
             balanceToolStripMenuItem = new ToolStripMenuItem();
+            petInheritanceToolStripMenuItem = new ToolStripMenuItem();
             systemToolStripMenuItem = new ToolStripMenuItem();
             dragonSystemToolStripMenuItem = new ToolStripMenuItem();
             miningToolStripMenuItem = new ToolStripMenuItem();
@@ -612,7 +613,7 @@ namespace Server
             // 
             // configToolStripMenuItem1
             // 
-            configToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { serverToolStripMenuItem, balanceToolStripMenuItem, systemToolStripMenuItem, monsterTunerToolStripMenuItem, dropBuilderToolStripMenuItem });
+            configToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { serverToolStripMenuItem, balanceToolStripMenuItem, petInheritanceToolStripMenuItem, systemToolStripMenuItem, monsterTunerToolStripMenuItem, dropBuilderToolStripMenuItem });
             configToolStripMenuItem1.Name = "configToolStripMenuItem1";
             configToolStripMenuItem1.Size = new Size(55, 20);
             configToolStripMenuItem1.Text = "Config";
@@ -630,6 +631,13 @@ namespace Server
             balanceToolStripMenuItem.Size = new Size(152, 22);
             balanceToolStripMenuItem.Text = "Balance";
             balanceToolStripMenuItem.Click += balanceToolStripMenuItem_Click;
+            // 
+            // petInheritanceToolStripMenuItem
+            // 
+            petInheritanceToolStripMenuItem.Name = "petInheritanceToolStripMenuItem";
+            petInheritanceToolStripMenuItem.Size = new Size(152, 22);
+            petInheritanceToolStripMenuItem.Text = "Servant Inheritance";
+            petInheritanceToolStripMenuItem.Click += petInheritanceToolStripMenuItem_Click;
             // 
             // systemToolStripMenuItem
             // 
@@ -833,6 +841,7 @@ namespace Server
         private ToolStripMenuItem configToolStripMenuItem1;
         private ToolStripMenuItem serverToolStripMenuItem;
         private ToolStripMenuItem balanceToolStripMenuItem;
+        private ToolStripMenuItem petInheritanceToolStripMenuItem;
         private ToolStripMenuItem systemToolStripMenuItem;
         private ToolStripMenuItem dragonSystemToolStripMenuItem;
         private ToolStripMenuItem guildsToolStripMenuItem;

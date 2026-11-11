@@ -829,7 +829,77 @@ namespace Server.MirObjects
             if (MoveSpeed < 400) MoveSpeed = 400;
             if (AttackSpeed < 400) AttackSpeed = 400;
 
+            ApplyOwnerStatInheritance();
+
             RefreshBuffs();
+        }
+
+        /// <summary>
+        /// Adds the owner attribute inheritance configured for the pet's class group on top of the
+        /// template and pet level values. It is called from RefreshAll, so the inherited part is
+        /// rebuilt from scratch on every refresh and never accumulates.
+        /// </summary>
+        protected virtual void ApplyOwnerStatInheritance()
+        {
+            PetInheritanceSettings settings = GetOwnerStatInheritance();
+            if (settings == null) return;
+
+            HumanObject owner = Master as HumanObject;
+            if (owner == null) return;
+
+            int source = owner.Stats[settings.OwnerStat];
+            if (source <= 0) return;
+
+            AddInheritedStat(Stat.MinDC, source, settings.MinDamagePercent);
+            AddInheritedStat(Stat.MaxDC, source, settings.MaxDamagePercent);
+            AddInheritedStat(Stat.MinAC, source, settings.MinDefencePercent);
+            AddInheritedStat(Stat.MaxAC, source, settings.MaxDefencePercent);
+            AddInheritedStat(Stat.MinMAC, source, settings.MinMagicDefencePercent);
+            AddInheritedStat(Stat.MaxMAC, source, settings.MaxMagicDefencePercent);
+
+            if (settings.HealthPerPoint > 0)
+                Stats[Stat.HP] += source * settings.HealthPerPoint;
+
+            if (HP > Stats[Stat.HP]) HP = Stats[Stat.HP];
+        }
+
+        /// <summary>
+        /// Resolves the inheritance configuration that applies to this pet, or null when the pet is
+        /// not a servant of a matching class or the group is disabled.
+        /// </summary>
+        private PetInheritanceSettings GetOwnerStatInheritance()
+        {
+            if (Master == null || Race != ObjectType.Monster || Info == null) return null;
+
+            HumanObject owner = Master as HumanObject;
+            if (owner == null) return null;
+
+            bool taoistSummon = Info.Name == Settings.SkeletonName
+                || Info.Name == Settings.ShinsuName
+                || Info.Name == Settings.AngelName;
+
+            if (taoistSummon)
+            {
+                if (owner.Class != MirClass.Taoist) return null;
+
+                PetInheritanceSettings taoist = Settings.TaoistPetInheritance;
+                return taoist != null && taoist.Enabled ? taoist : null;
+            }
+
+            if (owner.Class != MirClass.Wizard) return null;
+
+            // The assassin clone copies the whole owner stat block already.
+            if (Info.Name == Settings.CloneName) return null;
+
+            PetInheritanceSettings wizard = Settings.WizardPetInheritance;
+            return wizard != null && wizard.Enabled ? wizard : null;
+        }
+
+        private void AddInheritedStat(Stat stat, int source, int percent)
+        {
+            if (percent <= 0) return;
+
+            Stats[stat] += (int)((long)source * percent / 100);
         }
 
         protected virtual void RefreshBuffs()

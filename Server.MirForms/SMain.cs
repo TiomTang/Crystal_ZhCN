@@ -499,6 +499,13 @@ namespace Server
             GenForm.ShowDialog();
         }
 
+        private void petInheritanceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PetInheritanceForm form = new PetInheritanceForm();
+
+            form.ShowDialog();
+        }
+
         private void clearBlockedIPsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Envir.IPBlocks.Clear();

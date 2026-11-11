@@ -25,6 +25,7 @@
       "MonsterTunerForm",
       "NPCInfoForm",
       "Namelists",
+      "PetInheritanceForm",
       "PlayerInfoForm",
       "QuestInfoForm",
       "RecipeInfoForm",
@@ -3170,6 +3171,78 @@
     "Source": "OK",
     "Text": "确定"
   },
+  "ui.PetInheritanceForm.#Title": {
+    "Source": "Pet Inheritance",
+    "Text": "仆从属性继承"
+  },
+  "ui.PetInheritanceForm.lblHint": {
+    "Source": "Inherited values are added on top of the servant template and pet level. Percentages use the owner core attribute, health is added per attribute point.",
+    "Text": "继承值在仆从模板与等级属性之上叠加。百分比按主人对应主属性计算，血量按主属性每点增加。"
+  },
+  "ui.PetInheritanceForm.grpTaoist": {
+    "Source": "Taoist summons (skeleton, shinsu, holy deva)",
+    "Text": "道士召唤兽（骷髅 / 神兽 / 圣兽）"
+  },
+  "ui.PetInheritanceForm.chkTaoistEnabled": {
+    "Source": "Enable inheritance",
+    "Text": "启用继承"
+  },
+  "ui.PetInheritanceForm.lblTaoistSource": {
+    "Source": "Owner attribute source: max Taoism (SC)",
+    "Text": "主人属性来源：最大道术"
+  },
+  "ui.PetInheritanceForm.lblTaoistDamage": {
+    "Source": "Attack min / max percentage",
+    "Text": "攻击下限 / 上限 %"
+  },
+  "ui.PetInheritanceForm.lblTaoistDefence": {
+    "Source": "Defence min / max percentage",
+    "Text": "物防下限 / 上限 %"
+  },
+  "ui.PetInheritanceForm.lblTaoistMagicDefence": {
+    "Source": "Magic defence min / max percentage",
+    "Text": "魔防下限 / 上限 %"
+  },
+  "ui.PetInheritanceForm.lblTaoistHealth": {
+    "Source": "Health per attribute point",
+    "Text": "每点道术增加血量"
+  },
+  "ui.PetInheritanceForm.grpWizard": {
+    "Source": "Wizard tamed pets",
+    "Text": "法师诱惑宝宝"
+  },
+  "ui.PetInheritanceForm.chkWizardEnabled": {
+    "Source": "Enable inheritance",
+    "Text": "启用继承"
+  },
+  "ui.PetInheritanceForm.lblWizardSource": {
+    "Source": "Owner attribute source: max Magic (MC)",
+    "Text": "主人属性来源：最大魔法"
+  },
+  "ui.PetInheritanceForm.lblWizardDamage": {
+    "Source": "Attack min / max percentage",
+    "Text": "攻击下限 / 上限 %"
+  },
+  "ui.PetInheritanceForm.lblWizardDefence": {
+    "Source": "Defence min / max percentage",
+    "Text": "物防下限 / 上限 %"
+  },
+  "ui.PetInheritanceForm.lblWizardMagicDefence": {
+    "Source": "Magic defence min / max percentage",
+    "Text": "魔防下限 / 上限 %"
+  },
+  "ui.PetInheritanceForm.lblWizardHealth": {
+    "Source": "Health per attribute point",
+    "Text": "每点魔法增加血量"
+  },
+  "ui.PetInheritanceForm.btnSave": {
+    "Source": "Save and apply",
+    "Text": "保存并应用"
+  },
+  "ui.PetInheritanceForm.btnCancel": {
+    "Source": "Close",
+    "Text": "关闭"
+  },
   "ui.PlayerInfoForm.#Title": {
     "Source": "PlayerInfoForm",
     "Text": "玩家信息"
@@ -5609,6 +5682,10 @@
   "ui.SMain.MainMenu.configToolStripMenuItem1.balanceToolStripMenuItem": {
     "Source": "Balance",
     "Text": "平衡性"
+  },
+  "ui.SMain.MainMenu.configToolStripMenuItem1.petInheritanceToolStripMenuItem": {
+    "Source": "Servant Inheritance",
+    "Text": "仆从属性继承"
   },
   "ui.SMain.MainMenu.configToolStripMenuItem1.systemToolStripMenuItem": {
     "Source": "System",

@@ -649,6 +649,7 @@ namespace Server
             LoadMentor();
             LoadGoods();
             LoadMonsterRarity();
+            LoadPetInheritance();
             LoadGem();
             LoadNotice();
             LoadWorldMap();
