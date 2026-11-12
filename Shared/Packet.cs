@@ -399,6 +399,8 @@ public abstract class Packet
                 return new C.GuildTerritoryPage();
             case (short)ClientPacketIds.DeleteItem:
                 return new C.DeleteItem();
+            case (short)ClientPacketIds.RequestObjectInfo:
+                return new C.RequestObjectInfo();
             default:
                 return null;
         }
@@ -964,6 +966,8 @@ public abstract class Packet
                 return new S.SetCompass();
             case (short)ServerPacketIds.GuildTerritoryPage:
                 return new S.GuildTerritoryPage();
+            case (short)ServerPacketIds.ObjectInfo:
+                return new S.ObjectInfo();
             default:
                 return null;
         }

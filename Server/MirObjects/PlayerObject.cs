@@ -7741,6 +7741,81 @@ namespace Server.MirObjects
             Connection.CheckMonsterInfo(info);
         }
 
+        public void RequestObjectInfo(uint objectID)
+        {
+            S.ObjectInfo info = GetObjectInfo(objectID);
+
+            if (info == null || Connection == null) return;
+
+            Connection.Enqueue(info);
+        }
+
+        public S.ObjectInfo GetObjectInfo(uint objectID)
+        {
+            if (objectID == 0 || CurrentMap == null) return null;
+
+            MapObject target = null;
+            int range = Globals.DataRange;
+
+            for (int y = CurrentLocation.Y - range; y <= CurrentLocation.Y + range && target == null; y++)
+            {
+                if (y < 0 || y >= CurrentMap.Height) continue;
+
+                for (int x = CurrentLocation.X - range; x <= CurrentLocation.X + range && target == null; x++)
+                {
+                    if (x < 0 || x >= CurrentMap.Width) continue;
+
+                    Cell cell = CurrentMap.GetCell(x, y);
+                    if (cell?.Objects == null) continue;
+
+                    for (int i = 0; i < cell.Objects.Count; i++)
+                    {
+                        if (cell.Objects[i].ObjectID != objectID) continue;
+
+                        target = cell.Objects[i];
+                        break;
+                    }
+                }
+            }
+
+            // Only objects the player can actually see may be inspected, otherwise the
+            // request could be forged to read stats of hidden or distant objects.
+            if (target == null) return null;
+            if (target.Hidden && !IsGM) return null;
+
+            // NPCs and other non-combat objects throw on Level/Health, and the client
+            // already knows their name, so there is nothing useful to send.
+            if (target is not MonsterObject && target is not HumanObject) return null;
+
+            S.ObjectInfo info = new S.ObjectInfo
+            {
+                ObjectID = target.ObjectID,
+                HP = target.Health,
+                MaxHP = target.MaxHealth,
+            };
+
+            if (target is MonsterObject monster)
+            {
+                info.Level = monster.Level;
+
+                // Offensive and defensive values are only exposed for monsters.
+                // Player and hero stats stay private.
+                info.Combat = true;
+                info.MinDC = monster.Stats[Stat.MinDC];
+                info.MaxDC = monster.Stats[Stat.MaxDC];
+                info.MinAC = monster.Stats[Stat.MinAC];
+                info.MaxAC = monster.Stats[Stat.MaxAC];
+                info.MinMAC = monster.Stats[Stat.MinMAC];
+                info.MaxMAC = monster.Stats[Stat.MaxMAC];
+            }
+            else
+            {
+                info.Level = ((HumanObject)target).Level;
+            }
+
+            return info;
+        }
+
         public void RequestNPCInfo(int npcIndex)
         {
             if (npcIndex <= 0 || Connection == null) return;

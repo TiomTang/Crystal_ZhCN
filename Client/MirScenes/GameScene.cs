@@ -169,6 +169,40 @@ namespace Client.MirScenes
         private static readonly HashSet<int> RequestedMonsterInfo = new HashSet<int>();
         private static readonly HashSet<int> RequestedNPCInfo = new HashSet<int>();
 
+        public sealed class ObjectInfoEntry
+        {
+            public ushort Level;
+            public int HP, MaxHP;
+            public int MinDC, MaxDC, MinAC, MaxAC, MinMAC, MaxMAC;
+            public bool Combat;
+        }
+
+        public static readonly Dictionary<uint, ObjectInfoEntry> ObjectInfoCache = new Dictionary<uint, ObjectInfoEntry>();
+        private static readonly Dictionary<uint, long> ObjectInfoRequestTime = new Dictionary<uint, long>();
+
+        public static void RequestObjectInfo(uint objectID)
+        {
+            if (objectID == 0 || !Network.Connected) return;
+            if (ObjectInfoRequestTime.TryGetValue(objectID, out long last) && CMain.Time < last + 800) return;
+            if (ObjectInfoRequestTime.Count > 512) ObjectInfoRequestTime.Clear();
+
+            ObjectInfoRequestTime[objectID] = CMain.Time;
+
+            Network.Enqueue(new C.RequestObjectInfo { ObjectID = objectID });
+        }
+
+        public static void ClearObjectInfo(uint objectID)
+        {
+            ObjectInfoCache.Remove(objectID);
+            ObjectInfoRequestTime.Remove(objectID);
+        }
+
+        public static void ClearObjectInfoCache()
+        {
+            ObjectInfoCache.Clear();
+            ObjectInfoRequestTime.Clear();
+        }
+
         public static void RequestItemInfo(int index)
         {
             if (index <= 0 || HasItemInfo(index) || !RequestedItemInfo.Add(index)) return;
@@ -249,6 +283,7 @@ namespace Client.MirScenes
 
         public static bool PickedUpGold;
         public MirControl ItemLabel, MailLabel, MemoLabel, GuildBuffLabel;
+        public ObjectInfoDialog ObjectInfoDialog;
         public static long UseItemTime, PickUpTime, DropViewTime, TargetDeadTime;
         public static uint Gold, Credit;
         public static long InspectTime;
@@ -398,6 +433,8 @@ namespace Client.MirScenes
             TimerControl = new TimerDialog { Parent = this, Visible = false };
             CompassControl = new CompassDialog { Parent = this, Visible = false };
             RollControl = new RollDialog { Parent = this, Visible = false };
+
+            ObjectInfoDialog = new ObjectInfoDialog { Parent = this, Visible = false };
 
             for (int i = 0; i < OutputLines.Length; i++)
                 OutputLines[i] = new MirLabel
@@ -1775,6 +1812,9 @@ namespace Client.MirScenes
                     break;
                 case (short)ServerPacketIds.ObjectHealth:
                     ObjectHealth((S.ObjectHealth)p);
+                    break;
+                case (short)ServerPacketIds.ObjectInfo:
+                    ObjectInfo((S.ObjectInfo)p);
                     break;
                 case (short)ServerPacketIds.ObjectMana:
                     ObjectMana((S.ObjectMana)p);
@@ -5167,6 +5207,23 @@ namespace Client.MirScenes
                 ob.PercentHealth = p.Percent;
                 ob.HealthTime = CMain.Time + p.Expire * 1000;
             }
+        }
+
+        private void ObjectInfo(S.ObjectInfo p)
+        {
+            ObjectInfoCache[p.ObjectID] = new ObjectInfoEntry
+            {
+                Level = p.Level,
+                HP = p.HP,
+                MaxHP = p.MaxHP,
+                MinDC = p.MinDC,
+                MaxDC = p.MaxDC,
+                MinAC = p.MinAC,
+                MaxAC = p.MaxAC,
+                MinMAC = p.MinMAC,
+                MaxMAC = p.MaxMAC,
+                Combat = p.Combat,
+            };
         }
 
         private void ObjectMana(S.ObjectMana p)
@@ -10356,6 +10413,8 @@ namespace Client.MirScenes
 
         private MonsterObject _hoverMonster;
         private Point _hoverMouseLocation, _hoverOffset;
+        private uint _objectInfoHoverID;
+        private long _objectInfoHoverTime;
 
         private bool _autoPath;
         public bool AutoPath
@@ -10471,6 +10530,8 @@ namespace Client.MirScenes
 
         public void ResetMap()
         {
+            GameScene.ClearObjectInfoCache();
+
             _hoverMonster = null;
             GameScene.Scene.NPCDialog.Hide();
 
@@ -10550,6 +10611,48 @@ namespace Client.MirScenes
             CheckInput();
 
             UpdateMouseObject();
+            ProcessObjectInfo();
+        }
+
+        private void ProcessObjectInfo()
+        {
+            if (!Settings.ObjectInfo)
+            {
+                _objectInfoHoverID = 0;
+                GameScene.Scene?.ObjectInfoDialog?.HideInfo();
+                return;
+            }
+
+            // Do not float the tooltip over open dialogs, the inventory or the chat bar.
+            if (MirControl.MouseControl != null && MirControl.MouseControl != this)
+            {
+                _objectInfoHoverID = 0;
+                GameScene.Scene?.ObjectInfoDialog?.HideInfo();
+                return;
+            }
+
+            MapObject target = MapObject.MouseObject;
+
+            if (target == null || target == MapObject.User || target is ItemObject || target is SpellObject || target is DecoObject)
+            {
+                _objectInfoHoverID = 0;
+                GameScene.Scene?.ObjectInfoDialog?.HideInfo();
+                return;
+            }
+
+            if (target.ObjectID != _objectInfoHoverID)
+            {
+                // Wait a moment before querying so sweeping the cursor across a row of
+                // monsters does not spam the server.
+                _objectInfoHoverID = target.ObjectID;
+                _objectInfoHoverTime = CMain.Time + 250;
+            }
+            else if (CMain.Time >= _objectInfoHoverTime && !(target is NPCObject))
+            {
+                GameScene.RequestObjectInfo(target.ObjectID);
+            }
+
+            GameScene.Scene?.ObjectInfoDialog?.ShowInfo(target);
         }
 
         private void UpdateMouseObject()

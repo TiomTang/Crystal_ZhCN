@@ -2715,4 +2715,22 @@ namespace ClientPackets
             writer.Write(HeroInventory);
         }
     }
+    public sealed class RequestObjectInfo : Packet
+    {
+        public override short Index
+        {
+            get { return (short)ClientPacketIds.RequestObjectInfo; }
+        }
+
+        public uint ObjectID;
+
+        protected override void ReadPacket(BinaryReader reader)
+        {
+            ObjectID = reader.ReadUInt32();
+        }
+        protected override void WritePacket(BinaryWriter writer)
+        {
+            writer.Write(ObjectID);
+        }
+    }
 }

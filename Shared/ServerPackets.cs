@@ -6838,4 +6838,49 @@ namespace ServerPackets
             Info.Save(writer);
         }
     }
+    public sealed class ObjectInfo : Packet
+    {
+        public override short Index
+        {
+            get { return (short)ServerPacketIds.ObjectInfo; }
+        }
+
+        public override bool Observable => false;
+
+        public uint ObjectID;
+        public ushort Level;
+        public int HP, MaxHP;
+        public int MinDC, MaxDC, MinAC, MaxAC, MinMAC, MaxMAC;
+        public bool Combat;
+
+        protected override void ReadPacket(BinaryReader reader)
+        {
+            ObjectID = reader.ReadUInt32();
+            Level = reader.ReadUInt16();
+            HP = reader.ReadInt32();
+            MaxHP = reader.ReadInt32();
+            MinDC = reader.ReadInt32();
+            MaxDC = reader.ReadInt32();
+            MinAC = reader.ReadInt32();
+            MaxAC = reader.ReadInt32();
+            MinMAC = reader.ReadInt32();
+            MaxMAC = reader.ReadInt32();
+            Combat = reader.ReadBoolean();
+        }
+
+        protected override void WritePacket(BinaryWriter writer)
+        {
+            writer.Write(ObjectID);
+            writer.Write(Level);
+            writer.Write(HP);
+            writer.Write(MaxHP);
+            writer.Write(MinDC);
+            writer.Write(MaxDC);
+            writer.Write(MinAC);
+            writer.Write(MaxAC);
+            writer.Write(MinMAC);
+            writer.Write(MaxMAC);
+            writer.Write(Combat);
+        }
+    }
 }

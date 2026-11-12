@@ -153,6 +153,8 @@ namespace Client.MirObjects
 
         public void Remove()
         {
+            GameScene.ClearObjectInfo(ObjectID);
+
             if (MouseObject == this) MouseObjectID = 0;
             if (TargetObject == this)
             {

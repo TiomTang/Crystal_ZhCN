@@ -78,6 +78,7 @@ namespace Server.MirNetwork
         public List<RecipeInfo> SentRecipeInfo = new List<RecipeInfo>();
         public List<UserItem> SentChatItem = new List<UserItem>(); //TODO - Add Expiry time
         public List<MapInfo> SentMapInfo = new List<MapInfo>();
+        private long _lastObjectInfoTime;
         public List<ulong> SentHeroInfo = new List<ulong>();
         public bool WorldMapSetupSent;
         public bool StorageSent;
@@ -482,6 +483,9 @@ namespace Server.MirNetwork
                     break;
                 case (short)ClientPacketIds.RequestMonsterInfo:
                     RequestMonsterInfo((C.RequestMonsterInfo)p);
+                    break;
+                case (short)ClientPacketIds.RequestObjectInfo:
+                    RequestObjectInfo((C.RequestObjectInfo)p);
                     break;
                 case (short)ClientPacketIds.RequestNPCInfo:
                     RequestNPCInfo((C.RequestNPCInfo)p);
@@ -1522,6 +1526,18 @@ namespace Server.MirNetwork
             if (Stage != GameStage.Game) return;
 
             Player.RequestMonsterInfo(p.MonsterIndex);
+        }
+
+        private void RequestObjectInfo(C.RequestObjectInfo p)
+        {
+            if (Stage != GameStage.Game) return;
+
+            // Rate limit the lookup so a forged client cannot scan the map through it.
+            if (Envir.Time < _lastObjectInfoTime + 100) return;
+
+            _lastObjectInfoTime = Envir.Time;
+
+            Player.RequestObjectInfo(p.ObjectID);
         }
 
         private void RequestNPCInfo(C.RequestNPCInfo p)
