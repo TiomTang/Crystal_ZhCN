@@ -172,7 +172,8 @@ namespace Client
             ExpandedHeroBuffWindow = true,
             DisplayBodyName = false,
             NewMove = false,
-            ObjectInfo = true;
+            ObjectInfo = true,
+            PetStatus = true;
 
         public static string Language = "English";
 
@@ -297,6 +298,7 @@ namespace Client
             DisplayBodyName = Reader.ReadBoolean("Game", "DisplayBodyName", DisplayBodyName);
             NewMove = Reader.ReadBoolean("Game", "NewMove", NewMove);
             ObjectInfo = Reader.ReadBoolean("Game", "ObjectInfo", ObjectInfo);
+            PetStatus = Reader.ReadBoolean("Game", "PetStatus", PetStatus);
             Language = Reader.ReadString("Game", "Language", Language);
 
             for (int i = 0; i < SkillbarLocation.Length / 2; i++)
@@ -380,6 +382,7 @@ namespace Client
             Reader.Write("Game", "DisplayBodyName", DisplayBodyName);
             Reader.Write("Game", "NewMove", NewMove);
             Reader.Write("Game", "ObjectInfo", ObjectInfo);
+            Reader.Write("Game", "PetStatus", PetStatus);
             Reader.Write("Game", "Language", Language);
 
             for (int i = 0; i < SkillbarLocation.Length / 2; i++)

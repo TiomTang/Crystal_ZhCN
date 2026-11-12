@@ -284,6 +284,7 @@ namespace Client.MirScenes
         public static bool PickedUpGold;
         public MirControl ItemLabel, MailLabel, MemoLabel, GuildBuffLabel;
         public ObjectInfoDialog ObjectInfoDialog;
+        public PetStatusDialog PetStatusDialog;
         public static long UseItemTime, PickUpTime, DropViewTime, TargetDeadTime;
         public static uint Gold, Credit;
         public static long InspectTime;
@@ -434,6 +435,7 @@ namespace Client.MirScenes
             CompassControl = new CompassDialog { Parent = this, Visible = false };
             RollControl = new RollDialog { Parent = this, Visible = false };
 
+            PetStatusDialog = new PetStatusDialog { Parent = this };
             ObjectInfoDialog = new ObjectInfoDialog { Parent = this, Visible = false };
 
             for (int i = 0; i < OutputLines.Length; i++)
@@ -10535,6 +10537,8 @@ namespace Client.MirScenes
             _hoverMonster = null;
             GameScene.Scene.NPCDialog.Hide();
 
+            GameScene.Scene?.PetStatusDialog?.Clear();
+
             MapObject.MouseObjectID = 0;
             MapObject.TargetObjectID = 0;
             MapObject.MagicObjectID = 0;
@@ -10610,7 +10614,12 @@ namespace Client.MirScenes
 
             CheckInput();
 
-            UpdateMouseObject();
+            // A pet card under the cursor becomes the mouse target, so spells and
+            // clicks reach the pet instead of whatever the map scan would find.
+            PetStatusDialog petStatus = GameScene.Scene?.PetStatusDialog;
+            if (petStatus == null || !petStatus.Process())
+                UpdateMouseObject();
+
             ProcessObjectInfo();
         }
 
@@ -10624,7 +10633,9 @@ namespace Client.MirScenes
             }
 
             // Do not float the tooltip over open dialogs, the inventory or the chat bar.
-            if (MirControl.MouseControl != null && MirControl.MouseControl != this)
+            // The pet roster is an exception: hovering it is the same as hovering the pet.
+            if (MirControl.MouseControl != null && MirControl.MouseControl != this &&
+                !PetStatusDialog.IsPetStatusControl(MirControl.MouseControl))
             {
                 _objectInfoHoverID = 0;
                 GameScene.Scene?.ObjectInfoDialog?.HideInfo();
