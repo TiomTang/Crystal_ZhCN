@@ -20,6 +20,7 @@
       "Market",
       "MiningDetailForm",
       "MiningInfoForm",
+      "MonsterBindingForm",
       "MonsterInfoForm",
       "MonsterInfoFormNew",
       "MonsterTunerForm",
@@ -5686,6 +5687,10 @@
   "ui.SMain.MainMenu.configToolStripMenuItem1.petInheritanceToolStripMenuItem": {
     "Source": "Servant Inheritance",
     "Text": "仆从属性继承"
+  },
+  "ui.SMain.MainMenu.configToolStripMenuItem1.monsterBindingsToolStripMenuItem": {
+    "Source": "Monster Bindings",
+    "Text": "怪物名称绑定"
   },
   "ui.SMain.MainMenu.configToolStripMenuItem1.systemToolStripMenuItem": {
     "Source": "System",
@@ -13590,5 +13595,181 @@
   "ui.ConfigForm.label24": {
     "Source": "(IPv4/IPv6. \"::\" = both stacks, \"0.0.0.0\" = IPv4 only)",
     "Text": "（IPv4/IPv6。\"::\" = 双栈，\"0.0.0.0\" = 仅 IPv4）"
+  },
+  "ui.ConfigForm.tabPage7": {
+    "Source": "Gameplay",
+    "Text": "玩法"
+  },
+  "ui.ConfigForm.grpItemTimers": {
+    "Source": "Ground items",
+    "Text": "地面物品"
+  },
+  "ui.ConfigForm.label25": {
+    "Source": "Dropped item lifetime:",
+    "Text": "地面物品存在时长："
+  },
+  "ui.ConfigForm.label26": {
+    "Source": "minutes",
+    "Text": "分钟"
+  },
+  "ui.ConfigForm.label27": {
+    "Source": "Player death drop lifetime:",
+    "Text": "死亡掉落物存在时长："
+  },
+  "ui.ConfigForm.label28": {
+    "Source": "minutes",
+    "Text": "分钟"
+  },
+  "ui.ConfigForm.grpPetsMonsters": {
+    "Source": "Pets and monster behaviour",
+    "Text": "宠物与怪物行为"
+  },
+  "ui.ConfigForm.chkPetSave": {
+    "Source": "Keep pets permanently (off: tamed pets leave after 60 minutes)",
+    "Text": "宠物永久保留（关闭时诱惑宠物 60 分钟后离队）"
+  },
+  "ui.ConfigForm.label29": {
+    "Source": "Charmed boss limit (0 = disallow):",
+    "Text": "可诱惑 BOSS 数量上限（0 = 禁止）："
+  },
+  "ui.ConfigForm.chkMonsterRecallEnabled": {
+    "Source": "Teleport monsters to an out-of-range target",
+    "Text": "目标超出判定距离时把怪物传到目标身边"
+  },
+  "ui.ConfigForm.label30": {
+    "Source": "Recall range (tiles):",
+    "Text": "召回判定距离（格）："
+  },
+  "ui.ConfigForm.lblRecallScope": {
+    "Source": "CanRecall monsters only",
+    "Text": "仅限勾选「可召回」的怪"
+  },
+  "ui.ConfigForm.label31": {
+    "Source": "Recall cooldown (ms):",
+    "Text": "召回冷却（毫秒）："
+  },
+  "ui.ConfigForm.grpCooldowns": {
+    "Source": "Cooldowns and costs",
+    "Text": "冷却与费用"
+  },
+  "ui.ConfigForm.label32": {
+    "Source": "PK point decay (seconds):",
+    "Text": "PK 值衰减间隔（秒）："
+  },
+  "ui.ConfigForm.label33": {
+    "Source": "Group invite cooldown (ms):",
+    "Text": "组队邀请冷却（毫秒）："
+  },
+  "ui.ConfigForm.label34": {
+    "Source": "Trade request cooldown (ms):",
+    "Text": "交易请求冷却（毫秒）："
+  },
+  "ui.ConfigForm.label35": {
+    "Source": "NPC teleport cost (gold):",
+    "Text": "NPC 传送费用（金币）："
+  },
+  "ui.ConfigForm.label36": {
+    "Source": "(0 = free)",
+    "Text": "（0 = 免费）"
+  },
+  "ui.GuildInfoForm.lblNewbieGuildName": {
+    "Source": "Newbie guild:",
+    "Text": "新手帮会名："
+  },
+  "ui.GuildInfoForm.lblNewbieGuildMaxSize": {
+    "Source": "Member limit:",
+    "Text": "成员上限："
+  },
+  "ui.MonsterBindingForm.#Title": {
+    "Source": "Monster Bindings",
+    "Text": "怪物名称绑定"
+  },
+  "ui.MonsterBindingForm.lblHint": {
+    "Source": "These names live in Configs/Setup.ini and must match a monster record. An entry that matches nothing makes its feature do nothing, and the server only checks them when EnforceDBChecks is enabled.",
+    "Text": "这些名称写在 Configs/Setup.ini，必须与怪物库中的记录对应。匹配不到的名字会让对应功能静默失效；只有开启 EnforceDBChecks 时服务器才会在启动时校验。"
+  },
+  "ui.MonsterBindingForm.lvBindings.colGroup": {
+    "Source": "Purpose",
+    "Text": "用途"
+  },
+  "ui.MonsterBindingForm.lvBindings.colKey": {
+    "Source": "Setting key",
+    "Text": "配置键"
+  },
+  "ui.MonsterBindingForm.lvBindings.colUsedBy": {
+    "Source": "Used by",
+    "Text": "使用位置"
+  },
+  "ui.MonsterBindingForm.lvBindings.colValue": {
+    "Source": "Monster name",
+    "Text": "怪物名称"
+  },
+  "ui.MonsterBindingForm.lvBindings.colStatus": {
+    "Source": "Status",
+    "Text": "状态"
+  },
+  "ui.MonsterBindingForm.chkOnlyUnresolved": {
+    "Source": "Only show unresolved entries",
+    "Text": "只显示未解析项"
+  },
+  "ui.MonsterBindingForm.grpEdit": {
+    "Source": "Change the monster",
+    "Text": "修改指向的怪物"
+  },
+  "ui.MonsterBindingForm.lblMonster": {
+    "Source": "Monster:",
+    "Text": "怪物："
+  },
+  "ui.MonsterBindingForm.btnApply": {
+    "Source": "Set name",
+    "Text": "设置名称"
+  },
+  "ui.MonsterBindingForm.btnSave": {
+    "Source": "Save",
+    "Text": "保存"
+  },
+  "ui.MonsterBindingForm.btnClose": {
+    "Source": "Close",
+    "Text": "关闭"
+  },
+  "Select a row to change the monster it points at.": {
+    "Source": "Select a row to change the monster it points at.",
+    "Text": "选中一行后为它指定怪物。"
+  },
+  "Unresolved: {0} of {1}": {
+    "Source": "Unresolved: {0} of {1}",
+    "Text": "未解析：{0} / {1}"
+  },
+  "index {0}": {
+    "Source": "index {0}",
+    "Text": "编号 {0}"
+  },
+  "Not found": {
+    "Source": "Not found",
+    "Text": "未找到"
+  },
+  "Taoist summons": {
+    "Source": "Taoist summons",
+    "Text": "道士召唤物"
+  },
+  "Clones": {
+    "Source": "Clones",
+    "Text": "分身"
+  },
+  "Poison and totem summons": {
+    "Source": "Poison and totem summons",
+    "Text": "毒系与图腾召唤"
+  },
+  "Stone trap": {
+    "Source": "Stone trap",
+    "Text": "石陷阱"
+  },
+  "Boss minion summons": {
+    "Source": "Boss minion summons",
+    "Text": "BOSS 召唤物"
+  },
+  "Special spawns": {
+    "Source": "Special spawns",
+    "Text": "特殊生成"
   }
 }
