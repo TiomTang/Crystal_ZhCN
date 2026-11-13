@@ -61,6 +61,10 @@
             NewbieGuildExptextBox = new TextBox();
             label29 = new Label();
             NewbieGuildBuffEnabledcheckBox = new CheckBox();
+            lblNewbieGuildName = new Label();
+            txtNewbieGuildName = new TextBox();
+            lblNewbieGuildMaxSize = new Label();
+            nudNewbieGuildMaxSize = new NumericUpDown();
             BuffPanel = new Panel();
             bufftxtIcon = new TextBox();
             label28 = new Label();
@@ -137,6 +141,7 @@
             tabPage2.SuspendLayout();
             groupBox9.SuspendLayout();
             tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(nudNewbieGuildMaxSize)).BeginInit();
             BuffPanel.SuspendLayout();
             groupBox2.SuspendLayout();
             tabPage4.SuspendLayout();
@@ -457,6 +462,10 @@
             tabPage3.Controls.Add(NewbieGuildExptextBox);
             tabPage3.Controls.Add(label29);
             tabPage3.Controls.Add(NewbieGuildBuffEnabledcheckBox);
+            tabPage3.Controls.Add(lblNewbieGuildName);
+            tabPage3.Controls.Add(txtNewbieGuildName);
+            tabPage3.Controls.Add(lblNewbieGuildMaxSize);
+            tabPage3.Controls.Add(nudNewbieGuildMaxSize);
             tabPage3.Controls.Add(BuffPanel);
             tabPage3.Controls.Add(BuffList);
             tabPage3.Controls.Add(BuffDelete);
@@ -497,6 +506,46 @@
             NewbieGuildBuffEnabledcheckBox.Text = "Enable NewbieGuild Exp Buff:";
             NewbieGuildBuffEnabledcheckBox.UseVisualStyleBackColor = true;
             NewbieGuildBuffEnabledcheckBox.CheckedChanged += NewbieGuildBuffEnabledcheckBox_CheckedChanged;
+            // 
+            // lblNewbieGuildName
+            // 
+            lblNewbieGuildName.AutoSize = true;
+            lblNewbieGuildName.Location = new Point(198, 13);
+            lblNewbieGuildName.Name = "lblNewbieGuildName";
+            lblNewbieGuildName.Size = new Size(85, 15);
+            lblNewbieGuildName.TabIndex = 7;
+            lblNewbieGuildName.Text = "Newbie guild:";
+            // 
+            // txtNewbieGuildName
+            // 
+            txtNewbieGuildName.Location = new Point(289, 9);
+            txtNewbieGuildName.Margin = new Padding(4, 3, 4, 3);
+            txtNewbieGuildName.Name = "txtNewbieGuildName";
+            txtNewbieGuildName.Size = new Size(115, 23);
+            txtNewbieGuildName.TabIndex = 8;
+            txtNewbieGuildName.TextChanged += txtNewbieGuildName_TextChanged;
+            txtNewbieGuildName.Leave += txtNewbieGuildName_Leave;
+            // 
+            // lblNewbieGuildMaxSize
+            // 
+            lblNewbieGuildMaxSize.AutoSize = true;
+            lblNewbieGuildMaxSize.Location = new Point(412, 13);
+            lblNewbieGuildMaxSize.Name = "lblNewbieGuildMaxSize";
+            lblNewbieGuildMaxSize.Size = new Size(82, 15);
+            lblNewbieGuildMaxSize.TabIndex = 9;
+            lblNewbieGuildMaxSize.Text = "Member limit:";
+            // 
+            // nudNewbieGuildMaxSize
+            // 
+            nudNewbieGuildMaxSize.Location = new Point(498, 9);
+            nudNewbieGuildMaxSize.Margin = new Padding(4, 3, 4, 3);
+            nudNewbieGuildMaxSize.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
+            nudNewbieGuildMaxSize.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudNewbieGuildMaxSize.Name = "nudNewbieGuildMaxSize";
+            nudNewbieGuildMaxSize.Size = new Size(54, 23);
+            nudNewbieGuildMaxSize.TabIndex = 10;
+            nudNewbieGuildMaxSize.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            nudNewbieGuildMaxSize.ValueChanged += nudNewbieGuildMaxSize_ValueChanged;
             // 
             // BuffPanel
             // 
@@ -1246,6 +1295,7 @@
             groupBox9.PerformLayout();
             tabPage3.ResumeLayout(false);
             tabPage3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(nudNewbieGuildMaxSize)).EndInit();
             BuffPanel.ResumeLayout(false);
             BuffPanel.PerformLayout();
             groupBox2.ResumeLayout(false);
@@ -1363,5 +1413,9 @@
         private Label label32;
         private Label label31;
         private Label label30;
+        private Label lblNewbieGuildName;
+        private TextBox txtNewbieGuildName;
+        private Label lblNewbieGuildMaxSize;
+        private NumericUpDown nudNewbieGuildMaxSize;
     }
 }

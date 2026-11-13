@@ -99,6 +99,7 @@ namespace Server
             serverToolStripMenuItem = new ToolStripMenuItem();
             balanceToolStripMenuItem = new ToolStripMenuItem();
             petInheritanceToolStripMenuItem = new ToolStripMenuItem();
+            monsterBindingsToolStripMenuItem = new ToolStripMenuItem();
             systemToolStripMenuItem = new ToolStripMenuItem();
             dragonSystemToolStripMenuItem = new ToolStripMenuItem();
             miningToolStripMenuItem = new ToolStripMenuItem();
@@ -613,7 +614,7 @@ namespace Server
             // 
             // configToolStripMenuItem1
             // 
-            configToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { serverToolStripMenuItem, balanceToolStripMenuItem, petInheritanceToolStripMenuItem, systemToolStripMenuItem, monsterTunerToolStripMenuItem, dropBuilderToolStripMenuItem });
+            configToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { serverToolStripMenuItem, balanceToolStripMenuItem, petInheritanceToolStripMenuItem, monsterBindingsToolStripMenuItem, systemToolStripMenuItem, monsterTunerToolStripMenuItem, dropBuilderToolStripMenuItem });
             configToolStripMenuItem1.Name = "configToolStripMenuItem1";
             configToolStripMenuItem1.Size = new Size(55, 20);
             configToolStripMenuItem1.Text = "Config";
@@ -638,6 +639,13 @@ namespace Server
             petInheritanceToolStripMenuItem.Size = new Size(152, 22);
             petInheritanceToolStripMenuItem.Text = "Servant Inheritance";
             petInheritanceToolStripMenuItem.Click += petInheritanceToolStripMenuItem_Click;
+            // 
+            // monsterBindingsToolStripMenuItem
+            // 
+            monsterBindingsToolStripMenuItem.Name = "monsterBindingsToolStripMenuItem";
+            monsterBindingsToolStripMenuItem.Size = new Size(152, 22);
+            monsterBindingsToolStripMenuItem.Text = "Monster Bindings";
+            monsterBindingsToolStripMenuItem.Click += monsterBindingsToolStripMenuItem_Click;
             // 
             // systemToolStripMenuItem
             // 
@@ -842,6 +850,7 @@ namespace Server
         private ToolStripMenuItem serverToolStripMenuItem;
         private ToolStripMenuItem balanceToolStripMenuItem;
         private ToolStripMenuItem petInheritanceToolStripMenuItem;
+        private ToolStripMenuItem monsterBindingsToolStripMenuItem;
         private ToolStripMenuItem systemToolStripMenuItem;
         private ToolStripMenuItem dragonSystemToolStripMenuItem;
         private ToolStripMenuItem guildsToolStripMenuItem;

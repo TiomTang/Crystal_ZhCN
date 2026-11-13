@@ -117,6 +117,34 @@
             label17 = new Label();
             gameMasterEffect_CheckBox = new CheckBox();
             label8 = new Label();
+            tabPage7 = new TabPage();
+            grpItemTimers = new GroupBox();
+            label25 = new Label();
+            nudItemTimeOut = new NumericUpDown();
+            label26 = new Label();
+            label27 = new Label();
+            nudPlayerDiedItemTimeOut = new NumericUpDown();
+            label28 = new Label();
+            grpPetsMonsters = new GroupBox();
+            chkPetSave = new CheckBox();
+            label29 = new Label();
+            nudMaxBossTames = new NumericUpDown();
+            chkMonsterRecallEnabled = new CheckBox();
+            label30 = new Label();
+            nudRecallRange = new NumericUpDown();
+            label31 = new Label();
+            nudRecallCooldown = new NumericUpDown();
+            lblRecallScope = new Label();
+            grpCooldowns = new GroupBox();
+            label32 = new Label();
+            nudPKDelay = new NumericUpDown();
+            label33 = new Label();
+            nudGroupInviteDelay = new NumericUpDown();
+            label34 = new Label();
+            nudTradeDelay = new NumericUpDown();
+            label35 = new Label();
+            nudTeleportToNPCCost = new NumericUpDown();
+            label36 = new Label();
             VPathDialog = new OpenFileDialog();
             configTabs.SuspendLayout();
             tabPage1.SuspendLayout();
@@ -135,6 +163,19 @@
             gbGlobals.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dropRateInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)expRateInput).BeginInit();
+            tabPage7.SuspendLayout();
+            grpItemTimers.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudItemTimeOut).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudPlayerDiedItemTimeOut).BeginInit();
+            grpPetsMonsters.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudMaxBossTames).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudRecallRange).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudRecallCooldown).BeginInit();
+            grpCooldowns.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudPKDelay).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudGroupInviteDelay).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudTradeDelay).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudTeleportToNPCCost).BeginInit();
             tabPage5.SuspendLayout();
             groupBox2.SuspendLayout();
             SuspendLayout();
@@ -158,6 +199,7 @@
             configTabs.Controls.Add(tabPage3);
             configTabs.Controls.Add(tabPage6);
             configTabs.Controls.Add(tabPage5);
+            configTabs.Controls.Add(tabPage7);
             configTabs.Location = new Point(14, 14);
             configTabs.Margin = new Padding(3, 4, 3, 4);
             configTabs.Name = "configTabs";
@@ -947,6 +989,287 @@
             lblExpRate.Name = "lblExpRate";
             lblExpRate.Size = new Size(52, 15);
             lblExpRate.TabIndex = 8;
+            // 
+            // tabPage7
+            // 
+            tabPage7.Controls.Add(grpItemTimers);
+            tabPage7.Controls.Add(grpPetsMonsters);
+            tabPage7.Controls.Add(grpCooldowns);
+            tabPage7.Location = new Point(4, 24);
+            tabPage7.Margin = new Padding(3, 4, 3, 4);
+            tabPage7.Name = "tabPage7";
+            tabPage7.Padding = new Padding(3, 4, 3, 4);
+            tabPage7.Size = new Size(476, 388);
+            tabPage7.TabIndex = 5;
+            tabPage7.Text = "Gameplay";
+            tabPage7.UseVisualStyleBackColor = true;
+            // 
+            // grpItemTimers
+            // 
+            grpItemTimers.Controls.Add(label25);
+            grpItemTimers.Controls.Add(nudItemTimeOut);
+            grpItemTimers.Controls.Add(label26);
+            grpItemTimers.Controls.Add(label27);
+            grpItemTimers.Controls.Add(nudPlayerDiedItemTimeOut);
+            grpItemTimers.Controls.Add(label28);
+            grpItemTimers.Location = new Point(9, 9);
+            grpItemTimers.Name = "grpItemTimers";
+            grpItemTimers.Size = new Size(462, 76);
+            grpItemTimers.TabIndex = 0;
+            grpItemTimers.TabStop = false;
+            grpItemTimers.Text = "Ground items";
+            // 
+            // label25
+            // 
+            label25.AutoSize = true;
+            label25.Location = new Point(14, 22);
+            label25.Name = "label25";
+            label25.Size = new Size(123, 15);
+            label25.TabIndex = 0;
+            label25.Text = "Dropped item lifetime:";
+            // 
+            // nudItemTimeOut
+            // 
+            nudItemTimeOut.Location = new Point(200, 19);
+            nudItemTimeOut.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            nudItemTimeOut.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudItemTimeOut.Name = "nudItemTimeOut";
+            nudItemTimeOut.Size = new Size(80, 23);
+            nudItemTimeOut.TabIndex = 1;
+            nudItemTimeOut.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // label26
+            // 
+            label26.AutoSize = true;
+            label26.Location = new Point(288, 22);
+            label26.Name = "label26";
+            label26.Size = new Size(50, 15);
+            label26.TabIndex = 2;
+            label26.Text = "minutes";
+            // 
+            // label27
+            // 
+            label27.AutoSize = true;
+            label27.Location = new Point(14, 48);
+            label27.Name = "label27";
+            label27.Size = new Size(153, 15);
+            label27.TabIndex = 3;
+            label27.Text = "Player death drop lifetime:";
+            // 
+            // nudPlayerDiedItemTimeOut
+            // 
+            nudPlayerDiedItemTimeOut.Location = new Point(200, 45);
+            nudPlayerDiedItemTimeOut.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            nudPlayerDiedItemTimeOut.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudPlayerDiedItemTimeOut.Name = "nudPlayerDiedItemTimeOut";
+            nudPlayerDiedItemTimeOut.Size = new Size(80, 23);
+            nudPlayerDiedItemTimeOut.TabIndex = 4;
+            nudPlayerDiedItemTimeOut.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // label28
+            // 
+            label28.AutoSize = true;
+            label28.Location = new Point(288, 48);
+            label28.Name = "label28";
+            label28.Size = new Size(50, 15);
+            label28.TabIndex = 5;
+            label28.Text = "minutes";
+            // 
+            // grpPetsMonsters
+            // 
+            grpPetsMonsters.Controls.Add(chkPetSave);
+            grpPetsMonsters.Controls.Add(label29);
+            grpPetsMonsters.Controls.Add(nudMaxBossTames);
+            grpPetsMonsters.Controls.Add(chkMonsterRecallEnabled);
+            grpPetsMonsters.Controls.Add(label30);
+            grpPetsMonsters.Controls.Add(nudRecallRange);
+            grpPetsMonsters.Controls.Add(label31);
+            grpPetsMonsters.Controls.Add(nudRecallCooldown);
+            grpPetsMonsters.Controls.Add(lblRecallScope);
+            grpPetsMonsters.Location = new Point(9, 93);
+            grpPetsMonsters.Name = "grpPetsMonsters";
+            grpPetsMonsters.Size = new Size(462, 158);
+            grpPetsMonsters.TabIndex = 1;
+            grpPetsMonsters.TabStop = false;
+            grpPetsMonsters.Text = "Pets and monster behaviour";
+            // 
+            // chkPetSave
+            // 
+            chkPetSave.AutoSize = true;
+            chkPetSave.Location = new Point(14, 20);
+            chkPetSave.Name = "chkPetSave";
+            chkPetSave.Size = new Size(233, 19);
+            chkPetSave.TabIndex = 0;
+            chkPetSave.Text = "Keep pets permanently (off: tamed pets leave after 60 minutes)";
+            chkPetSave.UseVisualStyleBackColor = true;
+            // 
+            // label29
+            // 
+            label29.AutoSize = true;
+            label29.Location = new Point(14, 48);
+            label29.Name = "label29";
+            label29.Size = new Size(183, 15);
+            label29.TabIndex = 1;
+            label29.Text = "Charmed boss limit (0 = disallow):";
+            // 
+            // nudMaxBossTames
+            // 
+            nudMaxBossTames.Location = new Point(240, 45);
+            nudMaxBossTames.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            nudMaxBossTames.Name = "nudMaxBossTames";
+            nudMaxBossTames.Size = new Size(70, 23);
+            nudMaxBossTames.TabIndex = 2;
+            // 
+            // chkMonsterRecallEnabled
+            // 
+            chkMonsterRecallEnabled.AutoSize = true;
+            chkMonsterRecallEnabled.Location = new Point(14, 74);
+            chkMonsterRecallEnabled.Name = "chkMonsterRecallEnabled";
+            chkMonsterRecallEnabled.Size = new Size(252, 19);
+            chkMonsterRecallEnabled.TabIndex = 3;
+            chkMonsterRecallEnabled.Text = "Teleport monsters to an out-of-range target";
+            chkMonsterRecallEnabled.UseVisualStyleBackColor = true;
+            // 
+            // label30
+            // 
+            label30.AutoSize = true;
+            label30.Location = new Point(14, 102);
+            label30.Name = "label30";
+            label30.Size = new Size(133, 15);
+            label30.TabIndex = 4;
+            label30.Text = "Recall range (tiles):";
+            // 
+            // nudRecallRange
+            // 
+            nudRecallRange.Location = new Point(240, 99);
+            nudRecallRange.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            nudRecallRange.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudRecallRange.Name = "nudRecallRange";
+            nudRecallRange.Size = new Size(70, 23);
+            nudRecallRange.TabIndex = 5;
+            nudRecallRange.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // label31
+            // 
+            label31.AutoSize = true;
+            label31.Location = new Point(14, 128);
+            label31.Name = "label31";
+            label31.Size = new Size(157, 15);
+            label31.TabIndex = 6;
+            label31.Text = "Recall cooldown (ms):";
+            // 
+            // nudRecallCooldown
+            // 
+            nudRecallCooldown.Location = new Point(240, 125);
+            nudRecallCooldown.Maximum = new decimal(new int[] { 600000, 0, 0, 0 });
+            nudRecallCooldown.Name = "nudRecallCooldown";
+            nudRecallCooldown.Size = new Size(70, 23);
+            nudRecallCooldown.TabIndex = 7;
+            // 
+            // lblRecallScope
+            // 
+            lblRecallScope.AutoSize = true;
+            lblRecallScope.ForeColor = SystemColors.GrayText;
+            lblRecallScope.Location = new Point(286, 77);
+            lblRecallScope.Name = "lblRecallScope";
+            lblRecallScope.Size = new Size(140, 15);
+            lblRecallScope.TabIndex = 8;
+            lblRecallScope.Text = "CanRecall monsters only";
+            // 
+            // grpCooldowns
+            // 
+            grpCooldowns.Controls.Add(label32);
+            grpCooldowns.Controls.Add(nudPKDelay);
+            grpCooldowns.Controls.Add(label33);
+            grpCooldowns.Controls.Add(nudGroupInviteDelay);
+            grpCooldowns.Controls.Add(label34);
+            grpCooldowns.Controls.Add(nudTradeDelay);
+            grpCooldowns.Controls.Add(label35);
+            grpCooldowns.Controls.Add(nudTeleportToNPCCost);
+            grpCooldowns.Controls.Add(label36);
+            grpCooldowns.Location = new Point(9, 259);
+            grpCooldowns.Name = "grpCooldowns";
+            grpCooldowns.Size = new Size(462, 124);
+            grpCooldowns.TabIndex = 2;
+            grpCooldowns.TabStop = false;
+            grpCooldowns.Text = "Cooldowns and costs";
+            // 
+            // label32
+            // 
+            label32.AutoSize = true;
+            label32.Location = new Point(14, 22);
+            label32.Name = "label32";
+            label32.Size = new Size(159, 15);
+            label32.TabIndex = 0;
+            label32.Text = "PK point decay (seconds):";
+            // 
+            // nudPKDelay
+            // 
+            nudPKDelay.Location = new Point(240, 19);
+            nudPKDelay.Maximum = new decimal(new int[] { 86400, 0, 0, 0 });
+            nudPKDelay.Name = "nudPKDelay";
+            nudPKDelay.Size = new Size(70, 23);
+            nudPKDelay.TabIndex = 1;
+            // 
+            // label33
+            // 
+            label33.AutoSize = true;
+            label33.Location = new Point(14, 48);
+            label33.Name = "label33";
+            label33.Size = new Size(177, 15);
+            label33.TabIndex = 2;
+            label33.Text = "Group invite cooldown (ms):";
+            // 
+            // nudGroupInviteDelay
+            // 
+            nudGroupInviteDelay.Location = new Point(240, 45);
+            nudGroupInviteDelay.Maximum = new decimal(new int[] { 3600000, 0, 0, 0 });
+            nudGroupInviteDelay.Name = "nudGroupInviteDelay";
+            nudGroupInviteDelay.Size = new Size(70, 23);
+            nudGroupInviteDelay.TabIndex = 3;
+            // 
+            // label34
+            // 
+            label34.AutoSize = true;
+            label34.Location = new Point(14, 74);
+            label34.Name = "label34";
+            label34.Size = new Size(181, 15);
+            label34.TabIndex = 4;
+            label34.Text = "Trade request cooldown (ms):";
+            // 
+            // nudTradeDelay
+            // 
+            nudTradeDelay.Location = new Point(240, 71);
+            nudTradeDelay.Maximum = new decimal(new int[] { 3600000, 0, 0, 0 });
+            nudTradeDelay.Name = "nudTradeDelay";
+            nudTradeDelay.Size = new Size(70, 23);
+            nudTradeDelay.TabIndex = 5;
+            // 
+            // label35
+            // 
+            label35.AutoSize = true;
+            label35.Location = new Point(14, 100);
+            label35.Name = "label35";
+            label35.Size = new Size(140, 15);
+            label35.TabIndex = 6;
+            label35.Text = "NPC teleport cost (gold):";
+            // 
+            // nudTeleportToNPCCost
+            // 
+            nudTeleportToNPCCost.Location = new Point(240, 97);
+            nudTeleportToNPCCost.Maximum = new decimal(new int[] { 1000000000, 0, 0, 0 });
+            nudTeleportToNPCCost.Name = "nudTeleportToNPCCost";
+            nudTeleportToNPCCost.Size = new Size(80, 23);
+            nudTeleportToNPCCost.TabIndex = 7;
+            // 
+            // label36
+            // 
+            label36.AutoSize = true;
+            label36.Location = new Point(328, 100);
+            label36.Name = "label36";
+            label36.Size = new Size(88, 15);
+            label36.TabIndex = 8;
+            label36.Text = "(0 = free)";
             lblExpRate.Text = "Exp rate:";
             // 
             // tabPage5
@@ -1129,6 +1452,22 @@
             gbGlobals.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dropRateInput).EndInit();
             ((System.ComponentModel.ISupportInitialize)expRateInput).EndInit();
+            tabPage7.ResumeLayout(false);
+            grpItemTimers.ResumeLayout(false);
+            grpItemTimers.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudItemTimeOut).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudPlayerDiedItemTimeOut).EndInit();
+            grpPetsMonsters.ResumeLayout(false);
+            grpPetsMonsters.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudMaxBossTames).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudRecallRange).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudRecallCooldown).EndInit();
+            grpCooldowns.ResumeLayout(false);
+            grpCooldowns.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudPKDelay).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudGroupInviteDelay).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudTradeDelay).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudTeleportToNPCCost).EndInit();
             tabPage5.ResumeLayout(false);
             tabPage5.PerformLayout();
             groupBox2.ResumeLayout(false);
@@ -1227,5 +1566,33 @@
         private GroupBox gbLoginScreen;
         private GroupBox gbCharacterScreen;
         private GroupBox gbGameWorld;
+        private TabPage tabPage7;
+        private GroupBox grpItemTimers;
+        private Label label25;
+        private NumericUpDown nudItemTimeOut;
+        private Label label26;
+        private Label label27;
+        private NumericUpDown nudPlayerDiedItemTimeOut;
+        private Label label28;
+        private GroupBox grpPetsMonsters;
+        private CheckBox chkPetSave;
+        private Label label29;
+        private NumericUpDown nudMaxBossTames;
+        private CheckBox chkMonsterRecallEnabled;
+        private Label label30;
+        private NumericUpDown nudRecallRange;
+        private Label label31;
+        private NumericUpDown nudRecallCooldown;
+        private Label lblRecallScope;
+        private GroupBox grpCooldowns;
+        private Label label32;
+        private NumericUpDown nudPKDelay;
+        private Label label33;
+        private NumericUpDown nudGroupInviteDelay;
+        private Label label34;
+        private NumericUpDown nudTradeDelay;
+        private Label label35;
+        private NumericUpDown nudTeleportToNPCCost;
+        private Label label36;
     }
 }

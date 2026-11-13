@@ -442,5 +442,17 @@ public class InIReader
         _contents[FindIndex(section, key)] = key + "=" + value;
         Save();
     }
+
+    /// <summary>
+    /// Updates several entries in the cached file and flushes it once. Pages that own a group of
+    /// keys inside a shared ini file use this instead of one whole-file write per key.
+    /// </summary>
+    public void WriteBatch(IEnumerable<(string Section, string Key, string Value)> values)
+    {
+        foreach (var (section, key, value) in values)
+            _contents[FindIndex(section, key)] = key + "=" + value;
+
+        Save();
+    }
     #endregion
 }

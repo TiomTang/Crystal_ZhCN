@@ -52,6 +52,18 @@ namespace Server
             tbRestedBuffLength.Text = Settings.RestedBuffLength.ToString();
             tbRestedExpBonus.Text = Settings.RestedExpBonus.ToString();
             tbMaxRestedBonus.Text = Settings.RestedMaxBonus.ToString();
+
+            SetNumeric(nudItemTimeOut, Settings.ItemTimeOut);
+            SetNumeric(nudPlayerDiedItemTimeOut, Settings.PlayerDiedItemTimeOut);
+            chkPetSave.Checked = Settings.PetSave;
+            SetNumeric(nudMaxBossTames, Settings.MaxBossTames);
+            chkMonsterRecallEnabled.Checked = Settings.MonsterRecallEnabled;
+            SetNumeric(nudRecallRange, Settings.MonsterRecallRange);
+            SetNumeric(nudRecallCooldown, Settings.MonsterRecallCooldown);
+            SetNumeric(nudPKDelay, Settings.PKDelay);
+            SetNumeric(nudGroupInviteDelay, Settings.GroupInviteDelay);
+            SetNumeric(nudTradeDelay, Settings.TradeDelay);
+            SetNumeric(nudTeleportToNPCCost, Settings.TeleportToNPCCost);
         }
 
         private void ConfigForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -127,6 +139,28 @@ namespace Server
             Settings.RestedBuffLength = Convert.ToInt32(tbRestedBuffLength.Text);
             Settings.RestedExpBonus = Convert.ToInt32(tbRestedExpBonus.Text);
             Settings.RestedMaxBonus = Convert.ToInt32(tbMaxRestedBonus.Text);
+
+            Settings.ItemTimeOut = (int)nudItemTimeOut.Value;
+            Settings.PlayerDiedItemTimeOut = (int)nudPlayerDiedItemTimeOut.Value;
+            Settings.PetSave = chkPetSave.Checked;
+            Settings.MaxBossTames = (int)nudMaxBossTames.Value;
+            Settings.MonsterRecallEnabled = chkMonsterRecallEnabled.Checked;
+            Settings.MonsterRecallRange = (int)nudRecallRange.Value;
+            Settings.MonsterRecallCooldown = (int)nudRecallCooldown.Value;
+            Settings.PKDelay = (int)nudPKDelay.Value;
+            Settings.GroupInviteDelay = (int)nudGroupInviteDelay.Value;
+            Settings.TradeDelay = (int)nudTradeDelay.Value;
+            Settings.TeleportToNPCCost = (int)nudTeleportToNPCCost.Value;
+        }
+
+        private static void SetNumeric(NumericUpDown box, long value)
+        {
+            decimal candidate = value;
+
+            if (candidate < box.Minimum) candidate = box.Minimum;
+            if (candidate > box.Maximum) candidate = box.Maximum;
+
+            box.Value = candidate;
         }
 
         private void IPAddressCheck(object sender, EventArgs e)

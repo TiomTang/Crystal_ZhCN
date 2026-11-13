@@ -356,8 +356,8 @@ namespace Server
         public static List<long> Guild_ExperienceList = new List<long>();
         public static List<int> Guild_MembercapList = new List<int>();
         public static List<GuildBuffInfo> Guild_BuffList = new List<GuildBuffInfo>();
-        public static long GroupInviteDelay { get; internal set; } = 2000;
-        public static long TradeDelay { get; internal set; } = 2000;
+        public static long GroupInviteDelay { get; set; } = 2000;
+        public static long TradeDelay { get; set; } = 2000;
 
         //Archive Settings
         public static int ArchiveInactiveCharacterAfterMonths = 12;
@@ -705,6 +705,42 @@ namespace Server
             lock (MonsterNameSyncRoot) SaveCore();
         }
 
+        /// <summary>
+        /// Persists only the [Game] entries owned by the editor pages, in a single file write.
+        /// Save() rewrites every section and flushes once per key, so pages that edit a few keys of
+        /// the shared Setup.ini use this instead.
+        /// </summary>
+        public static void SaveGameSettings()
+        {
+            lock (MonsterNameSyncRoot)
+                Reader.WriteBatch(new (string Section, string Key, string Value)[]
+                {
+                    ("Game", "ItemTimeOut", ItemTimeOut.ToString()),
+                    ("Game", "PlayerDiedItemTimeOut", PlayerDiedItemTimeOut.ToString()),
+                    ("Game", "PetSave", PetSave.ToString()),
+                    ("Game", "MaxBossTames", MaxBossTames.ToString()),
+                    ("Game", "PKDelay", PKDelay.ToString()),
+                    ("Game", "GroupInviteDelay", GroupInviteDelay.ToString()),
+                    ("Game", "TradeDelay", TradeDelay.ToString()),
+                    ("Game", "TeleportToNPCCost", TeleportToNPCCost.ToString()),
+                    ("Game", "MonsterRecallEnabled", MonsterRecallEnabled.ToString()),
+                    ("Game", "MonsterRecallRange", MonsterRecallRange.ToString()),
+                    ("Game", "MonsterRecallCooldown", MonsterRecallCooldown.ToString()),
+                    ("Game", "NewbieGuild", NewbieGuild),
+                    ("Game", "NewbieGuildMaxSize", NewbieGuildMaxSize.ToString())
+                });
+        }
+
+        /// <summary>
+        /// Persists the monster name references of [Game]. The keys come from
+        /// GetMonsterNameSettings so this list cannot drift from the fields it writes.
+        /// </summary>
+        public static void SaveMonsterNameSettings()
+        {
+            lock (MonsterNameSyncRoot)
+                Reader.WriteBatch(GetMonsterNameSettings().Select(x => (x.Section, x.Key, x.Value)));
+        }
+
         private static void SaveCore()
         {
             //General
@@ -762,6 +798,9 @@ namespace Server
             Reader.Write("Game", "PetSave", PetSave);
             Reader.Write("Game", "MaxBossTames", MaxBossTames);
             Reader.Write("Game", "PKDelay", PKDelay);
+            Reader.Write("Game", "MonsterRecallEnabled", MonsterRecallEnabled);
+            Reader.Write("Game", "MonsterRecallRange", MonsterRecallRange);
+            Reader.Write("Game", "MonsterRecallCooldown", MonsterRecallCooldown);
             Reader.Write("Game", "NewbieGuild", NewbieGuild);
             Reader.Write("Game", "NewbieGuildMaxSize", NewbieGuildMaxSize);
             Reader.Write("Game", "SkeletonName", SkeletonName);

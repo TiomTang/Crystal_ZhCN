@@ -506,6 +506,13 @@ namespace Server
             form.ShowDialog();
         }
 
+        private void monsterBindingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MonsterBindingForm form = new MonsterBindingForm();
+
+            form.ShowDialog();
+        }
+
         private void clearBlockedIPsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Envir.IPBlocks.Clear();

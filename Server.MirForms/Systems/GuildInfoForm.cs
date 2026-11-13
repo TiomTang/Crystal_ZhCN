@@ -10,6 +10,7 @@ namespace Server
         public Envir Envir => SMain.EditEnvir;
 
         public bool GuildsChanged = false;
+        public bool GameSettingsChanged = false;
         GuildBuffInfo SelectedBuff;
 
         public GuildInfoForm()
@@ -36,6 +37,9 @@ namespace Server
         {
             if (GuildsChanged)
                 Settings.SaveGuildSettings();
+
+            if (GameSettingsChanged)
+                Settings.SaveGameSettings();
         }
 
         private void UpdateGuildInterface()
@@ -47,6 +51,8 @@ namespace Server
             WarCostTextBox.Text = Settings.Guild_WarCost.ToString();
             NewbieGuildExptextBox.Text = Settings.NewbieGuildExpBuff.ToString();
             NewbieGuildBuffEnabledcheckBox.Checked = Settings.NewbieGuildBuffEnabled;
+            txtNewbieGuildName.Text = Settings.NewbieGuild;
+            nudNewbieGuildMaxSize.Value = Clamp(Settings.NewbieGuildMaxSize, nudNewbieGuildMaxSize);
             GTPriceBox.Text = Settings.BuyGTGold.ToString();
             GTExtendPriceBox.Text = Settings.ExtendGT.ToString();
             GTDurationBox.Text = Settings.GTDays.ToString();
@@ -156,6 +162,72 @@ namespace Server
             ActiveControl.BackColor = SystemColors.Window;
             Settings.NewbieGuildExpBuff = temp;
             GuildsChanged = true;
+        }
+
+        private static decimal Clamp(int value, NumericUpDown box)
+        {
+            decimal candidate = value;
+
+            if (candidate < box.Minimum) candidate = box.Minimum;
+            if (candidate > box.Maximum) candidate = box.Maximum;
+
+            return candidate;
+        }
+
+        private void txtNewbieGuildName_TextChanged(object sender, EventArgs e)
+        {
+            if (ActiveControl != sender) return;
+
+            string name = txtNewbieGuildName.Text.Trim();
+
+            if (!IsValidGuildName(name))
+            {
+                txtNewbieGuildName.BackColor = Color.Red;
+                return;
+            }
+
+            txtNewbieGuildName.BackColor = SystemColors.Window;
+
+            if (name == Settings.NewbieGuild) return;
+
+            Settings.NewbieGuild = name;
+            GameSettingsChanged = true;
+        }
+
+        private void txtNewbieGuildName_Leave(object sender, EventArgs e)
+        {
+            // An invalid name is never applied, so focus loss restores the last accepted value.
+            if (IsValidGuildName(txtNewbieGuildName.Text.Trim())) return;
+
+            txtNewbieGuildName.Text = Settings.NewbieGuild;
+            txtNewbieGuildName.BackColor = SystemColors.Window;
+        }
+
+        private static bool IsValidGuildName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return false;
+
+            // The name lives in Setup.ini: '=' splits an entry and brackets start a section, so a
+            // name containing them would corrupt the file or never match the guild it refers to.
+            foreach (char character in name)
+            {
+                if (character == '=' || character == '[' || character == ']') return false;
+                if (char.IsControl(character)) return false;
+            }
+
+            return true;
+        }
+
+        private void nudNewbieGuildMaxSize_ValueChanged(object sender, EventArgs e)
+        {
+            if (ActiveControl != sender) return;
+
+            int value = (int)nudNewbieGuildMaxSize.Value;
+
+            if (value == Settings.NewbieGuildMaxSize) return;
+
+            Settings.NewbieGuildMaxSize = value;
+            GameSettingsChanged = true;
         }
 
         private void NewbieGuildBuffEnabledcheckBox_CheckedChanged(object sender, EventArgs e)
