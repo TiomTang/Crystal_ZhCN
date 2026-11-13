@@ -287,7 +287,7 @@ namespace Client.MirScenes.Dialogs
 
         private void ButtonClicked(string action)
         {
-            if (action == "@Exit")
+            if (string.Equals(action,"@Exit", StringComparison.OrdinalIgnoreCase))
             {
                 Hide();
                 return;
