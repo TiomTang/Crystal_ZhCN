@@ -13805,8 +13805,8 @@
     "Text": "搜索指令名或说明"
   },
   "ui.CommandListForm.lblCount": {
-    "Source": "{0} commands: {1} game master only, {2} available to players",
-    "Text": "共 {0} 条指令：仅 GM {1} 条，玩家可用 {2} 条"
+    "Source": "{0} commands: {1} game master only, {2} available to players, {3} script commands",
+    "Text": "共 {0} 条指令：仅 GM {1} 条，玩家可用 {2} 条，脚本命令 {3} 条"
   },
   "ui.CommandListForm.cbPermission.all": {
     "Source": "All commands",
@@ -13819,6 +13819,26 @@
   "ui.CommandListForm.cbPermission.gameMaster": {
     "Source": "Game master commands only",
     "Text": "仅 GM 可用"
+  },
+  "ui.CommandListForm.cbPermission.script": {
+    "Source": "Script commands only",
+    "Text": "仅脚本命令"
+  },
+  "ui.CommandListForm.permission.script": {
+    "Source": "Script",
+    "Text": "脚本"
+  },
+  "ui.CommandListForm.category.script": {
+    "Source": "Script",
+    "Text": "脚本"
+  },
+  "ui.CommandListForm.scriptDescription": {
+    "Source": "Script command at {0} line {1}",
+    "Text": "脚本命令，定义在 {0} 第 {1} 行"
+  },
+  "ui.CommandListForm.scriptDescriptionRuntime": {
+    "Source": "Script command registered at runtime; the script decides what it does and who may use it.",
+    "Text": "运行时注册的脚本命令，效果与权限由脚本判断。"
   },
   "ui.CommandListForm.testServerSuffix": {
     "Source": " (players on test servers)",
