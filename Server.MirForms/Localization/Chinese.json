@@ -15111,5 +15111,37 @@
   "Name of the equipped weapon, older alias of WEAPON.": {
     "Source": "Name of the equipped weapon, older alias of WEAPON.",
     "Text": "已装备武器的名称，WEAPON 的旧写法。"
+  },
+  "Templates": {
+    "Source": "Templates",
+    "Text": "模板"
+  },
+  "Dialog Page": {
+    "Source": "Dialog Page",
+    "Text": "对话页"
+  },
+  "Conditional Page": {
+    "Source": "Conditional Page",
+    "Text": "条件页"
+  },
+  "Input Page": {
+    "Source": "Input Page",
+    "Text": "输入页"
+  },
+  "Teleport Page": {
+    "Source": "Teleport Page",
+    "Text": "传送页"
+  },
+  "Highlight": {
+    "Source": "Highlight",
+    "Text": "高亮"
+  },
+  "Auto Check": {
+    "Source": "Auto Check",
+    "Text": "自动校验"
+  },
+  "Unreferenced": {
+    "Source": "Unreferenced",
+    "Text": "未引用"
   }
 }

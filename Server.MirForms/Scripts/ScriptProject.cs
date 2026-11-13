@@ -32,6 +32,13 @@ namespace Server.MirForms.Scripts
         public readonly List<ScriptBlock> Blocks = new List<ScriptBlock>();
     }
 
+    /// <summary>Facts the checker borrows from the running server; null means "cannot judge".</summary>
+    public sealed class ScriptRules
+    {
+        public Func<string, bool> SpellExists;
+        public Func<string, bool> MapExists;
+    }
+
     public sealed class ScriptIssue
     {
         public int Line;
@@ -65,6 +72,16 @@ namespace Server.MirForms.Scripts
         private static readonly HashSet<string> DelayedGotoKeywords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "TIMERECALL", "TIMERECALLGROUP", "DELAYGOTO",
+        };
+
+        private static readonly HashSet<string> SpellActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "GIVESKILL", "REMOVESKILL", "HEROGIVESKILL",
+        };
+
+        private static readonly HashSet<string> MapActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "MOVE", "INSTANCEMOVE",
         };
 
         public string[] Lines = new string[0];
@@ -167,7 +184,7 @@ namespace Server.MirForms.Scripts
         }
 
         /// <summary>Rule checks that do not need the engine: unknown keywords, arity, links and values.</summary>
-        public List<ScriptIssue> Check()
+        public List<ScriptIssue> Check(ScriptRules rules = null)
         {
             var issues = new List<ScriptIssue>();
             var seenPages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -208,7 +225,7 @@ namespace Server.MirForms.Scripts
                         continue;
                     }
 
-                    CheckKeywords(block, i, trimmed, issues);
+                    CheckKeywords(block, i, trimmed, rules, issues);
                     CheckLinks(i, trimmed, issues);
                     CheckValues(i, trimmed, issues);
                 }
@@ -217,7 +234,7 @@ namespace Server.MirForms.Scripts
             return issues;
         }
 
-        private void CheckKeywords(ScriptBlock block, int line, string trimmed, List<ScriptIssue> issues)
+        private void CheckKeywords(ScriptBlock block, int line, string trimmed, ScriptRules rules, List<ScriptIssue> issues)
         {
             if (block.Kind != ScriptBlockKind.Check &&
                 block.Kind != ScriptBlockKind.Act &&
@@ -254,6 +271,18 @@ namespace Server.MirForms.Scripts
                     Line = line,
                     Message = keyword.Name + " 需要 " + (keyword.MinParts - 1) + " 个参数，当前 " + (parts.Length - 1) + " 个",
                 });
+            }
+
+            if (rules == null) return;
+
+            if (SpellActions.Contains(keyword.Name) && parts.Length > 1 && rules.SpellExists != null && !rules.SpellExists(parts[1]))
+            {
+                issues.Add(new ScriptIssue { Line = line, Message = "引擎不认识这个技能：" + parts[1] });
+            }
+
+            if (MapActions.Contains(keyword.Name) && parts.Length > 1 && rules.MapExists != null && !rules.MapExists(parts[1]))
+            {
+                issues.Add(new ScriptIssue { Line = line, Message = "找不到这个地图：" + parts[1] });
             }
         }
 

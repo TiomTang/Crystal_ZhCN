@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Server.MirEnvir;
 using Server.MirObjects;
@@ -12,10 +13,24 @@ namespace Server.MirForms.Scripts
 {
     /// <summary>
     /// NPC script editor: file tree, structure outline, a keyword palette filtered by the block the
-    /// caret sits in, and validation that runs both the rule checks and the engine parser.
+    /// caret sits in, syntax colouring and validation that runs both the rule checks and the engine.
     /// </summary>
     public sealed class ScriptEditorForm : Form
     {
+        private static readonly Regex PageHeaderPattern = new Regex(@"^\[[^\]\r\n]+\]", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex TagPattern = new Regex(@"^#[A-Za-z]+", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex CommentPattern = new Regex(@"^[ \t]*(;|//).*$", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex ButtonPattern = new Regex(@"<[^<>\r\n]*/@[A-Za-z0-9_\-]+[^<>\r\n]*>", RegexOptions.Compiled);
+        private static readonly Regex ValuePattern = new Regex(@"<\$[^>\r\n]+>", RegexOptions.Compiled);
+        private static readonly Regex LineKeywordPattern = new Regex(@"^[ \t]*([A-Za-z][A-Za-z0-9_()]*)", RegexOptions.Compiled);
+
+        private static readonly Color PageColor = Color.FromArgb(0, 51, 153);
+        private static readonly Color TagColor = Color.FromArgb(128, 0, 128);
+        private static readonly Color CommentColor = Color.FromArgb(128, 128, 128);
+        private static readonly Color ButtonColor = Color.FromArgb(0, 102, 204);
+        private static readonly Color ValueColor = Color.FromArgb(153, 51, 0);
+        private static readonly Color KeywordColor = Color.FromArgb(0, 102, 51);
+
         private readonly TreeView _files = new TreeView();
         private readonly RichTextBox _editor = new RichTextBox();
         private readonly TabControl _side = new TabControl();
@@ -25,14 +40,18 @@ namespace Server.MirForms.Scripts
         private readonly ListView _problems = new ListView();
         private readonly ToolStripStatusLabel _statusText = new ToolStripStatusLabel();
         private readonly ToolStripStatusLabel _statusIssues = new ToolStripStatusLabel();
-
+        private readonly System.Windows.Forms.Timer _idleTimer = new System.Windows.Forms.Timer { Interval = 700 };
         private readonly List<ScriptKeyword> _paletteSource = new List<ScriptKeyword>();
 
         private string _path;
         private bool _dirty;
         private bool _hasBom = true;
+        private bool _suppress;
+        private bool _highlight = true;
+        private bool _autoCheck = true;
         private string _newLine = "\r\n";
         private Encoding _encoding = new UTF8Encoding(false);
+        private HashSet<string> _referenced = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         public ScriptEditorForm()
         {
@@ -49,11 +68,37 @@ namespace Server.MirForms.Scripts
         private void BuildUi()
         {
             var toolbar = new ToolStrip { GripStyle = ToolStripGripStyle.Hidden };
+
             toolbar.Items.Add(Button(GameLanguage.Get("Open"), (s, e) => OpenSelectedFile()));
             toolbar.Items.Add(Button(GameLanguage.Get("Save"), (s, e) => SaveFile()));
             toolbar.Items.Add(new ToolStripSeparator());
-            toolbar.Items.Add(Button(GameLanguage.Get("Check"), (s, e) => CheckBuffer(true)));
-            toolbar.Items.Add(Button(GameLanguage.Get("New Page"), (s, e) => InsertPageTemplate()));
+            toolbar.Items.Add(Button(GameLanguage.Get("Check"), (s, e) => CheckBuffer(true, true)));
+            toolbar.Items.Add(new ToolStripSeparator());
+
+            var templates = new ToolStripDropDownButton(GameLanguage.Get("Templates"));
+
+            templates.DropDownItems.Add(new ToolStripMenuItem(GameLanguage.Get("Dialog Page"), null, (s, e) =>
+                InsertSnippet("[@NewPage]\r\n#SAY\r\n\r\n\r\n#ACT\r\n\r\n")));
+
+            templates.DropDownItems.Add(new ToolStripMenuItem(GameLanguage.Get("Conditional Page"), null, (s, e) =>
+                InsertSnippet("[@NewPage]\r\n#IF\r\nCHECKLEVEL 1\r\n#ACT\r\n\r\n#ELSESAY\r\n\r\n")));
+
+            templates.DropDownItems.Add(new ToolStripMenuItem(GameLanguage.Get("Input Page"), null, (s, e) =>
+                InsertSnippet("[@@NewPage]\r\n#SAY\r\n\r\n#ACT\r\n\r\n")));
+
+            templates.DropDownItems.Add(new ToolStripMenuItem(GameLanguage.Get("Teleport Page"), null, (s, e) =>
+                InsertSnippet("[@NewPage]\r\n#ACT\r\nMOVE map x y\r\n")));
+
+            toolbar.Items.Add(templates);
+            toolbar.Items.Add(new ToolStripSeparator());
+
+            var highlight = new ToolStripButton(GameLanguage.Get("Highlight")) { Checked = true, CheckOnClick = true };
+            highlight.CheckedChanged += (s, e) => { _highlight = highlight.Checked; ApplyHighlight(); };
+            toolbar.Items.Add(highlight);
+
+            var autoCheck = new ToolStripButton(GameLanguage.Get("Auto Check")) { Checked = true, CheckOnClick = true };
+            autoCheck.CheckedChanged += (s, e) => { _autoCheck = autoCheck.Checked; if (!_autoCheck) _idleTimer.Stop(); };
+            toolbar.Items.Add(autoCheck);
 
             var status = new StatusStrip();
             _statusText.Spring = true;
@@ -86,8 +131,9 @@ namespace Server.MirForms.Scripts
             _editor.HideSelection = false;
             _editor.ScrollBars = RichTextBoxScrollBars.Both;
             _editor.DetectUrls = false;
-            _editor.TextChanged += (s, e) => { _dirty = true; RefreshPalette(); };
-            _editor.SelectionChanged += (s, e) => { RefreshPalette(); UpdateStatus(); };
+            _editor.TextChanged += (s, e) => { _dirty = true; RefreshPalette(); ScheduleIdle(); };
+            _editor.SelectionChanged += (s, e) => { if (_suppress) return; RefreshPalette(); UpdateStatus(); };
+            _editor.MouseDown += EditorMouseDown;
             body.Panel1.Controls.Add(_editor);
 
             var palettePage = new TabPage(GameLanguage.Get("Commands"));
@@ -135,6 +181,8 @@ namespace Server.MirForms.Scripts
             Controls.Add(toolbar);
             Controls.Add(status);
 
+            _idleTimer.Tick += (s, e) => { _idleTimer.Stop(); ApplyHighlight(); if (_autoCheck) CheckBuffer(false, false); };
+
             Shown += (s, e) =>
             {
                 root.Panel1MinSize = 140;
@@ -152,11 +200,18 @@ namespace Server.MirForms.Scripts
             return button;
         }
 
+        private void InsertSnippet(string text)
+        {
+            _editor.SelectedText = text;
+            _editor.Focus();
+        }
+
         // ---------------------------------------------------------------- files
 
         private void LoadFileTree()
         {
             _files.Nodes.Clear();
+            _referenced = BuildReferencedSet();
 
             string root = Settings.NPCPath;
 
@@ -168,11 +223,36 @@ namespace Server.MirForms.Scripts
 
             var rootNode = new TreeNode(Path.GetFileName(root.TrimEnd(Path.DirectorySeparatorChar))) { Tag = root };
             _files.Nodes.Add(rootNode);
-            FillDirectory(rootNode, root, 0);
+            FillDirectory(rootNode, root, string.Empty, 0);
             rootNode.Expand();
         }
 
-        private void FillDirectory(TreeNode node, string path, int depth)
+        /// <summary>Script files an NPC actually points at; empty means the database is not loaded.</summary>
+        private static HashSet<string> BuildReferencedSet()
+        {
+            var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            try
+            {
+                var npcs = Envir.Main?.NPCs;
+
+                if (npcs == null) return set;
+
+                foreach (NPCObject npc in npcs)
+                {
+                    string fileName = npc?.Info?.FileName;
+
+                    if (!string.IsNullOrEmpty(fileName)) set.Add(fileName.Replace('/', '\\'));
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return set;
+        }
+
+        private void FillDirectory(TreeNode node, string path, string relative, int depth)
         {
             string[] files;
 
@@ -187,7 +267,16 @@ namespace Server.MirForms.Scripts
 
             foreach (string file in files.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
             {
-                node.Nodes.Add(new TreeNode(Path.GetFileName(file)) { Tag = file });
+                string key = Path.Combine(relative, Path.GetFileNameWithoutExtension(file));
+                var child = new TreeNode(Path.GetFileName(file)) { Tag = file };
+
+                if (_referenced.Count > 0 && !_referenced.Contains(key))
+                {
+                    child.Text += "  (" + GameLanguage.Get("Unreferenced") + ")";
+                    child.ForeColor = Color.Gray;
+                }
+
+                node.Nodes.Add(child);
             }
 
             if (depth >= 6) return;
@@ -196,7 +285,7 @@ namespace Server.MirForms.Scripts
             {
                 var child = new TreeNode(Path.GetFileName(directory)) { Tag = directory };
                 node.Nodes.Add(child);
-                FillDirectory(child, directory, depth + 1);
+                FillDirectory(child, directory, Path.Combine(relative, Path.GetFileName(directory)), depth + 1);
             }
         }
 
@@ -227,14 +316,18 @@ namespace Server.MirForms.Scripts
 
             _newLine = text.Contains("\r\n") ? "\r\n" : "\n";
 
-            _path = path;
+            _suppress = true;
             _editor.Text = text.Replace("\r\n", "\n").Replace("\n", "\r\n");
             _editor.SelectionStart = 0;
+            _suppress = false;
+
+            _path = path;
             _dirty = false;
 
             _statusText.Text = path;
             RefreshStructure();
-            CheckBuffer(false);
+            ApplyHighlight();
+            CheckBuffer(false, true);
             UpdateTitle();
         }
 
@@ -250,6 +343,7 @@ namespace Server.MirForms.Scripts
             _dirty = false;
             UpdateTitle();
             _statusIssues.Text = GameLanguage.Get("Saved");
+            CheckBuffer(false, true);
         }
 
         private bool ConfirmDiscard()
@@ -271,10 +365,16 @@ namespace Server.MirForms.Scripts
 
         // ---------------------------------------------------------------- palette
 
+        private void ScheduleIdle()
+        {
+            _idleTimer.Stop();
+            if (_autoCheck || _highlight) _idleTimer.Start();
+        }
+
         private void RefreshPalette()
         {
             int line = _editor.GetLineFromCharIndex(_editor.SelectionStart) + 1;
-            ScriptProject project = ScriptProject.Parse(_editor.Text.Replace("\r\n", "\n"));
+            ScriptProject project = ScriptProject.Parse(_editor.Text);
             ScriptBlockKind kind = project.ContextAt(line, out _);
 
             _paletteSource.Clear();
@@ -328,20 +428,16 @@ namespace Server.MirForms.Scripts
             if (entry == null || entry.Keyword == null) return;
 
             ScriptKeyword keyword = entry.Keyword;
-            string usage = keyword.Kind == ScriptKeywordKind.Variable
+            bool variable = keyword.Kind == ScriptKeywordKind.Variable;
+
+            string usage = variable
                 ? "<$" + keyword.Name + ">"
                 : keyword.Name + (keyword.Usage.Length > 0 ? " " + keyword.Usage : string.Empty);
 
             int start = _editor.SelectionStart;
             _editor.SelectedText = usage;
-            _editor.SelectionStart = start + (keyword.Kind == ScriptKeywordKind.Variable ? 0 : keyword.Name.Length + 1);
-            _editor.SelectionLength = keyword.Kind == ScriptKeywordKind.Variable ? 0 : keyword.Usage.Length;
-            _editor.Focus();
-        }
-
-        private void InsertPageTemplate()
-        {
-            _editor.SelectedText = "[@NewPage]\r\n#SAY\r\n\r\n\r\n#ACT\r\n\r\n";
+            _editor.SelectionStart = start + (variable ? 0 : keyword.Name.Length + 1);
+            _editor.SelectionLength = variable ? 0 : keyword.Usage.Length;
             _editor.Focus();
         }
 
@@ -352,13 +448,11 @@ namespace Server.MirForms.Scripts
             _structure.BeginUpdate();
             _structure.Nodes.Clear();
 
-            ScriptProject project = ScriptProject.Parse(_editor.Text.Replace("\r\n", "\n"));
-            var nodes = new Dictionary<string, TreeNode>(StringComparer.OrdinalIgnoreCase);
+            ScriptProject project = ScriptProject.Parse(_editor.Text);
 
             foreach (ScriptPageInfo page in project.Pages)
             {
                 var node = new TreeNode(page.Key + "    " + page.Line) { Tag = page.Line };
-                nodes[page.Key] = node;
                 _structure.Nodes.Add(node);
 
                 foreach (ScriptBlock block in page.Blocks)
@@ -397,16 +491,35 @@ namespace Server.MirForms.Scripts
             _editor.Focus();
         }
 
-        private void CheckBuffer(bool report)
+        private void JumpToPage(string key)
         {
-            ScriptProject project = ScriptProject.Parse(_editor.Text.Replace("\r\n", "\n"));
-            List<ScriptIssue> issues = project.Check();
+            ScriptProject project = ScriptProject.Parse(_editor.Text);
+            string normalized = ScriptProject.Normalize(key);
 
-            string engineError = EngineCheck();
-
-            if (engineError != null)
+            foreach (ScriptPageInfo page in project.Pages)
             {
-                issues.Insert(0, new ScriptIssue { Line = 0, IsError = true, Message = engineError });
+                if (ScriptProject.Normalize(page.Key) != normalized) continue;
+
+                JumpToLine(page.Line);
+                return;
+            }
+
+            _statusIssues.Text = "找不到页面 " + key;
+        }
+
+        private void CheckBuffer(bool report, bool engine)
+        {
+            ScriptProject project = ScriptProject.Parse(_editor.Text);
+            List<ScriptIssue> issues = project.Check(BuildRules());
+
+            if (engine)
+            {
+                string engineError = EngineCheck();
+
+                if (engineError != null)
+                {
+                    issues.Insert(0, new ScriptIssue { Line = 0, IsError = true, Message = engineError });
+                }
             }
 
             _problems.BeginUpdate();
@@ -415,7 +528,7 @@ namespace Server.MirForms.Scripts
             foreach (ScriptIssue issue in issues.OrderBy(x => x.Line))
             {
                 var item = new ListViewItem(issue.Line > 0 ? issue.Line.ToString() : "-");
-                item.SubItems.Add((issue.IsError ? "" : "") + issue.Message);
+                item.SubItems.Add(issue.Message);
                 item.ForeColor = issue.IsError ? Color.Firebrick : Color.DimGray;
                 item.Tag = issue.Line;
                 _problems.Items.Add(item);
@@ -437,6 +550,32 @@ namespace Server.MirForms.Scripts
             }
 
             if (report) _side.SelectedIndex = 2;
+        }
+
+        /// <summary>Spell and map names can only be judged against the loaded database.</summary>
+        private static ScriptRules BuildRules()
+        {
+            var rules = new ScriptRules
+            {
+                SpellExists = name => Enum.TryParse<Spell>(name, true, out _),
+            };
+
+            try
+            {
+                var maps = Envir.Main?.MapInfoList;
+
+                if (maps != null && maps.Count > 0)
+                {
+                    var names = new HashSet<string>(maps.Select(x => x.FileName), StringComparer.OrdinalIgnoreCase);
+
+                    rules.MapExists = name => names.Contains(name);
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return rules;
         }
 
         /// <summary>
@@ -484,6 +623,106 @@ namespace Server.MirForms.Scripts
                 _statusText.Text = _path + "   " + (index + 1) + ":" + (column + 1);
         }
 
+        // ---------------------------------------------------------------- highlighting
+
+        private void ApplyHighlight()
+        {
+            if (!_highlight || _suppress) return;
+
+            int selectionStart = _editor.SelectionStart;
+            int selectionLength = _editor.SelectionLength;
+
+            _suppress = true;
+            _editor.SuspendLayout();
+
+            try
+            {
+                string text = _editor.Text;
+
+                _editor.SelectAll();
+                _editor.SelectionColor = _editor.ForeColor;
+
+                Colorize(text, CommentPattern, CommentColor);
+                Colorize(text, PageHeaderPattern, PageColor);
+                Colorize(text, TagPattern, TagColor);
+                Colorize(text, ButtonPattern, ButtonColor);
+                Colorize(text, ValuePattern, ValueColor);
+                ColorizeKeywords(text);
+            }
+            finally
+            {
+                _editor.Select(selectionStart, selectionLength);
+                _editor.ResumeLayout();
+                _suppress = false;
+            }
+        }
+
+        private void Colorize(string text, Regex pattern, Color color)
+        {
+            foreach (Match match in pattern.Matches(text))
+            {
+                _editor.Select(match.Index, match.Length);
+                _editor.SelectionColor = color;
+            }
+        }
+
+        private void ColorizeKeywords(string text)
+        {
+            int[] lineStarts = BuildLineStarts(text);
+
+            foreach (ScriptBlock block in ScriptProject.Parse(text).Blocks)
+            {
+                if (block.Kind != ScriptBlockKind.Check && block.Kind != ScriptBlockKind.Act && block.Kind != ScriptBlockKind.ElseAct) continue;
+
+                for (int line = block.StartLine; line < block.EndLine && line - 1 < lineStarts.Length; line++)
+                {
+                    int start = lineStarts[line - 1];
+                    int end = line < lineStarts.Length ? lineStarts[line] : text.Length;
+                    Match match = LineKeywordPattern.Match(text.Substring(start, end - start));
+
+                    if (!match.Success) continue;
+
+                    _editor.Select(start + match.Groups[1].Index, match.Groups[1].Length);
+                    _editor.SelectionColor = KeywordColor;
+                }
+            }
+        }
+
+        private static int[] BuildLineStarts(string text)
+        {
+            var starts = new List<int> { 0 };
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (text[i] == '\n') starts.Add(i + 1);
+            }
+
+            return starts.ToArray();
+        }
+
+        // ---------------------------------------------------------------- navigation
+
+        private void EditorMouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left || !ModifierKeys.HasFlag(Keys.Control)) return;
+
+            int index = _editor.GetCharIndexFromPosition(e.Location);
+            int lineIndex = _editor.GetLineFromCharIndex(index);
+            string line = _editor.Lines[lineIndex];
+            int lineStart = _editor.GetFirstCharIndexFromLine(lineIndex);
+
+            foreach (Match match in Regex.Matches(line, @"/@[A-Za-z0-9_\-]+"))
+            {
+                int from = lineStart + match.Index + 1;
+                int to = from + match.Length - 1;
+
+                if (index < from || index > to) continue;
+
+                JumpToPage(match.Value.Substring(1));
+                return;
+            }
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (!ConfirmDiscard()) e.Cancel = true;
@@ -503,9 +742,7 @@ namespace Server.MirForms.Scripts
             {
                 if (Keyword == null) return GameLanguage.Get("No keyword here");
 
-                string description = GameLanguage.Get(Keyword.Description);
-
-                return Keyword.Name + "   " + description;
+                return Keyword.Name + "   " + GameLanguage.Get(Keyword.Description);
             }
         }
     }
