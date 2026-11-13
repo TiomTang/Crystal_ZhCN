@@ -14,8 +14,9 @@ namespace Server.MirObjects
     {
         private static readonly Dictionary<string, ScriptKeyword> CheckIndex = BuildIndex(ScriptCheckCatalog.Entries);
         private static readonly Dictionary<string, ScriptKeyword> ActionIndex = BuildIndex(ScriptActionCatalog.Entries);
+        private static readonly Dictionary<string, ScriptKeyword> VariableIndex = BuildIndex(ScriptValueCatalog.PlayerEntries);
+        private static readonly Dictionary<string, ScriptKeyword> MonsterVariableIndex = BuildIndex(ScriptValueCatalog.MonsterEntries);
 
-        private static readonly ScriptKeyword[] NoKeywords = new ScriptKeyword[0];
 
         /// <summary>Keywords allowed inside #IF.</summary>
         public static IReadOnlyList<ScriptKeyword> Checks
@@ -32,7 +33,13 @@ namespace Server.MirObjects
         /// <summary>Variables replaced inside #SAY, written as &lt;$NAME&gt;.</summary>
         public static IReadOnlyList<ScriptKeyword> Variables
         {
-            get { return NoKeywords; }
+            get { return ScriptValueCatalog.PlayerEntries; }
+        }
+
+        /// <summary>Variables available when a script runs for a monster.</summary>
+        public static IReadOnlyList<ScriptKeyword> MonsterVariables
+        {
+            get { return ScriptValueCatalog.MonsterEntries; }
         }
 
         public static bool TryGetCheck(string name, out ScriptKeyword keyword)
@@ -43,6 +50,16 @@ namespace Server.MirObjects
         public static bool TryGetAction(string name, out ScriptKeyword keyword)
         {
             return ActionIndex.TryGetValue(name, out keyword);
+        }
+
+        public static bool TryGetVariable(string name, out ScriptKeyword keyword)
+        {
+            return VariableIndex.TryGetValue(name, out keyword);
+        }
+
+        public static bool TryGetMonsterVariable(string name, out ScriptKeyword keyword)
+        {
+            return MonsterVariableIndex.TryGetValue(name, out keyword);
         }
 
         /// <summary>
@@ -67,6 +84,11 @@ namespace Server.MirObjects
                 return ScriptParseOutcome.Unknown;
             }
 
+            if (keyword.Handler == null)
+            {
+                return ScriptParseOutcome.Unknown;
+            }
+
             if (context.Parts.Length < keyword.MinParts)
             {
                 ScriptDiagnostics.Report(ScriptDiagnosticKind.WrongArity, context, keyword.Name,
@@ -86,6 +108,8 @@ namespace Server.MirObjects
                     return CheckIndex;
                 case ScriptKeywordKind.Action:
                     return ActionIndex;
+                case ScriptKeywordKind.Variable:
+                    return VariableIndex;
                 default:
                     return null;
             }

@@ -135,6 +135,54 @@ namespace Server.MirObjects
             }
         }
 
+        /// <summary>
+        /// Records a problem found while a script runs, where the file and line are no longer known.
+        /// Entries are keyed by page and keyword, so a value used on every visit is reported once.
+        /// </summary>
+        public static void ReportRuntime(ScriptDiagnosticKind kind, string pageKey, string keyword, string message)
+        {
+            bool added = false;
+
+            string key = kind + "||" + pageKey + "|" + keyword + "|";
+
+            lock (Sync)
+            {
+                ScriptDiagnostic existing;
+
+                if (Entries.TryGetValue(key, out existing))
+                {
+                    existing.Count++;
+                }
+                else if (Entries.Count >= MaxEntries)
+                {
+                    _suppressed++;
+                }
+                else
+                {
+                    Entries.Add(key, new ScriptDiagnostic
+                    {
+                        Kind = kind,
+                        FileName = string.Empty,
+                        PageKey = pageKey ?? string.Empty,
+                        Keyword = keyword ?? string.Empty,
+                        Text = string.Empty,
+                        Message = message,
+                    });
+
+                    added = true;
+                }
+            }
+
+            if (!added) return;
+
+            Action<string> sink = Sink;
+
+            if (sink != null)
+            {
+                sink(string.Format("[Script] {0}: {1}", pageKey, message));
+            }
+        }
+
         /// <summary>One-line summary for load-time logging.</summary>
         public static string Describe()
         {

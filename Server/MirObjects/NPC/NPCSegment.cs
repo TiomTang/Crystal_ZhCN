@@ -173,6 +173,23 @@ namespace Server.MirObjects
             }
         }
 
+        /// <summary>
+        /// Reports a &lt;$VALUE&gt; that no table knows. A value can also resolve to empty on purpose,
+        /// so anything the tables list is left alone.
+        /// </summary>
+        private void ReportUnknownValue(string name)
+        {
+            if (string.IsNullOrEmpty(name) || name.IndexOf('(') >= 0) return;
+
+            ScriptKeyword keyword;
+
+            if (ScriptKeywordRegistry.TryGetVariable(name, out keyword)) return;
+            if (ScriptKeywordRegistry.TryGetMonsterVariable(name, out keyword)) return;
+
+            ScriptDiagnostics.ReportRuntime(ScriptDiagnosticKind.UnknownValue, Page == null ? string.Empty : Page.Key, name,
+                "Unknown value <$" + name + ">");
+        }
+
         public string ReplaceValue(PlayerObject player, string param)
         {
             var regex = new Regex(@"\<\$(.*)\>");
@@ -545,7 +562,11 @@ namespace Server.MirObjects
                     newValue = (player.MyGuild.Name);
                     break;
             }
-            if (string.IsNullOrEmpty(newValue)) return param;
+            if (string.IsNullOrEmpty(newValue))
+            {
+                ReportUnknownValue(innerMatch);
+                return param;
+            }
 
             return param.Replace(match.Value, newValue);
         }
@@ -613,7 +634,11 @@ namespace Server.MirObjects
                     break;
             }
 
-            if (string.IsNullOrEmpty(newValue)) return param;
+            if (string.IsNullOrEmpty(newValue))
+            {
+                ReportUnknownValue(innerMatch);
+                return param;
+            }
 
             return param.Replace(match.Value, newValue);
         }
