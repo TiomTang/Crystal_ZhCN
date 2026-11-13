@@ -11,6 +11,7 @@ namespace Server.MirObjects
         UnknownValue,
         WrongArity,
         MissingPage,
+        MissingScript,
     }
 
     /// <summary>One script problem, deduplicated by file, page, keyword and line text.</summary>

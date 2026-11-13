@@ -13,6 +13,7 @@ namespace Server.MirObjects
     public static class ScriptKeywordRegistry
     {
         private static readonly Dictionary<string, ScriptKeyword> CheckIndex = BuildIndex(ScriptCheckCatalog.Entries);
+        private static readonly Dictionary<string, ScriptKeyword> ActionIndex = BuildIndex(ScriptActionCatalog.Entries);
 
         private static readonly ScriptKeyword[] NoKeywords = new ScriptKeyword[0];
 
@@ -25,7 +26,7 @@ namespace Server.MirObjects
         /// <summary>Keywords allowed inside #ACT and #ELSEACT.</summary>
         public static IReadOnlyList<ScriptKeyword> Actions
         {
-            get { return NoKeywords; }
+            get { return ScriptActionCatalog.Entries; }
         }
 
         /// <summary>Variables replaced inside #SAY, written as &lt;$NAME&gt;.</summary>
@@ -37,6 +38,11 @@ namespace Server.MirObjects
         public static bool TryGetCheck(string name, out ScriptKeyword keyword)
         {
             return CheckIndex.TryGetValue(name, out keyword);
+        }
+
+        public static bool TryGetAction(string name, out ScriptKeyword keyword)
+        {
+            return ActionIndex.TryGetValue(name, out keyword);
         }
 
         /// <summary>
@@ -78,6 +84,8 @@ namespace Server.MirObjects
             {
                 case ScriptKeywordKind.Check:
                     return CheckIndex;
+                case ScriptKeywordKind.Action:
+                    return ActionIndex;
                 default:
                     return null;
             }
