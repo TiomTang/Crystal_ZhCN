@@ -266,8 +266,8 @@ namespace Server.MirObjects
         /// <summary>Handles @CLEARBAG.</summary>
         internal void Cmd_CLEARBAG(string[] parts)
         {
-            PlayerObject player;
             UserItem item;
+            PlayerObject player;
 
                         if (!IsGM && !Settings.TestServer) return;
                         player = this;
@@ -1218,8 +1218,8 @@ namespace Server.MirObjects
         /// <summary>Handles @ADJUSTPKPOINT.</summary>
         internal void Cmd_ADJUSTPKPOINT(string[] parts)
         {
-            int tempInt;
             PlayerObject player;
+            int tempInt;
 
                         if ((!IsGM && !Settings.TestServer) || parts.Length < 2) return;
 
@@ -1685,6 +1685,609 @@ namespace Server.MirObjects
 
                         Enqueue(GetUpdateInfo());
                         Broadcast(GetUpdateInfo());
+                        return;
+        }
+        /// <summary>Handles @LOGIN.</summary>
+        internal void Cmd_LOGIN(string[] parts)
+        {
+
+                        GMLogin = true;
+                        ReceiveChat(GameLanguage.Get("Please type the GM Password"), ChatType.Hint);
+                        return;
+        }
+
+        /// <summary>Handles @CLEARBUFFS.</summary>
+        internal void Cmd_CLEARBUFFS(string[] parts)
+        {
+
+                        foreach (var buff in Buffs)
+                        {
+                            buff.FlagForRemoval = true;
+                            buff.ExpireTime = 0;
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @ALLOWGUILD.</summary>
+        internal void Cmd_ALLOWGUILD(string[] parts)
+        {
+            string hintstring;
+
+                        EnableGuildInvite = !EnableGuildInvite;
+                        hintstring = EnableGuildInvite ? GameLanguage.Get("Guild invites enabled.") : GameLanguage.Get("Guild invites disabled.");
+                        ReceiveChat(hintstring, ChatType.Hint);
+                        return;
+        }
+
+        /// <summary>Handles @OBSERVE.</summary>
+        internal void Cmd_OBSERVE(string[] parts)
+        {
+            PlayerObject player;
+
+                        if (parts.Length < 2) return;
+                        player = Envir.GetPlayer(parts[1]);
+
+                        if (player == null) return;
+                        if ((!player.AllowObserve || !Settings.AllowObserve) && !IsGM) return;
+
+                        player.AddObserver(Connection);
+                        return;
+        }
+
+        /// <summary>Handles @ENABLEGROUPRECALL.</summary>
+        internal void Cmd_ENABLEGROUPRECALL(string[] parts)
+        {
+            string hintstring;
+
+                        EnableGroupRecall = !EnableGroupRecall;
+                        hintstring = EnableGroupRecall ? GameLanguage.Get("Group Recall Enabled.") : GameLanguage.Get("Group Recall Disabled.");
+                        ReceiveChat(hintstring, ChatType.Hint);
+                        return;
+        }
+
+        /// <summary>Handles @GROUPRECALL.</summary>
+        internal void Cmd_GROUPRECALL(string[] parts)
+        {
+
+                        if (GroupMembers == null || GroupMembers[0] != this || Dead)
+                            return;
+
+                        if (CurrentMap.Info.NoRecall)
+                        {
+                            ReceiveChat(GameLanguage.Get("You cannot recall people on this map"), ChatType.System);
+                            return;
+                        }
+
+                        if (Envir.Time < LastRecallTime)
+                        {
+                            ReceiveChat(GameLanguage.Get("You cannot recall for another {0} seconds", (LastRecallTime - Envir.Time) / 1000), ChatType.System);
+                            return;
+                        }
+
+                        if (ItemSets.Any(set => set.Set == ItemSet.Recall && set.SetComplete))
+                        {
+                            LastRecallTime = Envir.Time + 180000;
+                            for (var i = 1; i < GroupMembers.Count(); i++)
+                            {
+                                if (GroupMembers[i].EnableGroupRecall)
+                                    GroupMembers[i].Teleport(CurrentMap, CurrentLocation);
+                                else
+                                    GroupMembers[i].ReceiveChat(GameLanguage.Get("A recall was attempted without your permission"),
+                                        ChatType.System);
+                            }
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @RECALLMEMBER.</summary>
+        internal void Cmd_RECALLMEMBER(string[] parts)
+        {
+            PlayerObject player;
+
+                        if (GroupMembers == null || GroupMembers[0] != this)
+                        {
+                            ReceiveChat(GameLanguage.Get("You are not the group leader."), ChatType.System);
+                            return;
+                        }
+
+                        if (Dead)
+                        {
+                            ReceiveChat(GameLanguage.Get("You cannot recall when you are dead."), ChatType.System);
+                            return;
+                        }
+
+                        if (CurrentMap.Info.NoRecall)
+                        {
+                            ReceiveChat(GameLanguage.Get("You cannot recall people on this map"), ChatType.System);
+                            return;
+                        }
+
+                        if (Envir.Time < LastRecallTime)
+                        {
+                            ReceiveChat(GameLanguage.Get("You cannot recall for another {0} seconds", (LastRecallTime - Envir.Time) / 1000), ChatType.System);
+                            return;
+                        }
+                        if (ItemSets.Any(set => set.Set == ItemSet.Recall && set.SetComplete))
+                        {
+                            if (parts.Length < 2) return;
+                            player = Envir.GetPlayer(parts[1]);
+
+                            if (player == null || !IsMember(player) || this == player)
+                            {
+                                ReceiveChat((GameLanguage.Get("Player {0} could not be found", parts[1])), ChatType.System);
+                                return;
+                            }
+                            if (!player.EnableGroupRecall)
+                            {
+                                player.ReceiveChat(GameLanguage.Get("A recall was attempted without your permission"), ChatType.System);
+                                ReceiveChat((GameLanguage.Get("{0} is blocking grouprecall", player.Name)), ChatType.System);
+                                return;
+                            }
+                            LastRecallTime = Envir.Time + 60000;
+
+                            if (!player.Teleport(CurrentMap, Front))
+                                player.Teleport(CurrentMap, CurrentLocation);
+                        }
+                        else
+                        {
+                            ReceiveChat(GameLanguage.Get("You cannot recall without a recallset."), ChatType.System);
+                            return;
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @RECALLLOVER.</summary>
+        internal void Cmd_RECALLLOVER(string[] parts)
+        {
+            PlayerObject player;
+
+                        if (Info.Married == 0)
+                        {
+                            ReceiveChat(GameLanguage.Get("You're not married."), ChatType.System);
+                            return;
+                        }
+
+                        if (Dead)
+                        {
+                            ReceiveChat(GameLanguage.Get("You cannot recall when you are dead."), ChatType.System);
+                            return;
+                        }
+
+                        if (CurrentMap.Info.NoRecall)
+                        {
+                            ReceiveChat(GameLanguage.Get("You cannot recall people on this map"), ChatType.System);
+                            return;
+                        }
+
+                        if (Info.Equipment[(int)EquipmentSlot.RingL] == null)
+                        {
+                            ReceiveChat(GameLanguage.Get("You need to be wearing a Wedding Ring for recall."), ChatType.System);
+                            return;
+                        }
+
+
+                        if (Info.Equipment[(int)EquipmentSlot.RingL].WeddingRing == Info.Married)
+                        {
+                            CharacterInfo Lover = Envir.GetCharacterInfo(Info.Married);
+
+                            if (Lover == null) return;
+
+                            player = Envir.GetPlayer(Lover.Name);
+
+                            if (!Settings.WeddingRingRecall)
+                            {
+                                ReceiveChat(GameLanguage.Get("Teleportation via Wedding Ring is disabled."), ChatType.System);
+                                return;
+                            }
+
+                            if (player == null)
+                            {
+                                ReceiveChat((GameLanguage.Get("{0} is not online.", Lover.Name)), ChatType.System);
+                                return;
+                            }
+
+                            if (player.Dead)
+                            {
+                                ReceiveChat(GameLanguage.Get("You can't recall a dead player."), ChatType.System);
+                                return;
+                            }
+
+                            if (player.Info.Equipment[(int)EquipmentSlot.RingL] == null)
+                            {
+                                player.ReceiveChat((GameLanguage.Get("You need to wear a Wedding Ring for recall.", Lover.Name)), ChatType.System);
+                                ReceiveChat((GameLanguage.Get("{0} Isn't wearing a Wedding Ring.", Lover.Name)), ChatType.System);
+                                return;
+                            }
+
+                            if (player.Info.Equipment[(int)EquipmentSlot.RingL].WeddingRing != player.Info.Married)
+                            {
+                                player.ReceiveChat((GameLanguage.Get("You need to wear a Wedding Ring on your left finger for recall.", Lover.Name)), ChatType.System);
+                                ReceiveChat((GameLanguage.Get("{0} Isn't wearing a Wedding Ring.", Lover.Name)), ChatType.System);
+                                return;
+                            }
+
+                            if (!player.AllowLoverRecall)
+                            {
+                                player.ReceiveChat(GameLanguage.Get("A recall was attempted without your permission"), ChatType.System);
+                                ReceiveChat((GameLanguage.Get("{0} is blocking Lover Recall.", player.Name)), ChatType.System);
+                                return;
+                            }
+
+                            if ((Envir.Time < LastRecallTime) && (Envir.Time < player.LastRecallTime))
+                            {
+                                ReceiveChat(GameLanguage.Get("You cannot recall for another {0} seconds", (LastRecallTime - Envir.Time) / 1000), ChatType.System);
+                                return;
+                            }
+
+                            LastRecallTime = Envir.Time + 60000;
+                            player.LastRecallTime = Envir.Time + 60000;
+
+                            if (!player.Teleport(CurrentMap, Front))
+                                player.Teleport(CurrentMap, CurrentLocation);
+                        }
+                        else
+                        {
+                            ReceiveChat(GameLanguage.Get("You cannot recall your lover without wearing a wedding ring"), ChatType.System);
+                            return;
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @TIME.</summary>
+        internal void Cmd_TIME(string[] parts)
+        {
+
+                        ReceiveChat(GameLanguage.Get("The time is : {0}", Envir.Now.ToString("hh:mm tt")), ChatType.System);
+                        return;
+        }
+
+        /// <summary>Handles @ROLL.</summary>
+        internal void Cmd_ROLL(string[] parts)
+        {
+
+                        int diceNum = Envir.Random.Next(5) + 1;
+
+                        if (GroupMembers == null) { return; }
+
+                        for (int i = 0; i < GroupMembers.Count; i++)
+                        {
+                            PlayerObject playerSend = GroupMembers[i];
+                            playerSend.ReceiveChat(GameLanguage.Get("{0} has rolled a {1}", Name, diceNum), ChatType.Group);
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @MAP.</summary>
+        internal void Cmd_MAP(string[] parts)
+        {
+
+                        var mapName = CurrentMap.Info.FileName;
+                        var mapTitle = CurrentMap.Info.Title;
+                        ReceiveChat((GameLanguage.Get("You are currently in {0}. Map ID: {1}", mapTitle, mapName)), ChatType.System);
+                        return;
+        }
+
+        /// <summary>Handles @LEAVEGUILD.</summary>
+        internal void Cmd_LEAVEGUILD(string[] parts)
+        {
+
+                        if (MyGuild == null) return;
+                        if (MyGuildRank == null) return;
+                        if (MyGuild.IsAtWar())
+                        {
+                            ReceiveChat(GameLanguage.Get("Cannot leave guild whilst at war."), ChatType.System);
+                            return;
+                        }
+                        if (MyGuild.Name == Settings.NewbieGuild && Settings.NewbieGuildBuffEnabled == true) RemoveBuff(BuffType.Newbie);
+                        if (HasBuff(BuffType.Guild)) RemoveBuff(BuffType.Guild);
+                        MyGuild.DeleteMember(this, Name);
+                        return;
+        }
+
+        /// <summary>Handles @ALLOWTRADE.</summary>
+        internal void Cmd_ALLOWTRADE(string[] parts)
+        {
+
+                        AllowTrade = !AllowTrade;
+
+                        if (AllowTrade)
+                            ReceiveChat(GameLanguage.Get("You are now allowing trade"), ChatType.System);
+                        else
+                            ReceiveChat(GameLanguage.Get("You are no longer allowing trade"), ChatType.System);
+                        return;
+        }
+
+        /// <summary>Handles @RIDE.</summary>
+        internal void Cmd_RIDE(string[] parts)
+        {
+
+                        ToggleRide();
+
+                        if (HasHero && HeroSpawned && Hero.RidingMount != RidingMount)
+                            Hero.ToggleRide();
+
+                        ChatTime = 0;
+                        return;
+        }
+
+        /// <summary>Handles @DIE.</summary>
+        internal void Cmd_DIE(string[] parts)
+        {
+
+                        LastHitter = null;
+                        Die();
+                        return;
+        }
+
+        /// <summary>Handles @ADDINVENTORY.</summary>
+        internal void Cmd_ADDINVENTORY(string[] parts)
+        {
+
+                        {
+                            int openLevel = (int)((Info.Inventory.Length - 46) / 4);
+                            uint openGold = (uint)(1000000 + openLevel * 1000000);
+                            if (Account.Gold >= openGold)
+                            {
+                                Account.Gold -= openGold;
+                                Enqueue(new S.LoseGold { Gold = openGold });
+                                Enqueue(new S.ResizeInventory { Size = Info.ResizeInventory() });
+                                ReceiveChat(GameLanguage.Get("Inventory size increased."), ChatType.System);
+                            }
+                            else
+                            {
+                                ReceiveChat(GameLanguage.Get("Not enough gold."), ChatType.System);
+                            }
+                            ChatTime = 0;
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @ADDSTORAGE.</summary>
+        internal void Cmd_ADDSTORAGE(string[] parts)
+        {
+
+                        {
+                            TimeSpan addedTime = new TimeSpan(10, 0, 0, 0);
+                            uint cost = 1000000;
+
+                            if (Account.Gold >= cost)
+                            {
+                                var sz = Account.ExpandStorage();
+
+                                Account.Gold -= cost;
+                                Account.HasExpandedStorage = true;
+
+                                if (Account.ExpandedStorageExpiryDate > Envir.Now)
+                                {
+                                    Account.ExpandedStorageExpiryDate = Account.ExpandedStorageExpiryDate + addedTime;
+                                    ReceiveChat(GameLanguage.Get("Expanded Storage Expires On") + Account.ExpandedStorageExpiryDate.ToString(), ChatType.System);
+                                }
+                                else
+                                {
+                                    Account.ExpandedStorageExpiryDate = Envir.Now + addedTime;
+                                    ReceiveChat(GameLanguage.Get("Expanded Storage Expires On") + Account.ExpandedStorageExpiryDate.ToString(), ChatType.System);
+                                }
+
+                                Enqueue(new S.LoseGold { Gold = cost });
+                                Enqueue(new S.ResizeStorage { Size = sz, HasExpandedStorage = Account.HasExpandedStorage, ExpiryTime = Account.ExpandedStorageExpiryDate });
+                            }
+                            else
+                            {
+                                ReceiveChat(GameLanguage.Get("Not enough gold."), ChatType.System);
+                            }
+                            ChatTime = 0;
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @SUMMONHERO.</summary>
+        internal void Cmd_SUMMONHERO(string[] parts)
+        {
+
+                        {
+                            if (!HasHero) return;
+
+                        if (!HeroSpawned)
+                                SummonHero();
+                        else if (Hero != null)
+                        {
+                            long remaining = Hero.LogTime - Envir.Time;
+                            if (remaining > 0)
+                            {
+                                int remainingSeconds = (int)Math.Ceiling(remaining / 1000D);
+                                ReceiveChat(GameLanguage.Get("Your Hero recently left combat. Please wait {0} seconds before desummoning.", remainingSeconds), ChatType.System);
+                                return;
+                            }
+
+                            DespawnHero();
+                            Info.HeroSpawned = false;
+                        }
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @ALLOWOBSERVE.</summary>
+        internal void Cmd_ALLOWOBSERVE(string[] parts)
+        {
+
+                        AllowObserve = !AllowObserve;
+                        Enqueue(new S.AllowObserve { Allow = AllowObserve });
+                        return;
+        }
+
+        /// <summary>Handles @TOGGLETRANSFORM.</summary>
+        internal void Cmd_TOGGLETRANSFORM(string[] parts)
+        {
+            string hintstring;
+
+                        if (HasBuff(BuffType.Transform, out Buff transform))
+                        {
+                            if (transform.Paused)
+                            {
+                                UnpauseBuff(transform);
+                            }
+                            else
+                            {
+                                PauseBuff(transform);
+                            }
+                            RefreshStats();
+
+                            hintstring = transform.Paused ? GameLanguage.Get("Transform Disabled.") : GameLanguage.Get("Transform Enabled.");
+                            ReceiveChat(hintstring, ChatType.Hint);
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @GATES.</summary>
+        internal void Cmd_GATES(string[] parts)
+        {
+
+                        if (MyGuild == null || MyGuild.Conquest == null || !MyGuildRank.Options.HasFlag(GuildRankOptions.CanChangeRank) || MyGuild.Conquest.WarIsOn)
+                        {
+                            ReceiveChat(GameLanguage.Get("You don't have access to control any gates at the moment."), ChatType.System);
+                            return;
+                        }
+
+                        bool openClose = false;
+
+                        if (parts.Length > 1)
+                        {
+                            string openclose = parts[1];
+
+                            if (openclose.ToUpper() == "CLOSE")
+                            {
+                                openClose = true;
+                            }
+                            else if (openclose.ToUpper() == "OPEN")
+                            {
+                                openClose = false;
+                            }
+                            else
+                            {
+                                ReceiveChat(GameLanguage.Get("You must type /Gates Open or /Gates Close."), ChatType.System);
+                                return;
+                            }
+
+                            for (int i = 0; i < MyGuild.Conquest.GateList.Count; i++)
+                            {
+                                if (MyGuild.Conquest.GateList[i].Gate != null && !MyGuild.Conquest.GateList[i].Gate.Dead)
+                                {
+                                    if (openClose)
+                                    {
+                                        MyGuild.Conquest.GateList[i].Gate.CloseDoor();
+                                    }
+                                    else
+                                    {
+                                        MyGuild.Conquest.GateList[i].Gate.OpenDoor();
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < MyGuild.Conquest.GateList.Count; i++)
+                            {
+                                if (MyGuild.Conquest.GateList[i].Gate != null && !MyGuild.Conquest.GateList[i].Gate.Dead)
+                                {
+                                    if (!MyGuild.Conquest.GateList[i].Gate.Closed)
+                                    {
+                                        MyGuild.Conquest.GateList[i].Gate.CloseDoor();
+                                        openClose = true;
+                                    }
+                                    else
+                                    {
+                                        MyGuild.Conquest.GateList[i].Gate.OpenDoor();
+                                        openClose = false;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (openClose)
+                        {
+                            ReceiveChat(GameLanguage.Get("The gates at {0} have been closed.", MyGuild.Conquest.Info.Name), ChatType.System);
+                        }
+                        else
+                        {
+                            ReceiveChat(GameLanguage.Get("The gates at {0} have been opened.", MyGuild.Conquest.Info.Name), ChatType.System);
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @CHANGEFLAG.</summary>
+        internal void Cmd_CHANGEFLAG(string[] parts)
+        {
+
+                        if (MyGuild == null || MyGuild.Conquest == null || !MyGuildRank.Options.HasFlag(GuildRankOptions.CanChangeRank) || MyGuild.Conquest.WarIsOn)
+                        {
+                            ReceiveChat(GameLanguage.Get("You don't have access to change any flags at the moment."), ChatType.System);
+                            return;
+                        }
+
+                        ushort flag = (ushort)Envir.Random.Next(12);
+
+                        if (parts.Length > 1)
+                        {
+                            ushort.TryParse(parts[1], out ushort temp);
+
+                            if (temp <= 11) flag = temp;
+                        }
+
+                        MyGuild.Info.FlagImage = (ushort)(1000 + flag);
+
+                        for (int i = 0; i < MyGuild.Conquest.FlagList.Count; i++)
+                        {
+                            MyGuild.Conquest.FlagList[i].UpdateImage();
+                        }
+
+                        return;
+        }
+
+        /// <summary>Handles @CHANGEFLAGCOLOUR.</summary>
+        internal void Cmd_CHANGEFLAGCOLOUR(string[] parts)
+        {
+
+                        {
+                            if (MyGuild == null || MyGuild.Conquest == null || !MyGuildRank.Options.HasFlag(GuildRankOptions.CanChangeRank) || MyGuild.Conquest.WarIsOn)
+                            {
+                                ReceiveChat(GameLanguage.Get("You don't have access to change any flags at the moment."), ChatType.System);
+                                return;
+                            }
+
+                            byte r1 = (byte)Envir.Random.Next(255);
+                            byte g1 = (byte)Envir.Random.Next(255);
+                            byte b1 = (byte)Envir.Random.Next(255);
+
+                            if (parts.Length > 3)
+                            {
+                                byte.TryParse(parts[1], out r1);
+                                byte.TryParse(parts[2], out g1);
+                                byte.TryParse(parts[3], out b1);
+                            }
+
+                            MyGuild.Info.FlagColour = Color.FromArgb(255, r1, g1, b1);
+
+                            for (int i = 0; i < MyGuild.Conquest.FlagList.Count; i++)
+                            {
+                                MyGuild.Conquest.FlagList[i].UpdateColour();
+                            }
+                        }
+                        return;
+        }
+
+        /// <summary>Handles @SETTIMER.</summary>
+        internal void Cmd_SETTIMER(string[] parts)
+        {
+
+                        if (parts.Length < 4) return;
+
+                        string key = parts[1];
+
+                        if (!int.TryParse(parts[2], out int seconds)) return;
+                        if (!byte.TryParse(parts[3], out byte timerType)) return;
+
+                        SetTimer(key, seconds, timerType);
+
                         return;
         }
     }
