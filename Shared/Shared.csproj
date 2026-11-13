@@ -19,4 +19,26 @@
     <NoWarn>1701;1702</NoWarn>
   </PropertyGroup>
 
+  <!--
+    Regenerates Shared/LocalizationCatalog.g.cs from the GameLanguage.Get templates before this
+    assembly compiles. The scanner rewrites the file only when its content changes, so a normal
+    build leaves it untouched. Skipped for design-time builds and when LocalizationScanEnabled is
+    false, for build hosts without the .NET SDK on PATH.
+  -->
+  <PropertyGroup>
+    <LocalizationScanProject>$(MSBuildThisFileDirectory)..\tools\LocalizationScan\LocalizationScan.csproj</LocalizationScanProject>
+    <LocalizationCatalogFile>$(MSBuildThisFileDirectory)LocalizationCatalog.g.cs</LocalizationCatalogFile>
+  </PropertyGroup>
+
+  <Target Name="RunLocalizationScan"
+          BeforeTargets="CoreCompile"
+          Condition="'$(DesignTimeBuild)' != 'true' and '$(LocalizationScanEnabled)' != 'false' and Exists('$(LocalizationScanProject)')">
+    <!-- Build the scanner in this MSBuild session instead of spawning "dotnet run", so a solution
+         build that also compiles the tool never has two processes writing its obj/bin. -->
+    <MSBuild Projects="$(LocalizationScanProject)" Targets="Build" Properties="Configuration=Debug">
+      <Output TaskParameter="TargetOutputs" ItemName="LocalizationScanAssembly" />
+    </MSBuild>
+    <Exec Command="dotnet &quot;@(LocalizationScanAssembly)&quot; &quot;$(MSBuildThisFileDirectory)..&quot; &quot;$(LocalizationCatalogFile)&quot;" />
+  </Target>
+
 </Project>
