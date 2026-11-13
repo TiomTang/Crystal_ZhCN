@@ -2162,18 +2162,6 @@ namespace Server.MirObjects
 
                 if (parts.Length == 0) return;
 
-                PlayerObject player;
-                String hintstring;
-
-                List<int> conquestAIs = new()
-                {
-                    72, // siege gate
-                    73, // gate west
-                    80, // archer
-                    81, // gate 
-                    82  // wall
-                };
-
                 if (CommandRegistry.TryDispatch(this, parts)) return;
 
                 foreach (string command in Envir.CustomCommands)

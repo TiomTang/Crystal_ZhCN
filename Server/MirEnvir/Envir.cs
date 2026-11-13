@@ -1,4 +1,4 @@
-using ClientPackets;
+﻿using ClientPackets;
 using Server.Library.MirDatabase;
 using Server.Library.Utils;
 using Server.MirDatabase;
@@ -2050,6 +2050,8 @@ namespace Server.MirEnvir
                     }
                 }
 
+                LogCommandRegistry();
+
                 StartEnvir();
                 var canstartserver = CanStartEnvir();
                 if (canstartserver != "true")
@@ -3443,6 +3445,28 @@ namespace Server.MirEnvir
         public void UpdateIPBlock(string accessKey, TimeSpan value)
         {
             IPBlocks[accessKey] = Now.Add(value);
+        }
+
+
+        /// <summary>
+        /// Reports the command table at start-up and prints any declaration problems, so a duplicate
+        /// or half-declared command shows up in the server log instead of failing silently later.
+        /// </summary>
+        private static void LogCommandRegistry()
+        {
+            int gm = 0;
+
+            foreach (CommandInfo command in CommandRegistry.All)
+            {
+                if (command.Permission == CommandPermission.GameMaster) gm++;
+            }
+
+            MessageQueue.Enqueue(string.Format("Commands: {0} registered ({1} GM, {2} player).", CommandRegistry.Count, gm, CommandRegistry.Count - gm));
+
+            foreach (string problem in CommandRegistry.Validate())
+            {
+                MessageQueue.Enqueue("Command registry: " + problem);
+            }
         }
 
         private void StartEnvir()
