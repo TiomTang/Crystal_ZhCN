@@ -578,6 +578,10 @@ namespace Server.MirObjects
                     acts.Add(new NPCActions(ActionType.Break));
                     break;
 
+                case "CLOSE":
+                    acts.Add(new NPCActions(ActionType.Close));
+                    break;
+
                 //cant use stored var
                 case "ADDNAMELIST":
                     if (parts.Length < 2) return;
@@ -3692,6 +3696,12 @@ namespace Server.MirObjects
                             Page.BreakFromSegments = true;
                         }
                         break;
+                    case ActionType.Close:
+                        {
+                            player.NPCDialogClose = true;
+                        }
+                        break;
+
 
                     case ActionType.Set:
                         {

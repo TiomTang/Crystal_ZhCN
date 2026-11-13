@@ -124,6 +124,7 @@ namespace Server.MirObjects
         public NPCPage NPCPage;
         public Dictionary<NPCSegment, bool> NPCSuccess = new Dictionary<NPCSegment, bool>();
         public bool NPCDelayed;
+        public bool NPCDialogClose;
         public List<string> NPCSpeech = new List<string>();
         public Dictionary<string, object> NPCData = new Dictionary<string, object>();
 

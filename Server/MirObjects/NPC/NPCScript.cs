@@ -874,6 +874,7 @@ namespace Server.MirObjects
 
                 player.NPCSpeech = new List<string>();
                 player.NPCSuccess.Clear();
+                player.NPCDialogClose = false;
 
                 foreach (NPCSegment segment in page.SegmentList)
                 {
@@ -882,6 +883,8 @@ namespace Server.MirObjects
                         page.BreakFromSegments = false;
                         break;
                     }
+
+                    if (player.NPCDialogClose) break;
 
                     ProcessSegment(player, page, segment, objectID);
                 }
@@ -894,6 +897,18 @@ namespace Server.MirObjects
 
         private void Response(PlayerObject player, NPCPage page)
         {
+            // A CLOSE action ends the page without dialogue: the client hides the
+            // window when it receives an empty page.
+            if (player.NPCDialogClose)
+            {
+                player.NPCDialogClose = false;
+                player.NPCSpeech.Clear();
+
+                player.Enqueue(new S.NPCResponse { Page = player.NPCSpeech });
+
+                return;
+            }
+
             player.Enqueue(new S.NPCResponse { Page = player.NPCSpeech });
 
             ProcessSpecial(player, page);
