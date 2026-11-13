@@ -117,6 +117,8 @@ namespace Server
             monsterTunerToolStripMenuItem = new ToolStripMenuItem();
             dropBuilderToolStripMenuItem = new ToolStripMenuItem();
             CharacterToolStripMenuItem = new ToolStripMenuItem();
+            helpToolStripMenuItem = new ToolStripMenuItem();
+            commandListToolStripMenuItem = new ToolStripMenuItem();
             UpTimeLabel = new ToolStripTextBox();
             InterfaceTimer = new Timer(components);
             mapHeader = new ColumnHeader();
@@ -416,7 +418,7 @@ namespace Server
             // MainMenu
             // 
             MainMenu.BackColor = Color.Transparent;
-            MainMenu.Items.AddRange(new ToolStripItem[] { controlToolStripMenuItem, accountToolStripMenuItem, databaseFormsToolStripMenuItem, configToolStripMenuItem1, CharacterToolStripMenuItem, UpTimeLabel });
+            MainMenu.Items.AddRange(new ToolStripItem[] { controlToolStripMenuItem, accountToolStripMenuItem, databaseFormsToolStripMenuItem, configToolStripMenuItem1, CharacterToolStripMenuItem, helpToolStripMenuItem, UpTimeLabel });
             MainMenu.Location = new Point(0, 0);
             MainMenu.Name = "MainMenu";
             MainMenu.Padding = new Padding(7, 2, 0, 2);
@@ -766,6 +768,20 @@ namespace Server
             CharacterToolStripMenuItem.Text = "Characters";
             CharacterToolStripMenuItem.Click += CharacterToolStripMenuItem_Click;
             // 
+            // helpToolStripMenuItem
+            // 
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { commandListToolStripMenuItem });
+            helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            helpToolStripMenuItem.Size = new Size(44, 20);
+            helpToolStripMenuItem.Text = "Help";
+            // 
+            // commandListToolStripMenuItem
+            // 
+            commandListToolStripMenuItem.Name = "commandListToolStripMenuItem";
+            commandListToolStripMenuItem.Size = new Size(160, 22);
+            commandListToolStripMenuItem.Text = "Commands";
+            commandListToolStripMenuItem.Click += commandListToolStripMenuItem_Click;
+            // 
             // UpTimeLabel
             // 
             UpTimeLabel.Alignment = ToolStripItemAlignment.Right;
@@ -900,6 +916,8 @@ namespace Server
         private ToolStripTextBox UpTimeLabel;
         private ToolStripMenuItem heroesToolStripMenuItem;
         private ToolStripMenuItem CharacterToolStripMenuItem;
+        private ToolStripMenuItem helpToolStripMenuItem;
+        private ToolStripMenuItem commandListToolStripMenuItem;
         private ToolStripMenuItem recipeToolStripMenuItem;
         private ToolStripMenuItem accountsToolStripMenuItem1;
         private ToolStripMenuItem marketToolStripMenuItem;

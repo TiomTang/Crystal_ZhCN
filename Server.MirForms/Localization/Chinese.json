@@ -13771,5 +13771,409 @@
   "Special spawns": {
     "Source": "Special spawns",
     "Text": "特殊生成"
+  },
+  "ui.CommandPermission.Player": {
+    "Source": "Player",
+    "Text": "玩家"
+  },
+  "ui.CommandPermission.GameMaster": {
+    "Source": "Game master",
+    "Text": "GM"
+  },
+  "ui.CommandListForm.#Title": {
+    "Source": "Commands",
+    "Text": "指令一览"
+  },
+  "ui.CommandListForm.lblPermission": {
+    "Source": "Permission:",
+    "Text": "权限："
+  },
+  "ui.CommandListForm.lblHint": {
+    "Source": "Double-click a command to copy it.",
+    "Text": "双击一行可复制指令。"
+  },
+  "ui.CommandListForm.btnCopy": {
+    "Source": "Copy",
+    "Text": "复制"
+  },
+  "ui.CommandListForm.btnClose": {
+    "Source": "Close",
+    "Text": "关闭"
+  },
+  "ui.CommandListForm.txtSearch.placeholder": {
+    "Source": "Search a command or its description",
+    "Text": "搜索指令名或说明"
+  },
+  "ui.CommandListForm.lblCount": {
+    "Source": "{0} commands: {1} game master only, {2} available to players",
+    "Text": "共 {0} 条指令：仅 GM {1} 条，玩家可用 {2} 条"
+  },
+  "ui.CommandListForm.cbPermission.all": {
+    "Source": "All commands",
+    "Text": "全部指令"
+  },
+  "ui.CommandListForm.cbPermission.player": {
+    "Source": "Player commands only",
+    "Text": "仅玩家可用"
+  },
+  "ui.CommandListForm.cbPermission.gameMaster": {
+    "Source": "Game master commands only",
+    "Text": "仅 GM 可用"
+  },
+  "ui.CommandListForm.testServerSuffix": {
+    "Source": " (players on test servers)",
+    "Text": "（测试服玩家可用）"
+  },
+  "ui.CommandListForm.specialItemSuffix": {
+    "Source": " (players holding {0})",
+    "Text": "（玩家持 {0} 可用）"
+  },
+  "ui.CommandListForm.lvCommands.Column[0]": {
+    "Source": "Command",
+    "Text": "指令"
+  },
+  "ui.CommandListForm.lvCommands.Column[1]": {
+    "Source": "Permission",
+    "Text": "权限"
+  },
+  "ui.CommandListForm.lvCommands.Column[2]": {
+    "Source": "Usage",
+    "Text": "参数"
+  },
+  "ui.CommandListForm.lvCommands.Column[3]": {
+    "Source": "Description",
+    "Text": "说明"
+  },
+  "ui.CommandListForm.lvCommands.Column[4]": {
+    "Source": "Category",
+    "Text": "分类"
+  },
+  "ui.CommandCategory.General": {
+    "Source": "General",
+    "Text": "通用"
+  },
+  "ui.CommandCategory.Character": {
+    "Source": "Character",
+    "Text": "角色"
+  },
+  "ui.CommandCategory.Items": {
+    "Source": "Items",
+    "Text": "物品"
+  },
+  "ui.CommandCategory.Social": {
+    "Source": "Social",
+    "Text": "社交"
+  },
+  "ui.CommandCategory.Guild": {
+    "Source": "Guild",
+    "Text": "行会"
+  },
+  "ui.CommandCategory.Quest": {
+    "Source": "Quest",
+    "Text": "任务"
+  },
+  "ui.CommandCategory.Movement": {
+    "Source": "Movement",
+    "Text": "移动"
+  },
+  "ui.CommandCategory.Monster": {
+    "Source": "Monster",
+    "Text": "怪物"
+  },
+  "ui.CommandCategory.World": {
+    "Source": "World",
+    "Text": "世界"
+  },
+  "ui.CommandCategory.Admin": {
+    "Source": "Admin",
+    "Text": "管理"
+  },
+  "ui.Command.LOGIN": {
+    "Source": "Start GM authentication; the next chat line is read as the GM password.",
+    "Text": "申请 GM 认证，下一条聊天内容会被当作 GM 密码"
+  },
+  "ui.Command.KILL": {
+    "Source": "Kill a player or the target in front of you.",
+    "Text": "杀死指定玩家或正前方的目标"
+  },
+  "ui.Command.CHANGEGENDER": {
+    "Source": "Change the gender of yourself or a player.",
+    "Text": "切换自己或指定玩家的性别"
+  },
+  "ui.Command.LEVEL": {
+    "Source": "Set the level of yourself or a player.",
+    "Text": "设置自己或指定玩家的等级"
+  },
+  "ui.Command.LEVELHERO": {
+    "Source": "Set the level of a player's hero.",
+    "Text": "设置玩家英雄的等级"
+  },
+  "ui.Command.MAKE": {
+    "Source": "Create an item by name or index.",
+    "Text": "按名称或编号制造物品"
+  },
+  "ui.Command.CLEARBUFFS": {
+    "Source": "Remove every buff from yourself.",
+    "Text": "清除自身全部增益与减益"
+  },
+  "ui.Command.CLEARBAG": {
+    "Source": "Empty a player's inventory.",
+    "Text": "清空玩家背包"
+  },
+  "ui.Command.SUPERMAN": {
+    "Source": "Toggle GM invincibility.",
+    "Text": "开关 GM 无敌模式"
+  },
+  "ui.Command.GAMEMASTER": {
+    "Source": "Toggle GM mode.",
+    "Text": "开关 GM 模式"
+  },
+  "ui.Command.OBSERVER": {
+    "Source": "Toggle observer mode.",
+    "Text": "开关观察者模式"
+  },
+  "ui.Command.ALLOWGUILD": {
+    "Source": "Turn guild invitations on or off.",
+    "Text": "开关是否接受行会邀请"
+  },
+  "ui.Command.RECALL": {
+    "Source": "Bring a player to your side.",
+    "Text": "把指定玩家传送到自己身边"
+  },
+  "ui.Command.OBSERVE": {
+    "Source": "Observe a player; needs the target's permission unless you are a GM.",
+    "Text": "观察指定玩家，非 GM 需对方允许"
+  },
+  "ui.Command.ENABLEGROUPRECALL": {
+    "Source": "Accept or refuse group recalls.",
+    "Text": "开关是否接受组队召唤"
+  },
+  "ui.Command.GROUPRECALL": {
+    "Source": "Group leader: pull every member to your side.",
+    "Text": "队长把全体队员召唤到身边"
+  },
+  "ui.Command.RECALLMEMBER": {
+    "Source": "Group leader: pull one member to your side.",
+    "Text": "队长召唤单个队员"
+  },
+  "ui.Command.RECALLLOVER": {
+    "Source": "Pull your spouse to your side.",
+    "Text": "把配偶召唤到身边"
+  },
+  "ui.Command.TIME": {
+    "Source": "Show the server time.",
+    "Text": "显示服务器时间"
+  },
+  "ui.Command.ROLL": {
+    "Source": "Roll a dice for the group.",
+    "Text": "组队掷骰"
+  },
+  "ui.Command.MAP": {
+    "Source": "Show the current map name and identifier.",
+    "Text": "显示当前地图名称与编号"
+  },
+  "ui.Command.BACKUPPLAYER": {
+    "Source": "Write a backup copy of a character.",
+    "Text": "备份指定角色存档"
+  },
+  "ui.Command.ARCHIVEPLAYER": {
+    "Source": "Archive a character.",
+    "Text": "归档指定角色"
+  },
+  "ui.Command.LOADPLAYER": {
+    "Source": "Load an archived character.",
+    "Text": "读取已归档的角色"
+  },
+  "ui.Command.RESTOREPLAYER": {
+    "Source": "Restore an archived character onto an account.",
+    "Text": "把归档角色恢复到账号"
+  },
+  "ui.Command.MOVE": {
+    "Source": "Move to a map or to coordinates.",
+    "Text": "移动到指定地图或坐标"
+  },
+  "ui.Command.MAPMOVE": {
+    "Source": "Send yourself or your group to a map by file name.",
+    "Text": "按地图文件名移动自己或队伍"
+  },
+  "ui.Command.GOTO": {
+    "Source": "Teleport next to a player.",
+    "Text": "传送到指定玩家身边"
+  },
+  "ui.Command.MOB": {
+    "Source": "Spawn monsters near you.",
+    "Text": "在身边刷出怪物"
+  },
+  "ui.Command.RECALLMOB": {
+    "Source": "Spawn monsters as your pets.",
+    "Text": "刷出怪物作为自己的宠物"
+  },
+  "ui.Command.RELOADDROPS": {
+    "Source": "Reload the drop configuration.",
+    "Text": "重新载入掉落配置"
+  },
+  "ui.Command.RELOADNPCS": {
+    "Source": "Reload NPC scripts.",
+    "Text": "重新载入 NPC 脚本"
+  },
+  "ui.Command.CLEARIPBLOCKS": {
+    "Source": "Clear the blocked IP list.",
+    "Text": "清空 IP 封禁列表"
+  },
+  "ui.Command.GIVEGOLD": {
+    "Source": "Give gold.",
+    "Text": "发放金币"
+  },
+  "ui.Command.GIVEPEARLS": {
+    "Source": "Give pearls.",
+    "Text": "发放珍珠"
+  },
+  "ui.Command.GIVECREDIT": {
+    "Source": "Give credit.",
+    "Text": "发放点数"
+  },
+  "ui.Command.GIVESKILL": {
+    "Source": "Teach a spell.",
+    "Text": "传授技能"
+  },
+  "ui.Command.FIND": {
+    "Source": "Find the nearest monster of a kind.",
+    "Text": "查找最近的指定怪物"
+  },
+  "ui.Command.LEAVEGUILD": {
+    "Source": "Leave your current guild.",
+    "Text": "退出当前行会"
+  },
+  "ui.Command.CREATEGUILD": {
+    "Source": "Create a guild, skipping level, gold and newbie-name checks.",
+    "Text": "创建行会，跳过等级、金币与新手行会名限制"
+  },
+  "ui.Command.ALLOWTRADE": {
+    "Source": "Allow or refuse trade requests.",
+    "Text": "开关是否允许交易"
+  },
+  "ui.Command.TRIGGER": {
+    "Source": "Run an NPC trigger page.",
+    "Text": "触发 NPC 脚本页"
+  },
+  "ui.Command.RIDE": {
+    "Source": "Mount or dismount.",
+    "Text": "上马或下马"
+  },
+  "ui.Command.SETFLAG": {
+    "Source": "Set a character flag.",
+    "Text": "设置角色标记位"
+  },
+  "ui.Command.LISTFLAGS": {
+    "Source": "List the character flags that are set.",
+    "Text": "列出已开启的角色标记位"
+  },
+  "ui.Command.CLEARFLAGS": {
+    "Source": "Clear all character flags.",
+    "Text": "清除角色标记位"
+  },
+  "ui.Command.CLEARMOB": {
+    "Source": "Remove monsters from a map.",
+    "Text": "清除地图上的怪物"
+  },
+  "ui.Command.CHANGECLASS": {
+    "Source": "Change the class of yourself or a player.",
+    "Text": "更改自己或指定玩家的职业"
+  },
+  "ui.Command.DIE": {
+    "Source": "Kill yourself.",
+    "Text": "自杀"
+  },
+  "ui.Command.HAIR": {
+    "Source": "Set the hair style.",
+    "Text": "设置发型"
+  },
+  "ui.Command.DECO": {
+    "Source": "Place a decoration object.",
+    "Text": "放置装饰物"
+  },
+  "ui.Command.ADJUSTPKPOINT": {
+    "Source": "Adjust PK points.",
+    "Text": "调整 PK 值"
+  },
+  "ui.Command.AWAKENING": {
+    "Source": "Add an awakening to a worn item.",
+    "Text": "给身上装备添加觉醒"
+  },
+  "ui.Command.REMOVEAWAKENING": {
+    "Source": "Remove an awakening from a worn item.",
+    "Text": "移除身上装备的觉醒"
+  },
+  "ui.Command.STARTWAR": {
+    "Source": "Start a guild war.",
+    "Text": "发起行会战"
+  },
+  "ui.Command.ADDINVENTORY": {
+    "Source": "Buy extra inventory rows with gold.",
+    "Text": "用金币扩充背包"
+  },
+  "ui.Command.ADDSTORAGE": {
+    "Source": "Buy extra storage time with gold.",
+    "Text": "用金币扩充仓库时限"
+  },
+  "ui.Command.SUMMONHERO": {
+    "Source": "Summon or recall your hero.",
+    "Text": "召唤或收回英雄"
+  },
+  "ui.Command.ALLOWOBSERVE": {
+    "Source": "Allow or refuse being observed by other players.",
+    "Text": "开关是否允许他人观察自己"
+  },
+  "ui.Command.INFO": {
+    "Source": "Show detailed information about a monster or item.",
+    "Text": "查看怪物或物品的详细信息"
+  },
+  "ui.Command.CLEARQUESTS": {
+    "Source": "Clear quest progress.",
+    "Text": "清除任务进度"
+  },
+  "ui.Command.SETQUEST": {
+    "Source": "Set the state of a quest.",
+    "Text": "设置任务状态"
+  },
+  "ui.Command.TOGGLETRANSFORM": {
+    "Source": "Pause or resume a transform effect.",
+    "Text": "暂停或恢复变身效果"
+  },
+  "ui.Command.STARTCONQUEST": {
+    "Source": "Start a conquest.",
+    "Text": "开启攻城战"
+  },
+  "ui.Command.RESETCONQUEST": {
+    "Source": "Reset a conquest.",
+    "Text": "重置攻城战"
+  },
+  "ui.Command.GATES": {
+    "Source": "Open or close conquest gates; needs guild conquest rights.",
+    "Text": "开关攻城城门，需行会攻城权限"
+  },
+  "ui.Command.CHANGEFLAG": {
+    "Source": "Change the guild conquest flag; needs guild conquest rights.",
+    "Text": "更换行会战旗，需行会攻城权限"
+  },
+  "ui.Command.CHANGEFLAGCOLOUR": {
+    "Source": "Change the guild flag colour; needs guild conquest rights.",
+    "Text": "更换战旗颜色，需行会攻城权限"
+  },
+  "ui.Command.REVIVE": {
+    "Source": "Revive yourself or a player.",
+    "Text": "复活自己或指定玩家"
+  },
+  "ui.Command.DELETESKILL": {
+    "Source": "Remove a spell.",
+    "Text": "删除技能"
+  },
+  "ui.Command.SETTIMER": {
+    "Source": "Set a quest timer.",
+    "Text": "设置任务计时器"
+  },
+  "ui.Command.SETLIGHT": {
+    "Source": "Set your light range.",
+    "Text": "设置自身照明范围"
   }
 }

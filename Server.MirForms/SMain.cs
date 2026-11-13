@@ -506,6 +506,13 @@ namespace Server
             form.ShowDialog();
         }
 
+        private void commandListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CommandListForm form = new CommandListForm();
+
+            form.ShowDialog();
+        }
+
         private void monsterBindingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MonsterBindingForm form = new MonsterBindingForm();
