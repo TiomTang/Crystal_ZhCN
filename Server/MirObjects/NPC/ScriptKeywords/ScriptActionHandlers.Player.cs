@@ -10,7 +10,7 @@ namespace Server.MirObjects
 
         public static ScriptParseOutcome Act_Move(ScriptParseContext ctx)
         {
-            string x = ctx.Parts.Length > 3 ? ctx.Parts[2] : "0";
+            string x = ctx.Parts.Length > 2 ? ctx.Parts[2] : "0";
             string y = ctx.Parts.Length > 3 ? ctx.Parts[3] : "0";
 
             ctx.Acts.Add(new NPCActions(ActionType.Move, ctx.Parts[1], x, y));

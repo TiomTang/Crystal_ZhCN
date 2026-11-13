@@ -36,6 +36,9 @@ namespace Server.MirObjects
             new ScriptKeyword("CONQUESTSCHEDULE()", ScriptKeywordKind.Variable, ScriptKeywordCategory.Variable, "(conquest index)",
                 "War scheduled for a conquest.", 1, null),
 
+            new ScriptKeyword("CASTLEWARDATE", ScriptKeywordKind.Variable, ScriptKeywordCategory.Variable, "",
+                "Date of the next castle war.", 1, null),
+
             new ScriptKeyword("OUTPUT()", ScriptKeywordKind.Variable, ScriptKeywordCategory.Variable, "(variable)",
                 "Value of a script variable.", 1, null),
 
@@ -83,6 +86,9 @@ namespace Server.MirObjects
 
             new ScriptKeyword("WEAPON", ScriptKeywordKind.Variable, ScriptKeywordCategory.Variable, "",
                 "Name of the equipped weapon.", 1, null),
+
+            new ScriptKeyword("USERWEAPON", ScriptKeywordKind.Variable, ScriptKeywordCategory.Variable, "",
+                "Name of the equipped weapon, older alias of WEAPON.", 1, null),
 
             new ScriptKeyword("RING_L", ScriptKeywordKind.Variable, ScriptKeywordCategory.Variable, "",
                 "Name of the left ring.", 1, null),

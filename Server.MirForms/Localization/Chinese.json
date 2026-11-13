@@ -15103,5 +15103,13 @@
   "No keyword here": {
     "Source": "No keyword here",
     "Text": "此处没有可用命令"
+  },
+  "Date of the next castle war.": {
+    "Source": "Date of the next castle war.",
+    "Text": "下一次攻城战的日期。"
+  },
+  "Name of the equipped weapon, older alias of WEAPON.": {
+    "Source": "Name of the equipped weapon, older alias of WEAPON.",
+    "Text": "已装备武器的名称，WEAPON 的旧写法。"
   }
 }

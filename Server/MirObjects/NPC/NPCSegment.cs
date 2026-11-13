@@ -356,6 +356,18 @@ namespace Server.MirObjects
                         newValue = Conquest.GuildInfo.NPCRate.ToString() + "%";
                     }
                     break;
+                case "CASTLEWARDATE":
+                    {
+                        ConquestObject nextWar = Envir.Conquests
+                            .Where(x => x.WarStartTime > Envir.Now)
+                            .OrderBy(x => x.WarStartTime)
+                            .FirstOrDefault();
+
+                        newValue = nextWar == null
+                            ? GameLanguage.Get("No War Scheduled")
+                            : nextWar.WarStartTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    }
+                    break;
                 case "CONQUESTSCHEDULE()":
                     val1 = FindVariable(player, "%" + oneValMatch.Groups[2].Captures[0].Value.ToUpper());
 
@@ -426,6 +438,7 @@ namespace Server.MirObjects
                     newValue = player.Info.Equipment[(int)EquipmentSlot.Armour] != null ?
                         player.Info.Equipment[(int)EquipmentSlot.Armour].FriendlyName : GameLanguage.Get("No Armour");
                     break;
+                case "USERWEAPON":
                 case "WEAPON":
                     newValue = player.Info.Equipment[(int)EquipmentSlot.Weapon] != null ?
                         player.Info.Equipment[(int)EquipmentSlot.Weapon].FriendlyName : GameLanguage.Get("No Weapon");
@@ -1759,17 +1772,13 @@ namespace Server.MirObjects
 
                                 long remainingTime = 0;
 
-                                if (timer != null)
-                                {
-                                    remainingTime = (timer.RelativeTime - Envir.Time) / 1000;
-                                    break;
-                                }
+                                if (timer != null) remainingTime = (timer.RelativeTime - Envir.Time) / 1000;
 
-                                failed = !Compare(param[0], remainingTime, time);
+                                failed = !Compare(param[2], remainingTime, time);
                             }
                             catch (ArgumentException)
                             {
-                                MessageQueue.Enqueue(GameLanguage.Get("Incorrect operator: {0}, Page: {1}", param[0], Key));
+                                MessageQueue.Enqueue(GameLanguage.Get("Incorrect operator: {0}, Page: {1}", param[2], Key));
                                 return true;
                             }
                         }
