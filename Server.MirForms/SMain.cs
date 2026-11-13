@@ -3,6 +3,7 @@ using Server.Account;
 using Server.Database;
 using Server.MirDatabase;
 using Server.MirEnvir;
+using Server.MirForms.Scripts;
 using Server.MirForms.Systems;
 using Server.MirObjects;
 using Server.Systems;
@@ -23,9 +24,25 @@ namespace Server
             InitializeComponent();
             UiText.Apply(this);
 
+            AddScriptEditorMenu();
+
             AutoResize();
 
             Shown += SMain_Shown;
+        }
+
+        private void AddScriptEditorMenu()
+        {
+            var menu = new ToolStripMenuItem(GameLanguage.Get("Scripts"));
+            menu.DropDownItems.Add(new ToolStripMenuItem(GameLanguage.Get("Script Editor"), null, (s, e) =>
+            {
+                using (var form = new ScriptEditorForm())
+                {
+                    form.ShowDialog(this);
+                }
+            }));
+
+            MainMenu.Items.Add(menu);
         }
 
         private void SMain_Shown(object sender, EventArgs e)

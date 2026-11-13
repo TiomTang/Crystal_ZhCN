@@ -15027,5 +15027,81 @@
   "Maximum hit points of the monster.": {
     "Source": "Maximum hit points of the monster.",
     "Text": "怪物的最大生命值。"
+  },
+  "Scripts": {
+    "Source": "Scripts",
+    "Text": "脚本"
+  },
+  "Script Editor": {
+    "Source": "Script Editor",
+    "Text": "脚本编辑器"
+  },
+  "Open": {
+    "Source": "Open",
+    "Text": "打开"
+  },
+  "Save": {
+    "Source": "Save",
+    "Text": "保存"
+  },
+  "Check": {
+    "Source": "Check",
+    "Text": "校验"
+  },
+  "New Page": {
+    "Source": "New Page",
+    "Text": "新建页面"
+  },
+  "Commands": {
+    "Source": "Commands",
+    "Text": "命令"
+  },
+  "Structure": {
+    "Source": "Structure",
+    "Text": "结构"
+  },
+  "Problems": {
+    "Source": "Problems",
+    "Text": "问题"
+  },
+  "Line": {
+    "Source": "Line",
+    "Text": "行"
+  },
+  "Message": {
+    "Source": "Message",
+    "Text": "说明"
+  },
+  "Filter": {
+    "Source": "Filter",
+    "Text": "筛选"
+  },
+  "No problems found": {
+    "Source": "No problems found",
+    "Text": "没有发现问题"
+  },
+  "{0} error(s), {1} warning(s)": {
+    "Source": "{0} error(s), {1} warning(s)",
+    "Text": "{0} 个错误，{1} 个警告"
+  },
+  "The script has unsaved changes. Discard them?": {
+    "Source": "The script has unsaved changes. Discard them?",
+    "Text": "脚本有未保存的修改，确定放弃吗？"
+  },
+  "NPC script folder is not configured.": {
+    "Source": "NPC script folder is not configured.",
+    "Text": "未配置 NPC 脚本目录。"
+  },
+  "Engine rejected the script:": {
+    "Source": "Engine rejected the script:",
+    "Text": "引擎解析失败："
+  },
+  "Saved": {
+    "Source": "Saved",
+    "Text": "已保存"
+  },
+  "No keyword here": {
+    "Source": "No keyword here",
+    "Text": "此处没有可用命令"
   }
 }
