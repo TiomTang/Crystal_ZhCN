@@ -214,6 +214,14 @@ namespace Server.MirEnvir
             PasswordReg = new Regex(@"^[A-Za-z0-9]{" + Globals.MinPasswordLength + "," + Globals.MaxPasswordLength + "}$");
             EMailReg = new Regex(@"\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*");
             CharacterReg = new Regex(@"^[\u4e00-\u9fa5_A-Za-z0-9]{" + Globals.MinCharacterNameLength + "," + Globals.MaxCharacterNameLength + "}$");
+
+            ScriptDiagnostics.Sink = LogScriptDiagnostic;
+        }
+
+        /// <summary>Surfaces script problems in the server log; the collection stays queryable for tools.</summary>
+        private static void LogScriptDiagnostic(string message)
+        {
+            Logger.GetLogger(LogType.Server).Warn(message);
         }
 
         public static bool IsPasswordValid(string password)

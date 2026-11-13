@@ -143,6 +143,8 @@ namespace Server.MirObjects
 
             if (File.Exists(fileName))
             {
+                ScriptParseScope.Set(FileName + ".txt");
+
                 List<string> lines = File.ReadAllLines(fileName).ToList();
 
                 lines = ParseInsert(lines);
@@ -160,6 +162,8 @@ namespace Server.MirObjects
                         ParseDefault(lines);
                         break;
                 }
+
+                ScriptParseScope.Set(null);
             }
             else
                 MessageQueue.Enqueue(GameLanguage.Get("Script Not Found: {0}", FileName));
