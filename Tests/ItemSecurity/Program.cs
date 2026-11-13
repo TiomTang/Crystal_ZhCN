@@ -98,6 +98,36 @@ foreach (var restrict in restrictions)
 }
 
 {
+    // The same stackable reaches a bag by different creation paths: shops, quests and crafting build
+    // "fresh" items while drops, fishing and pets build theirs from the drop path. Those two paths used
+    // to disagree on the identified flag, which split identical stacks and refused every merge.
+    var p = Player();
+    var bought = Item(1, 11);
+    var dropped = Item(2, 1, bought.Info);
+    dropped.Identified = true;
+    Check(bought.CanStackWith(dropped), "Identical stackables with differing identified flags cannot stack");
+    p.Info.Inventory[0] = bought;
+    p.AddForTest(dropped);
+    Check(bought.Count == 12 && p.Info.Inventory.Count(item => item != null) == 1,
+        "Identical stackables from different sources did not auto-stack");
+
+    var mergePlayer = Player();
+    var info = new ItemInfo { Index = 654322, Name = "SecurityPotion", Type = ItemType.Potion, StackSize = 20 };
+    Envir.Main.ItemInfoList.Add(info);
+    var shopItem = Envir.Main.CreateFreshItem(info); shopItem.Count = 5;
+    var dropItem = Envir.Main.CreateDropItem(info); dropItem.Count = 3;
+    mergePlayer.Info.Inventory[0] = shopItem;
+    mergePlayer.Info.Inventory[1] = dropItem;
+    mergePlayer.StopAfterMerge = true;
+    try { mergePlayer.MergeItem(MirGridType.Inventory, MirGridType.Inventory, shopItem.UniqueID, dropItem.UniqueID); }
+    catch (MergeCompleted) { }
+    Check(mergePlayer.Packets.Last() is S.MergeItem { Success: true } && dropItem.Count == 8 &&
+        mergePlayer.Info.Inventory[0] == null,
+        "Manual merge rejected shop and drop copies of the same stackable");
+    Envir.Main.ItemInfoList.Remove(info);
+}
+
+{
     var p = Player();
     var a = Item(1);
     var expiry = new ExpireInfo { ExpiryDate = DateTime.MaxValue };

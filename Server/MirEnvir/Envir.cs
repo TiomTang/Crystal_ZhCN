@@ -4697,6 +4697,8 @@ namespace Server.MirEnvir
                 MaxDura = info.Durability
             };
 
+            if (!info.NeedIdentify) item.Identified = true;
+
             UpdateItemExpiry(item);
 
             return item;
@@ -4735,6 +4737,8 @@ namespace Server.MirEnvir
                 MaxDura = info.Durability,
                 IsShopItem = true,
             };
+
+            if (!info.NeedIdentify) item.Identified = true;
 
             return item;
         }

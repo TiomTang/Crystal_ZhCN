@@ -712,12 +712,16 @@ public class UserItem
 
     public bool CanStackWith(UserItem other)
     {
+        // Identified is intentionally not compared: it records whether the player has revealed the item,
+        // not what the item is. Freshly created items (shops, quests, crafting) are built without the flag
+        // while drops set it, so comparing it split identical stacks and refused legitimate merges.
+        // Anything the flag could conceal is still compared field by field below.
         return other != null && Info == other.Info && Info.StackSize > 1 &&
             SoulBoundId == other.SoulBoundId && RentalInformation == null && other.RentalInformation == null &&
             ExpireInfo?.ExpiryDate == other.ExpireInfo?.ExpiryDate &&
             SealedInfo?.ExpiryDate == other.SealedInfo?.ExpiryDate &&
             SealedInfo?.NextSealDate == other.SealedInfo?.NextSealDate &&
-            Cursed == other.Cursed && WeddingRing == other.WeddingRing && Identified == other.Identified &&
+            Cursed == other.Cursed && WeddingRing == other.WeddingRing &&
             CurrentDura == other.CurrentDura && MaxDura == other.MaxDura && GemCount == other.GemCount &&
             RefineAdded == other.RefineAdded && RefinedValue == other.RefinedValue &&
             RefineSuccessChance == other.RefineSuccessChance && AddedStats.Equals(other.AddedStats) &&
