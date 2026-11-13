@@ -14195,5 +14195,837 @@
   "ui.Command.SETLIGHT": {
     "Source": "Set your light range.",
     "Text": "设置自身照明范围"
+  },
+  "Compare the player's level with a value.": {
+    "Source": "Compare the player's level with a value.",
+    "Text": "比较玩家等级与指定值。"
+  },
+  "Compare the gold the player carries.": {
+    "Source": "Compare the gold the player carries.",
+    "Text": "比较玩家携带的金币。"
+  },
+  "Compare the player's credit balance.": {
+    "Source": "Compare the player's credit balance.",
+    "Text": "比较玩家的点数余额。"
+  },
+  "Check the player's gender.": {
+    "Source": "Check the player's gender.",
+    "Text": "检查玩家性别。"
+  },
+  "Check the player's class.": {
+    "Source": "Check the player's class.",
+    "Text": "检查玩家职业。"
+  },
+  "Compare the player's PK points.": {
+    "Source": "Compare the player's PK points.",
+    "Text": "比较玩家的 PK 值。"
+  },
+  "Check a player flag.": {
+    "Source": "Check a player flag.",
+    "Text": "检查玩家的标记位。"
+  },
+  "Require the account to hold a single character.": {
+    "Source": "Require the account to hold a single character.",
+    "Text": "要求账号下只有一个角色。"
+  },
+  "Check whether the player carries an item.": {
+    "Source": "Check whether the player carries an item.",
+    "Text": "检查玩家是否携带指定物品。"
+  },
+  "Compare the number of free bag slots.": {
+    "Source": "Compare the number of free bag slots.",
+    "Text": "比较背包空格数量。"
+  },
+  "Check whether the player's name is in a name list.": {
+    "Source": "Check whether the player's name is in a name list.",
+    "Text": "检查玩家名字是否在名单中。"
+  },
+  "Require the player to be married.": {
+    "Source": "Require the player to be married.",
+    "Text": "要求玩家已婚。"
+  },
+  "Require the player to be able to make a wedding ring.": {
+    "Source": "Require the player to be able to make a wedding ring.",
+    "Text": "要求玩家可以打造结婚戒指。"
+  },
+  "Compare the gold held by the guild.": {
+    "Source": "Compare the gold held by the guild.",
+    "Text": "比较公会持有的金币。"
+  },
+  "Check whether the player's guild is in a name list.": {
+    "Source": "Check whether the player's guild is in a name list.",
+    "Text": "检查玩家所在公会是否在名单中。"
+  },
+  "Check guild membership, optionally of one named guild.": {
+    "Source": "Check guild membership, optionally of one named guild.",
+    "Text": "检查是否属于公会，可指定公会名。"
+  },
+  "Check a permission of the player's guild rank.": {
+    "Source": "Check a permission of the player's guild rank.",
+    "Text": "检查玩家公会职位的权限。"
+  },
+  "Require the player's guild to own a guild territory.": {
+    "Source": "Require the player's guild to own a guild territory.",
+    "Text": "要求玩家所在公会拥有领地。"
+  },
+  "Check whether the guild can pay to repair a guard.": {
+    "Source": "Check whether the guild can pay to repair a guard.",
+    "Text": "检查公会能否支付守卫修理费。"
+  },
+  "Check whether the guild can pay to repair a gate.": {
+    "Source": "Check whether the guild can pay to repair a gate.",
+    "Text": "检查公会能否支付城门修理费。"
+  },
+  "Check whether the guild can pay to repair a wall.": {
+    "Source": "Check whether the guild can pay to repair a wall.",
+    "Text": "检查公会能否支付城墙修理费。"
+  },
+  "Check whether the guild can pay to repair a siege gate.": {
+    "Source": "Check whether the guild can pay to repair a siege gate.",
+    "Text": "检查公会能否支付攻城门的修理费。"
+  },
+  "Require the player to be the group leader.": {
+    "Source": "Require the player to be the group leader.",
+    "Text": "要求玩家是队长。"
+  },
+  "Compare the size of the player's group.": {
+    "Source": "Compare the size of the player's group.",
+    "Text": "比较队伍人数。"
+  },
+  "Require every group member to stand within nine tiles of the NPC.": {
+    "Source": "Require every group member to stand within nine tiles of the NPC.",
+    "Text": "要求所有队员都在 NPC 九格范围内。"
+  },
+  "Compare how many pets the player has.": {
+    "Source": "Compare how many pets the player has.",
+    "Text": "比较玩家的宠物数量。"
+  },
+  "Compare the level of the player's pet.": {
+    "Source": "Compare the level of the player's pet.",
+    "Text": "比较玩家宠物的等级。"
+  },
+  "Check whether the player owns a named pet.": {
+    "Source": "Check whether the player owns a named pet.",
+    "Text": "检查玩家是否拥有指定宠物。"
+  },
+  "Compare the hero's level.": {
+    "Source": "Compare the hero's level.",
+    "Text": "比较英雄等级。"
+  },
+  "Check the hero's class.": {
+    "Source": "Check the hero's class.",
+    "Text": "检查英雄职业。"
+  },
+  "Check the hero's gender.": {
+    "Source": "Check the hero's gender.",
+    "Text": "检查英雄性别。"
+  },
+  "Check whether the hero carries an item.": {
+    "Source": "Check whether the hero carries an item.",
+    "Text": "检查英雄是否携带指定物品。"
+  },
+  "Check a quest's state.": {
+    "Source": "Check a quest's state.",
+    "Text": "检查任务状态。"
+  },
+  "Check whether the player stands within range of a point.": {
+    "Source": "Check whether the player stands within range of a point.",
+    "Text": "检查玩家是否在指定坐标范围内。"
+  },
+  "Check the player's current map.": {
+    "Source": "Check the player's current map.",
+    "Text": "检查玩家当前所在地图。"
+  },
+  "Check the current map light setting.": {
+    "Source": "Check the current map light setting.",
+    "Text": "检查当前地图的光照设置。"
+  },
+  "Compare how many players are on a map.": {
+    "Source": "Compare how many players are on a map.",
+    "Text": "比较地图上的玩家数量。"
+  },
+  "Compare how many monsters are on a map.": {
+    "Source": "Compare how many monsters are on a map.",
+    "Text": "比较地图上的怪物数量。"
+  },
+  "Compare how many of one named monster are on a map.": {
+    "Source": "Compare how many of one named monster are on a map.",
+    "Text": "比较地图上指定怪物的数量。"
+  },
+  "Check whether a conquest war is running.": {
+    "Source": "Check whether a conquest war is running.",
+    "Text": "检查攻城战是否正在进行。"
+  },
+  "Check whether the player's guild may start a conquest attack.": {
+    "Source": "Check whether the player's guild may start a conquest attack.",
+    "Text": "检查玩家公会是否可以发起攻城。"
+  },
+  "Check whether the player's guild owns a conquest.": {
+    "Source": "Check whether the player's guild owns a conquest.",
+    "Text": "检查玩家公会是否拥有该攻城。"
+  },
+  "Check the day of the week.": {
+    "Source": "Check the day of the week.",
+    "Text": "检查星期几。"
+  },
+  "Compare the current hour.": {
+    "Source": "Compare the current hour.",
+    "Text": "比较当前小时。"
+  },
+  "Compare the current minute.": {
+    "Source": "Compare the current minute.",
+    "Text": "比较当前分钟。"
+  },
+  "Compare the time left on a timer.": {
+    "Source": "Compare the time left on a timer.",
+    "Text": "比较计时器剩余时间。"
+  },
+  "Check whether the player has a buff.": {
+    "Source": "Check whether the player has a buff.",
+    "Text": "检查玩家是否拥有指定增益。"
+  },
+  "Require the player to be a GM.": {
+    "Source": "Require the player to be a GM.",
+    "Text": "要求玩家是 GM。"
+  },
+  "Succeed with a one-in-N chance.": {
+    "Source": "Succeed with a one-in-N chance.",
+    "Text": "以 1/N 的概率通过。"
+  },
+  "Compare two numbers or stored variables.": {
+    "Source": "Compare two numbers or stored variables.",
+    "Text": "比较两个数值或脚本变量。"
+  },
+  "Move the player to a map position.": {
+    "Source": "Move the player to a map position.",
+    "Text": "把玩家移动到地图上的坐标。"
+  },
+  "Move the player to a map instance position.": {
+    "Source": "Move the player to a map instance position.",
+    "Text": "把玩家移动到地图的指定副本坐标。"
+  },
+  "Give gold to the player.": {
+    "Source": "Give gold to the player.",
+    "Text": "给玩家金币。"
+  },
+  "Take gold from the player.": {
+    "Source": "Take gold from the player.",
+    "Text": "扣除玩家金币。"
+  },
+  "Give gold to the player's guild.": {
+    "Source": "Give gold to the player's guild.",
+    "Text": "给玩家所在公会金币。"
+  },
+  "Take gold from the player's guild.": {
+    "Source": "Take gold from the player's guild.",
+    "Text": "扣除玩家所在公会金币。"
+  },
+  "Give credit to the player.": {
+    "Source": "Give credit to the player.",
+    "Text": "给玩家点数。"
+  },
+  "Take credit from the player.": {
+    "Source": "Take credit from the player.",
+    "Text": "扣除玩家点数。"
+  },
+  "Give pearls to the player.": {
+    "Source": "Give pearls to the player.",
+    "Text": "给玩家珍珠。"
+  },
+  "Take pearls from the player.": {
+    "Source": "Take pearls from the player.",
+    "Text": "扣除玩家珍珠。"
+  },
+  "Give an item to the player.": {
+    "Source": "Give an item to the player.",
+    "Text": "给玩家一件物品。"
+  },
+  "Take an item from the player.": {
+    "Source": "Take an item from the player.",
+    "Text": "取走玩家的一件物品。"
+  },
+  "Give experience to the player.": {
+    "Source": "Give experience to the player.",
+    "Text": "给玩家经验。"
+  },
+  "Give a pet to the player.": {
+    "Source": "Give a pet to the player.",
+    "Text": "给玩家一只宠物。"
+  },
+  "Remove a pet from the player.": {
+    "Source": "Remove a pet from the player.",
+    "Text": "收回玩家的一只宠物。"
+  },
+  "Remove every pet the player owns.": {
+    "Source": "Remove every pet the player owns.",
+    "Text": "收回玩家的全部宠物。"
+  },
+  "Jump to another page of this script.": {
+    "Source": "Jump to another page of this script.",
+    "Text": "跳转到本脚本的另一个页面。"
+  },
+  "Run a page of another script.": {
+    "Source": "Run a page of another script.",
+    "Text": "执行另一个脚本的页面。"
+  },
+  "Stop processing the rest of the page.": {
+    "Source": "Stop processing the rest of the page.",
+    "Text": "停止处理本页后续内容。"
+  },
+  "Close the NPC dialog.": {
+    "Source": "Close the NPC dialog.",
+    "Text": "关闭 NPC 对话窗口。"
+  },
+  "Add the player's name to a name list.": {
+    "Source": "Add the player's name to a name list.",
+    "Text": "把玩家名字加入名单。"
+  },
+  "Add the player's guild to a name list.": {
+    "Source": "Add the player's guild to a name list.",
+    "Text": "把玩家公会加入名单。"
+  },
+  "Remove the player's name from a name list.": {
+    "Source": "Remove the player's name from a name list.",
+    "Text": "从名单中删除玩家名字。"
+  },
+  "Remove the player's guild from a name list.": {
+    "Source": "Remove the player's guild from a name list.",
+    "Text": "从名单中删除玩家公会。"
+  },
+  "Empty a name list.": {
+    "Source": "Empty a name list.",
+    "Text": "清空名单。"
+  },
+  "Empty a guild name list.": {
+    "Source": "Empty a guild name list.",
+    "Text": "清空公会名单。"
+  },
+  "Restore hit points.": {
+    "Source": "Restore hit points.",
+    "Text": "恢复生命值。"
+  },
+  "Restore mana.": {
+    "Source": "Restore mana.",
+    "Text": "恢复魔法值。"
+  },
+  "Set the player's level.": {
+    "Source": "Set the player's level.",
+    "Text": "设置玩家等级。"
+  },
+  "Set the player's PK points.": {
+    "Source": "Set the player's PK points.",
+    "Text": "设置玩家 PK 值。"
+  },
+  "Reduce the player's PK points.": {
+    "Source": "Reduce the player's PK points.",
+    "Text": "减少玩家 PK 值。"
+  },
+  "Increase the player's PK points.": {
+    "Source": "Increase the player's PK points.",
+    "Text": "增加玩家 PK 值。"
+  },
+  "Switch the player's gender.": {
+    "Source": "Switch the player's gender.",
+    "Text": "转换玩家性别。"
+  },
+  "Change the player's class.": {
+    "Source": "Change the player's class.",
+    "Text": "改变玩家职业。"
+  },
+  "Change the player's hair style.": {
+    "Source": "Change the player's hair style.",
+    "Text": "改变玩家发型。"
+  },
+  "Show a message to players near the NPC.": {
+    "Source": "Show a message to players near the NPC.",
+    "Text": "向 NPC 附近的玩家显示消息。"
+  },
+  "Show a message to every player.": {
+    "Source": "Show a message to every player.",
+    "Text": "向所有玩家显示消息。"
+  },
+  "Teach the player a skill.": {
+    "Source": "Teach the player a skill.",
+    "Text": "教玩家一项技能。"
+  },
+  "Remove a skill from the player.": {
+    "Source": "Remove a skill from the player.",
+    "Text": "从玩家身上删除技能。"
+  },
+  "Set a player flag.": {
+    "Source": "Set a player flag.",
+    "Text": "设置玩家标记位。"
+  },
+  "Store the first page parameter.": {
+    "Source": "Store the first page parameter.",
+    "Text": "记录第一个页面参数。"
+  },
+  "Store the second page parameter.": {
+    "Source": "Store the second page parameter.",
+    "Text": "记录第二个页面参数。"
+  },
+  "Store the third page parameter.": {
+    "Source": "Store the third page parameter.",
+    "Text": "记录第三个页面参数。"
+  },
+  "Spawn monsters on the current map.": {
+    "Source": "Spawn monsters on the current map.",
+    "Text": "在当前地图刷怪。"
+  },
+  "Move the player after a delay.": {
+    "Source": "Move the player after a delay.",
+    "Text": "延迟后将玩家传送走。"
+  },
+  "Move the group after a delay.": {
+    "Source": "Move the group after a delay.",
+    "Text": "延迟后将队伍传送走。"
+  },
+  "Cancel a pending recall.": {
+    "Source": "Cancel a pending recall.",
+    "Text": "取消待执行的传送。"
+  },
+  "Go to a page after a delay.": {
+    "Source": "Go to a page after a delay.",
+    "Text": "延迟后跳转到指定页面。"
+  },
+  "Remove monsters from a map.": {
+    "Source": "Remove monsters from a map.",
+    "Text": "清除地图上的怪物。"
+  },
+  "Bring every group member to the player.": {
+    "Source": "Bring every group member to the player.",
+    "Text": "把全体队员拉到玩家身边。"
+  },
+  "Move the group to a map position.": {
+    "Source": "Move the group to a map position.",
+    "Text": "把队伍移动到地图坐标。"
+  },
+  "Store a value in a script variable.": {
+    "Source": "Store a value in a script variable.",
+    "Text": "在脚本变量中保存一个值。"
+  },
+  "Combine a script variable with a value.": {
+    "Source": "Combine a script variable with a value.",
+    "Text": "用值计算脚本变量。"
+  },
+  "Give the player a buff.": {
+    "Source": "Give the player a buff.",
+    "Text": "给玩家一个增益。"
+  },
+  "Remove a buff from the player.": {
+    "Source": "Remove a buff from the player.",
+    "Text": "移除玩家的增益。"
+  },
+  "Add the player to a guild.": {
+    "Source": "Add the player to a guild.",
+    "Text": "把玩家加入公会。"
+  },
+  "Remove the player from a guild.": {
+    "Source": "Remove the player from a guild.",
+    "Text": "把玩家移出公会。"
+  },
+  "Refresh the player's visible effects.": {
+    "Source": "Refresh the player's visible effects.",
+    "Text": "刷新玩家的可见效果。"
+  },
+  "Allow or block experience gain.": {
+    "Source": "Allow or block experience gain.",
+    "Text": "允许或禁止获得经验。"
+  },
+  "Start composing a mail.": {
+    "Source": "Start composing a mail.",
+    "Text": "开始撰写邮件。"
+  },
+  "Attach gold to the composed mail.": {
+    "Source": "Attach gold to the composed mail.",
+    "Text": "在邮件中附带金币。"
+  },
+  "Attach an item to the composed mail.": {
+    "Source": "Attach an item to the composed mail.",
+    "Text": "在邮件中附带物品。"
+  },
+  "Send the composed mail.": {
+    "Source": "Send the composed mail.",
+    "Text": "发送邮件。"
+  },
+  "Send the whole group to a page.": {
+    "Source": "Send the whole group to a page.",
+    "Text": "把整个队伍送到指定页面。"
+  },
+  "Enter the map chosen in the map dialog.": {
+    "Source": "Enter the map chosen in the map dialog.",
+    "Text": "进入地图选择框中选中的地图。"
+  },
+  "Create a wedding ring for the couple.": {
+    "Source": "Create a wedding ring for the couple.",
+    "Text": "为夫妻打造结婚戒指。"
+  },
+  "Divorce the player from their partner.": {
+    "Source": "Divorce the player from their partner.",
+    "Text": "强制玩家离婚。"
+  },
+  "Read a stored value into a variable.": {
+    "Source": "Read a stored value into a variable.",
+    "Text": "从存档读出数值到变量。"
+  },
+  "Write a variable into the value file.": {
+    "Source": "Write a variable into the value file.",
+    "Text": "把变量写入存档文件。"
+  },
+  "Repair a conquest guard.": {
+    "Source": "Repair a conquest guard.",
+    "Text": "修理攻城守卫。"
+  },
+  "Repair a conquest gate.": {
+    "Source": "Repair a conquest gate.",
+    "Text": "修理攻城城门。"
+  },
+  "Repair a conquest wall.": {
+    "Source": "Repair a conquest wall.",
+    "Text": "修理攻城城墙。"
+  },
+  "Take gold from the conquest treasury.": {
+    "Source": "Take gold from the conquest treasury.",
+    "Text": "从攻城金库扣除金币。"
+  },
+  "Set a conquest rate.": {
+    "Source": "Set a conquest rate.",
+    "Text": "设置攻城费率。"
+  },
+  "Start a conquest war.": {
+    "Source": "Start a conquest war.",
+    "Text": "发起攻城战。"
+  },
+  "Schedule a conquest war.": {
+    "Source": "Schedule a conquest war.",
+    "Text": "预约攻城战。"
+  },
+  "Open a conquest gate.": {
+    "Source": "Open a conquest gate.",
+    "Text": "打开攻城城门。"
+  },
+  "Close a conquest gate.": {
+    "Source": "Close a conquest gate.",
+    "Text": "关闭攻城城门。"
+  },
+  "Open a web page for the player.": {
+    "Source": "Open a web page for the player.",
+    "Text": "为玩家打开网页。"
+  },
+  "Store a random line of a file in a variable.": {
+    "Source": "Store a random line of a file in a variable.",
+    "Text": "从文件中随机取一行存入变量。"
+  },
+  "Play a sound for the player.": {
+    "Source": "Play a sound for the player.",
+    "Text": "为玩家播放音效。"
+  },
+  "Start or update a timer.": {
+    "Source": "Start or update a timer.",
+    "Text": "启动或更新计时器。"
+  },
+  "Expire a timer.": {
+    "Source": "Expire a timer.",
+    "Text": "让计时器到期。"
+  },
+  "Unequip an item slot.": {
+    "Source": "Unequip an item slot.",
+    "Text": "卸下指定装备栏物品。"
+  },
+  "Roll a six-sided die.": {
+    "Source": "Roll a six-sided die.",
+    "Text": "掷一次六面骰。"
+  },
+  "Play a round of yut.": {
+    "Source": "Play a round of yut.",
+    "Text": "进行一轮掷柶。"
+  },
+  "Drop items from a drop file.": {
+    "Source": "Drop items from a drop file.",
+    "Text": "按掉落文件掉落物品。"
+  },
+  "Revive the player's hero.": {
+    "Source": "Revive the player's hero.",
+    "Text": "复活玩家的英雄。"
+  },
+  "Seal the player's hero.": {
+    "Source": "Seal the player's hero.",
+    "Text": "封印玩家的英雄。"
+  },
+  "Delete the player's hero.": {
+    "Source": "Delete the player's hero.",
+    "Text": "删除玩家的英雄。"
+  },
+  "Repair every structure of a conquest.": {
+    "Source": "Repair every structure of a conquest.",
+    "Text": "修理攻城的全部建筑。"
+  },
+  "Buy the guild territory.": {
+    "Source": "Buy the guild territory.",
+    "Text": "购买公会领地。"
+  },
+  "Teleport to the guild territory.": {
+    "Source": "Teleport to the guild territory.",
+    "Text": "传送到公会领地。"
+  },
+  "Extend the territory rental.": {
+    "Source": "Extend the territory rental.",
+    "Text": "续费领地租期。"
+  },
+  "Summon a guild member to the territory.": {
+    "Source": "Summon a guild member to the territory.",
+    "Text": "把一名公会成员召唤到领地。"
+  },
+  "Summon every guild member to the territory.": {
+    "Source": "Summon every guild member to the territory.",
+    "Text": "把全体公会成员召唤到领地。"
+  },
+  "Offer the territory for sale.": {
+    "Source": "Offer the territory for sale.",
+    "Text": "将领地挂牌出售。"
+  },
+  "Cancel the territory sale.": {
+    "Source": "Cancel the territory sale.",
+    "Text": "取消领地出售。"
+  },
+  "Teach the hero a skill.": {
+    "Source": "Teach the hero a skill.",
+    "Text": "教英雄一项技能。"
+  },
+  "Remove a skill from the hero.": {
+    "Source": "Remove a skill from the hero.",
+    "Text": "删除英雄的技能。"
+  },
+  "Number of monsters on a map.": {
+    "Source": "Number of monsters on a map.",
+    "Text": "地图上的怪物数量。"
+  },
+  "Name and repair cost of a conquest guard.": {
+    "Source": "Name and repair cost of a conquest guard.",
+    "Text": "攻城守卫的名称与修理费。"
+  },
+  "Name and repair cost of a conquest gate.": {
+    "Source": "Name and repair cost of a conquest gate.",
+    "Text": "攻城城门的名称与修理费。"
+  },
+  "Name and repair cost of a conquest wall.": {
+    "Source": "Name and repair cost of a conquest wall.",
+    "Text": "攻城城墙的名称与修理费。"
+  },
+  "Name and repair cost of a siege gate.": {
+    "Source": "Name and repair cost of a siege gate.",
+    "Text": "攻城门的名称与修理费。"
+  },
+  "Guild that owns a conquest.": {
+    "Source": "Guild that owns a conquest.",
+    "Text": "拥有该攻城的公会。"
+  },
+  "Gold stored by a conquest.": {
+    "Source": "Gold stored by a conquest.",
+    "Text": "攻城金库中的金币。"
+  },
+  "NPC rate of a conquest.": {
+    "Source": "NPC rate of a conquest.",
+    "Text": "攻城的 NPC 费率。"
+  },
+  "War scheduled for a conquest.": {
+    "Source": "War scheduled for a conquest.",
+    "Text": "攻城的预约战争信息。"
+  },
+  "Value of a script variable.": {
+    "Source": "Value of a script variable.",
+    "Text": "脚本变量的值。"
+  },
+  "Name of the NPC the player is talking to.": {
+    "Source": "Name of the NPC the player is talking to.",
+    "Text": "玩家正在对话的 NPC 名称。"
+  },
+  "Name of the player.": {
+    "Source": "Name of the player.",
+    "Text": "玩家名称。"
+  },
+  "Player level.": {
+    "Source": "Player level.",
+    "Text": "玩家等级。"
+  },
+  "Player class name.": {
+    "Source": "Player class name.",
+    "Text": "玩家职业名称。"
+  },
+  "Current map file name.": {
+    "Source": "Current map file name.",
+    "Text": "当前地图文件名。"
+  },
+  "Current map X coordinate.": {
+    "Source": "Current map X coordinate.",
+    "Text": "当前地图 X 坐标。"
+  },
+  "Current map Y coordinate.": {
+    "Source": "Current map Y coordinate.",
+    "Text": "当前地图 Y 坐标。"
+  },
+  "Current hit points.": {
+    "Source": "Current hit points.",
+    "Text": "当前生命值。"
+  },
+  "Maximum hit points.": {
+    "Source": "Maximum hit points.",
+    "Text": "最大生命值。"
+  },
+  "Current mana.": {
+    "Source": "Current mana.",
+    "Text": "当前魔法值。"
+  },
+  "Maximum mana.": {
+    "Source": "Maximum mana.",
+    "Text": "最大魔法值。"
+  },
+  "Gold the player carries.": {
+    "Source": "Gold the player carries.",
+    "Text": "玩家携带的金币。"
+  },
+  "Credit the player holds.": {
+    "Source": "Credit the player holds.",
+    "Text": "玩家持有的点数。"
+  },
+  "Name of the equipped armour.": {
+    "Source": "Name of the equipped armour.",
+    "Text": "已装备盔甲的名称。"
+  },
+  "Name of the equipped weapon.": {
+    "Source": "Name of the equipped weapon.",
+    "Text": "已装备武器的名称。"
+  },
+  "Name of the left ring.": {
+    "Source": "Name of the left ring.",
+    "Text": "左手戒指的名称。"
+  },
+  "Name of the right ring.": {
+    "Source": "Name of the right ring.",
+    "Text": "右手戒指的名称。"
+  },
+  "Name of the left bracelet.": {
+    "Source": "Name of the left bracelet.",
+    "Text": "左手手镯的名称。"
+  },
+  "Name of the right bracelet.": {
+    "Source": "Name of the right bracelet.",
+    "Text": "右手手镯的名称。"
+  },
+  "Name of the necklace.": {
+    "Source": "Name of the necklace.",
+    "Text": "项链的名称。"
+  },
+  "Name of the belt.": {
+    "Source": "Name of the belt.",
+    "Text": "腰带的名称。"
+  },
+  "Name of the boots.": {
+    "Source": "Name of the boots.",
+    "Text": "靴子的名称。"
+  },
+  "Name of the helmet.": {
+    "Source": "Name of the helmet.",
+    "Text": "头盔的名称。"
+  },
+  "Name of the amulet.": {
+    "Source": "Name of the amulet.",
+    "Text": "护身符的名称。"
+  },
+  "Name of the equipped stone, or the empty text.": {
+    "Source": "Name of the equipped stone, or the empty text.",
+    "Text": "已装备宝石的名称，未装备时为空文本。"
+  },
+  "Name of the equipped torch, or the empty text.": {
+    "Source": "Name of the equipped torch, or the empty text.",
+    "Text": "已装备火把的名称，未装备时为空文本。"
+  },
+  "Current server date.": {
+    "Source": "Current server date.",
+    "Text": "当前服务器日期。"
+  },
+  "Current map light setting.": {
+    "Source": "Current map light setting.",
+    "Text": "当前地图光照设置。"
+  },
+  "Number of players online.": {
+    "Source": "Number of players online.",
+    "Text": "在线玩家数量。"
+  },
+  "Player PK points.": {
+    "Source": "Player PK points.",
+    "Text": "玩家 PK 值。"
+  },
+  "Length of a guild war.": {
+    "Source": "Length of a guild war.",
+    "Text": "公会战的时长。"
+  },
+  "Cost of starting a guild war.": {
+    "Source": "Cost of starting a guild war.",
+    "Text": "发起公会战的费用。"
+  },
+  "Number of parcels waiting to be collected.": {
+    "Source": "Number of parcels waiting to be collected.",
+    "Text": "待领取包裹数量。"
+  },
+  "Name of the player's guild.": {
+    "Source": "Name of the player's guild.",
+    "Text": "玩家所在公会名称。"
+  },
+  "Result of the last die roll.": {
+    "Source": "Result of the last die roll.",
+    "Text": "最近一次掷骰结果。"
+  },
+  "Loyalty of the equipped mount.": {
+    "Source": "Loyalty of the equipped mount.",
+    "Text": "已装备坐骑的忠诚度。"
+  },
+  "Name of the equipped mount.": {
+    "Source": "Name of the equipped mount.",
+    "Text": "已装备坐骑的名称。"
+  },
+  "Cost of extending the guild territory.": {
+    "Source": "Cost of extending the guild territory.",
+    "Text": "公会领地续费费用。"
+  },
+  "Rent of the guild territory.": {
+    "Source": "Rent of the guild territory.",
+    "Text": "公会领地租金。"
+  },
+  "Days left on the guild territory rental.": {
+    "Source": "Days left on the guild territory rental.",
+    "Text": "公会领地租期剩余天数。"
+  },
+  "Guild that owns the territory.": {
+    "Source": "Guild that owns the territory.",
+    "Text": "拥有该领地的公会。"
+  },
+  "Name of the monster.": {
+    "Source": "Name of the monster.",
+    "Text": "怪物名称。"
+  },
+  "Monster level.": {
+    "Source": "Monster level.",
+    "Text": "怪物等级。"
+  },
+  "Map file name the monster stands on.": {
+    "Source": "Map file name the monster stands on.",
+    "Text": "怪物所在地图文件名。"
+  },
+  "Map X coordinate of the monster.": {
+    "Source": "Map X coordinate of the monster.",
+    "Text": "怪物的地图 X 坐标。"
+  },
+  "Map Y coordinate of the monster.": {
+    "Source": "Map Y coordinate of the monster.",
+    "Text": "怪物的地图 Y 坐标。"
+  },
+  "Current hit points of the monster.": {
+    "Source": "Current hit points of the monster.",
+    "Text": "怪物的当前生命值。"
+  },
+  "Maximum hit points of the monster.": {
+    "Source": "Maximum hit points of the monster.",
+    "Text": "怪物的最大生命值。"
   }
 }
